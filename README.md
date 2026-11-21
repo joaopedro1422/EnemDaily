@@ -1,7 +1,12 @@
-<h1 align="center">enem.daily</h1>
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/readme/logo-escuro.png">
+    <img src="docs/readme/logo.png" width="300" alt="enem.daily">
+  </picture>
+</p>
 
 <p align="center">
-  <b>Um desafio diário de 4 questões inéditas do ENEM, geradas e revisadas por IA,<br>com um campus universitário que evolui a cada acerto.</b>
+  <b>Desafio diário com 4 questões inéditas no padrão ENEM, geradas e revisadas por IA.</b>
 </p>
 
 <p align="center">
@@ -13,44 +18,71 @@
   <img alt="PWA" src="https://img.shields.io/badge/PWA-instalável-5A0FC8">
 </p>
 
----
+## Sumário
 
-## O que é
-
-Todo dia o estudante recebe **4 questões, uma de cada área do ENEM** (Linguagens, Ciências Humanas, Ciências da Natureza e Matemática). Cada questão tem texto-base, comando e 5 alternativas, no mesmo formato da prova, e é **inédita**: foi escrita por IA na noite anterior e passou por uma revisão automática antes de ir ao ar.
-
-Acertou, ganha XP (mais rápido, mais XP), mantém a sequência de dias e **constrói uma peça do seu campus universitário**, uma cidade isométrica que cresce de um terreno vazio até uma universidade completa, com reitoria, área de lazer, hospital e praça de alimentação. Dá para competir em grupos com ranking, marcar duelos com amigos e compartilhar o resumo do dia.
-
-<p align="center">
-  <img src="docs/readme/landing.jpg" width="230" alt="Página inicial com o desafio do dia">
-  <img src="docs/readme/questao.jpg" width="230" alt="Questão aberta, já corrigida">
-  <img src="docs/readme/resolucao.jpg" width="230" alt="Resolução comentada da alternativa marcada">
-</p>
-<p align="center">
-  <img src="docs/readme/campus-obra.jpg" width="230" alt="Uma peça nova sendo construída no campus">
-  <img src="docs/readme/portal-noite.jpg" width="230" alt="Portal monumental liberado por XP, de noite">
-  <img src="docs/readme/conteudo.jpg" width="230" alt="Página de conteúdo voltada ao ENEM">
-</p>
-
-> Este repositório é o **frontend** (Angular). O backend (Spring Boot) fica em um repositório separado; as partes dele que importam para entender o projeto estão descritas abaixo.
+- [Visão geral](#visão-geral)
+- [Geração de questões com IA](#geração-de-questões-com-ia)
+  - [Resumo do pipeline](#resumo-do-pipeline)
+  - [Modelo e esforço de raciocínio](#1-modelo-e-esforço-de-raciocínio)
+  - [Saída estruturada com JSON Schema](#2-saída-estruturada-com-json-schema)
+  - [Engenharia de prompt](#3-engenharia-de-prompt)
+  - [Exemplos reais como referência](#4-exemplos-reais-como-referência)
+  - [Resolvedor cego e revisor](#5-resolvedor-cego-e-revisor)
+  - [Loop de revisão](#6-loop-de-revisão)
+  - [Verificações determinísticas](#7-verificações-determinísticas)
+  - [Robustez e custo](#8-robustez-e-custo)
+  - [Conteúdo de estudo com revisão humana](#9-conteúdo-de-estudo-com-revisão-humana)
+- [Backend](#backend)
+- [Frontend](#frontend)
+- [Como rodar](#como-rodar)
 
 ---
 
-## A parte que mais me orgulha: a geração de questões com IA
+## Visão geral
 
-Gerar uma questão "parecida com o ENEM" é fácil. Gerar uma questão **que um professor não conseguiria derrubar em recurso** é outra história. A primeira versão do projeto fazia uma chamada só e confiava no resultado, e os problemas apareciam todo dia: alternativas absurdas, conta errada em Matemática, resposta óbvia, a alternativa certa sempre a mais longa.
+- **4 questões por dia**, uma de cada área do ENEM: Linguagens, Ciências Humanas, Ciências da Natureza e Matemática.
+- **Questões inéditas**, geradas por IA na noite anterior e aprovadas por um pipeline de revisão automática.
+- **Formato oficial:** texto-base, comando e 5 alternativas, com 3min30 por questão.
+- **Correção comentada**, focada na alternativa marcada.
+- **XP por acerto** (quanto mais rápido, mais XP) e sequência de dias.
+- **Uma animação de campus universitário que evolui a cada acerto seu**, com estruturas especiais liberadas por metas.
+- **Social:** grupos com ranking, duelos diários entre amigos e resumo do dia compartilhável.
 
-Então eu parei de tratar a IA como "a resposta" e passei a tratar como **um elaborador que precisa ser conferido**, do jeito que a banca do Inep trabalha: alguém escreve, outra pessoa resolve sem saber o gabarito, um revisor avalia e o item volta para correção quando precisa. Em cima disso, tudo o que dá para conferir com código é conferido com código.
+<p align="center">
+  <img src="docs/readme/painel.jpg" width="230" alt="Painel inicial com o desafio do dia">
+  <img src="docs/readme/questao.jpg" width="230" alt="Questão respondida e corrigida">
+  <img src="docs/readme/resolucao.jpg" width="230" alt="Resolução da alternativa marcada">
+</p>
+<p align="center">
+  <img src="docs/readme/campus-obra.jpg" width="230" alt="Campus com uma peça nova em construção">
+  <img src="docs/readme/conteudo.jpg" width="230" alt="Página de conteúdo de estudo">
+</p>
+
+> Este repositório contém o **frontend** (Angular). O backend (Spring Boot) fica em um repositório separado e está descrito abaixo.
+
+---
+
+## Geração de questões com IA
+
+### Resumo do pipeline
+
+Uma chamada única ao modelo gera questões com problemas frequentes: conta errada, mais de uma resposta defensável, distratores absurdos e o gabarito sempre na alternativa mais longa. Por isso a geração segue o mesmo fluxo de uma banca de elaboração:
+
+1. **Elaborar:** o modelo escreve o item com base na Matriz de Referência da área e em textos-base de questões reais do ENEM.
+2. **Verificar com código:** o Java confere as regras de formato e **refaz as contas**.
+3. **Resolver às cegas:** outra chamada resolve o item sem conhecer o gabarito.
+4. **Revisar:** um revisor avalia o item com uma rubrica de 11 critérios.
+5. **Corrigir ou publicar:** se alguma etapa reprovar, o item volta ao elaborador com todos os apontamentos. Se tudo passar, vira a questão do dia.
 
 ```mermaid
 flowchart LR
     A[Assunto da fila] --> B[Busca textos-base reais<br>do ENEM no Postgres]
-    B --> C[Elaborador<br>GPT-5.5 · raciocínio alto]
-    C --> D{Verificação em Java<br>regras do Inep + contas}
-    D -- reprovou --> R[Revisão com a<br>lista de problemas]
-    D -- passou --> E[Sistema embaralha<br>as alternativas]
-    E --> F[Resolvedor cego<br>sem saber o gabarito]
-    E --> G[Revisor<br>rubrica de 11 critérios]
+    B --> C[Elaborador<br>GPT-5.5 · xhigh]
+    C --> D{Verificação em Java<br>regras + contas}
+    D -- reprovou --> R[Feedback estruturado]
+    D -- passou --> E[Sistema define a<br>ordem das alternativas]
+    E --> F[Resolvedor cego<br>high]
+    E --> G[Revisor<br>medium]
     F --> H{Aprovado?}
     G --> H
     H -- não --> R
@@ -58,89 +90,98 @@ flowchart LR
     H -- sim --> I[(Questão do dia)]
 ```
 
-### 1. Modelo e esforço de raciocínio por etapa
+### 1. Modelo e esforço de raciocínio
 
-Uso o **GPT-5.5 pela Responses API**, chamando a API direto com `java.net.http` (a biblioteca de IA que eu usava antes não expunha o controle de raciocínio). Cada etapa tem o seu nível de *reasoning effort*, configurável:
+O modelo é o **GPT-5.5**, acessado pela **Responses API**. O cliente HTTP é próprio, feito com `java.net.http`, para ter controle total dos parâmetros. Cada etapa usa um nível de *reasoning effort*, configurável por propriedade:
 
-| Etapa | Esforço | Por quê |
+| Etapa | Esforço | Motivo |
 |---|---|---|
-| Elaborar a questão | `xhigh` | É onde nasce a qualidade: contas limpas, distratores que fazem sentido, texto-base que não é pretexto. |
-| Resolver às cegas | `high` | Precisa achar dupla resposta e erro de conta, mas não precisa escrever nada longo. |
-| Revisar | `medium` | Julga estilo e homogeneidade; a parte crítica já é coberta pelo Java e pelo resolvedor. |
+| Elaborar | `xhigh` | Define a qualidade do item: contas consistentes, distratores plausíveis e texto-base necessário. |
+| Resolver às cegas | `high` | Precisa encontrar dupla resposta e erro de cálculo, com saída curta. |
+| Revisar | `medium` | Avalia estilo e homogeneidade; a parte crítica já é coberta pelo Java e pelo resolvedor. |
 
-Testei os níveis e medi: **uma questão aprovada de primeira custa cerca de US$ 0,40**. No nível baixo o custo empatava, porque o item reprovava e gerava mais rodadas de revisão. Barato que sai caro.
+Os níveis foram escolhidos por medição. Com esforço baixo, o item reprovava com mais frequência e as rodadas extras de revisão anulavam a economia. Na configuração atual, **uma questão aprovada custa cerca de US$ 0,40**.
 
-### 2. Saída estruturada com JSON Schema estrito
+### 2. Saída estruturada com JSON Schema
 
-Nada de pedir "responda em JSON" e torcer. Cada etapa tem um **JSON Schema com `strict: true`** (Structured Outputs), então a resposta sempre chega no formato certo e eu converto direto para `record`s Java.
+Todas as etapas usam **Structured Outputs com `strict: true`**. A resposta sempre respeita o schema e é desserializada direto em `record`s Java, sem parsing frágil de texto.
 
-O detalhe de que mais gosto é **a ordem dos campos**. O modelo gera o JSON na ordem do schema, então eu uso essa ordem para guiar o raciocínio:
+A **ordem dos campos** no schema também guia o raciocínio, porque o modelo gera o JSON na ordem definida:
 
-- **`verificacao_numerica` vem antes das alternativas.** O modelo se compromete com a conta antes de escrever as opções.
-- **Em cada distrator, `hipotese_de_erro` vem antes do `texto`.** Primeiro ele decide *qual erro real* aquela alternativa representa ("esqueceu de converter minutos em horas") e só depois escreve a alternativa. Foi isso que acabou com as alternativas absurdas.
-- O revisor lista os **problemas antes das notas** e as notas antes do veredito, para não dar a nota primeiro e justificar depois.
+- `verificacao_numerica` vem **antes** das alternativas, então o cálculo é fixado antes das opções serem escritas.
+- Em cada distrator, `hipotese_de_erro` vem **antes** do `texto`. O modelo primeiro define qual erro real aquela alternativa representa (ex.: "não converteu minutos em horas") e só depois a escreve. Isso elimina distratores sem sentido.
+- No revisor, a lista de problemas vem antes das notas e as notas antes do veredito. Assim o veredito é consequência da análise, e não o contrário.
 
-### 3. Prompt fixo + módulo dinâmico por área
+### 3. Engenharia de prompt
 
-O prompt do elaborador é dividido em duas partes:
+O prompt do elaborador tem duas partes.
 
-- **Uma parte fixa**, escrita a partir do *Guia de Elaboração e Revisão de Itens* do Inep, com as regras organizadas em seções com tags (`<regras_do_texto_base>`, `<regras_das_alternativas>`, `<rigor>`…):
-  - **o texto-base não pode ser pretexto:** escondendo o texto, deve ser impossível acertar;
-  - **comando positivo:** proibido "exceto", "incorreta" e "não";
-  - **distratores plausíveis**, sem pegadinha e sem "todas as anteriores";
-  - **alternativas homogêneas**, sem o gabarito se destacar;
-  - **honestidade nas fontes:** nunca inventar autor, livro ou dado.
-- **Um módulo por área**, carregado conforme a questão. Ele traz a **Matriz de Referência oficial** (competências e habilidades H1 a H30), os objetos de conhecimento, como os itens daquela área costumam ser e os **distratores típicos**. Em Matemática, por exemplo: esquecer a conversão de unidade, confundir raio com diâmetro, aplicar a porcentagem sobre a base errada.
+**Parte fixa**, baseada no *Guia de Elaboração e Revisão de Itens* do Inep e organizada em seções com tags (`<regras_do_texto_base>`, `<regras_das_alternativas>`, `<rigor>`):
+- o texto-base precisa ser necessário: sem ele, não deve ser possível acertar;
+- o comando é sempre positivo, sem "exceto", "incorreta" ou "não";
+- os distratores são plausíveis, sem pegadinha e sem "todas as anteriores";
+- as alternativas são homogêneas em tamanho e estrutura;
+- nenhuma fonte, autor ou dado pode ser inventado.
 
-A parte fixa vem primeiro e é sempre igual, o que aproveita o **cache de prompt** da OpenAI (uso `prompt_cache_key` por etapa e por área).
+**Módulo dinâmico por área**, carregado conforme a questão:
+- competências e habilidades da **Matriz de Referência oficial** (H1 a H30);
+- objetos de conhecimento e o formato típico dos itens daquela área;
+- **distratores típicos**. Em Matemática, por exemplo: esquecer a conversão de unidade, confundir raio com diâmetro, aplicar a porcentagem sobre a base errada.
 
-### 4. Âncoras de estilo com questões reais (RAG simples)
+A parte fixa fica no início e não muda entre chamadas, o que aproveita o **cache de prompt** da OpenAI (`prompt_cache_key` por etapa e por área).
 
-Tenho no Postgres **2.193 questões oficiais do ENEM**. Antes de elaborar, busco por *full-text search* os textos-base de questões reais do mesmo assunto (ou da mesma área, se não houver) e coloco no prompt **como referência de gênero, tamanho e forma de citar fontes**, com a instrução explícita de não copiar nem reaproveitar o contexto. Também mando os últimos itens publicados naquela área, para o modelo não repetir a situação de ontem.
+### 4. Exemplos reais como referência
 
-### 5. Um resolvedor que não sabe o gabarito
+O banco tem **2.193 questões oficiais do ENEM**. Antes de elaborar, o sistema busca por *full-text search* no Postgres os textos-base do mesmo assunto (ou da mesma área, se não houver) e os inclui no prompt como **referência de gênero textual, tamanho e forma de citar fontes**, com instrução explícita para não copiar o conteúdo. Os itens publicados recentemente na área também vão no prompt, para evitar repetição de tema e situação.
 
-Depois de elaborado, o item vai para **outra chamada que resolve do zero**, sem o gabarito. Ela devolve a letra escolhida, a confiança e um julgamento de cada alternativa (correta, incorreta ou "defensável em recurso"), além de sinais como `mais_de_uma_defensavel`, `erro_conceitual_ou_de_calculo` e `texto_base_dispensavel`.
+### 5. Resolvedor cego e revisor
 
-Se o resolvedor marca outra letra ou acha uma segunda alternativa defensável, a questão **não vai ao ar**: volta para revisão com o raciocínio dele anexado.
+**Resolvedor cego:** uma chamada independente resolve o item **sem conhecer o gabarito**. Retorna:
+- a letra escolhida e o nível de confiança;
+- a avaliação de cada alternativa (correta, incorreta ou defensável em recurso);
+- sinais como `mais_de_uma_defensavel`, `erro_conceitual_ou_de_calculo` e `texto_base_dispensavel`.
 
-### 6. Um revisor com rubrica
+Se ele escolhe outra letra ou encontra uma segunda alternativa defensável, o item é reprovado.
 
-Em paralelo, um revisor avalia o item completo, com gabarito, hipóteses de erro, resolução e alertas automáticos. Ele dá nota de 1 a 5 em 11 critérios (fidelidade ao ENEM, unicidade do gabarito, plausibilidade dos distratores, correção conceitual…) e lista cada problema com **gravidade, local e como corrigir**. Para aprovar, todas as notas precisam ser 4 ou 5 e não pode haver problema grave.
+**Revisor:** recebe o item completo, com gabarito, hipóteses de erro e os alertas automáticos. Atribui nota de 1 a 5 em **11 critérios**, entre eles fidelidade ao ENEM, unicidade do gabarito, plausibilidade dos distratores e correção conceitual. Cada problema vem com gravidade, local e sugestão de correção. A aprovação exige todas as notas ≥ 4 e nenhum problema grave.
 
-### 7. Revisão em loop, com feedback que o modelo entende
+### 6. Loop de revisão
 
-Quando algo falha, eu junto tudo num só retorno: os erros do Java, o raciocínio do resolvedor e os apontamentos do revisor. Um cuidado que fez diferença: o resolvedor e o revisor falam em letras ("a alternativa C também serve"), mas o elaborador nunca viu as letras, porque **quem embaralha é o sistema**. Então mando junto a ordem em que as alternativas foram apresentadas, para o feedback fazer sentido.
+Quando há reprovação, os erros do Java, o raciocínio do resolvedor e os apontamentos do revisor são consolidados em um único feedback para o elaborador.
 
-São no máximo 2 revisões por rascunho e 2 rascunhos. Se nada for aprovado sem ressalvas, publico a melhor versão que passou nas checagens de **correção**; erro de gabarito nunca passa.
+Como a ordem das alternativas é definida pelo sistema, o elaborador nunca vê as letras. O feedback inclui então o mapeamento entre letras e alternativas, para que referências como "a alternativa C também serve" façam sentido.
 
-### 8. O que dá para conferir com código, eu confiro com código
+Os limites são 2 revisões por rascunho e 2 rascunhos. Se nenhum item for aprovado sem ressalvas, publica-se a melhor versão entre as que passaram nos critérios de **correção**; erro de gabarito nunca é aceito.
 
-A IA não é a última palavra. Antes de qualquer avaliação por IA, o item passa por uma **verificação determinística em Java**:
+### 7. Verificações determinísticas
 
-- exatamente 5 alternativas e 1 correta, sem repetição;
+Tudo o que pode ser verificado por código é verificado antes das etapas de IA:
+
+- 5 alternativas, exatamente 1 correta e nenhuma repetida;
 - comando sem termos negativos;
-- nenhuma menção a letra ("a alternativa C"), já que a ordem muda depois;
-- gabarito não muito mais longo que os distratores (o truque clássico de quem chuta);
-- texto-base com tamanho mínimo, sem referência a figuras que não existem e com tabela bem formada.
+- nenhuma menção a letras de alternativas, já que a ordem é definida depois;
+- gabarito sem ser muito mais longo que os distratores;
+- tamanho mínimo do texto-base e ausência de referência a figuras inexistentes.
 
-E principalmente: **as contas são refeitas**. O elaborador entrega a expressão do cálculo (`150 * 0.8 * 1.1`) e um **avaliador de expressões que eu escrevi** (parser recursivo, sem `eval`) recalcula e compara com o valor do gabarito. Se não bater, o item volta. Foi isso que resolveu os erros de conta em Matemática.
+**Recálculo numérico:** o elaborador entrega a expressão do cálculo (ex.: `150 * 0.8 * 1.1`). Um **avaliador de expressões próprio** (parser recursivo, sem `eval`) recalcula o resultado e compara com o gabarito, considerando arredondamento. Se não bater, o item volta para revisão.
 
-### 9. A ordem das alternativas é decisão do sistema, não da IA
+**Posição do gabarito:** modelos tendem a repetir posições, então a ordem final é definida pelo sistema. Alternativas numéricas ficam em ordem crescente, como recomenda o Inep. As textuais são embaralhadas, com o gabarito na letra menos usada nas últimas questões.
 
-Modelos têm vícios de posição. Por isso o sistema monta a ordem final: alternativas **numéricas em ordem crescente**, como o Inep recomenda, e as textuais embaralhadas com o gabarito indo para a **letra menos usada nas últimas questões**, para não criar padrão.
+**Sanitização:** o HTML retornado pela IA passa por uma lista de tags permitidas antes de ser salvo.
 
-### 10. Robustez de produção
+### 8. Robustez e custo
 
-- **Modo background da Responses API, com polling:** chamadas de raciocínio longo não dependem de uma conexão HTTP aberta por minutos.
-- **Retentativas com backoff** em 429/5xx, respeitando o `retry-after`, e limite de tempo por chamada.
-- **Custo de cada chamada no log** (tokens de entrada, cache, saída e raciocínio) e **status da geração em tempo real** no painel de admin.
-- **Sanitização do HTML** que a IA devolve, com lista de tags permitidas, antes de chegar na tela.
-- **Geração agendada às 20h** para o dia seguinte, com uma **repescagem às 00h05** para as áreas que falharam.
+- **Background mode com polling**, para que chamadas longas de raciocínio não dependam de uma conexão aberta por minutos.
+- **Retentativas com backoff** em 429/5xx, respeitando `retry-after`.
+- **Log de custo por chamada**, com tokens de entrada, cache, saída e raciocínio.
+- **Status da geração em tempo real** no painel de admin.
+- **Agendamento:** geração às 20h para o dia seguinte e repescagem às 00h05 para as áreas que falharam.
 
-### Também usei IA para conteúdo, com revisão humana
+### 9. Conteúdo de estudo com revisão humana
 
-Cada assunto do ENEM pode ganhar uma **página de estudo para SEO**: resumo, "como cai no ENEM" (com as habilidades da Matriz) e "para não errar". O rascunho sai do mesmo pipeline, com prompt próprio e schema estrito, por cerca de US$ 0,10. Mas nada vai ao ar sem eu revisar e publicar pelo editor do admin, que tem pré-visualização e prévia de como a página aparece no Google.
+Cada assunto pode ter uma **página de estudo voltada para SEO**, com resumo, "como cai no ENEM" (relacionando habilidades da Matriz) e erros comuns. O rascunho é gerado com prompt e schema próprios, a cerca de US$ 0,10 por página.
+
+Nenhuma página é publicada automaticamente: a revisão e a publicação são feitas no editor do admin, que mostra a pré-visualização e a prévia do resultado no Google.
 
 <p align="center">
   <img src="docs/readme/admin-conteudo.jpg" width="300" alt="Editor de conteúdo no admin">
@@ -148,55 +189,53 @@ Cada assunto do ENEM pode ganhar uma **página de estudo para SEO**: resumo, "co
 
 ---
 
-## Regras de negócio no lugar certo
+## Backend
 
-Uma decisão que eu fiz questão de corrigir: **o gabarito não sai do servidor antes da resposta.** A questão chega ao app sem a alternativa correta, sem análise e sem resolução. O app manda só a alternativa marcada e o tempo gasto; quem corrige e calcula o XP (com o bônus de sequência) é o backend, que também impede responder duas vezes a mesma área no dia. Depois de respondida, a questão pode ser reaberta já corrigida, com a resposta que a pessoa marcou.
+**Stack:** Java 21, Spring Boot 3.5, Spring Data JPA, PostgreSQL e JWT.
 
----
-
-## Backend (Spring Boot)
-
-- **Java 21, Spring Boot 3.5, Spring Data JPA, PostgreSQL** e autenticação com **JWT**.
-- **Cliente da OpenAI próprio** (Responses API, Structured Outputs, background mode, retentativas), sem depender de SDK.
-- **Web Push implementado na mão**, com a criptografia do próprio JDK: cifragem `aes128gcm` (RFC 8291) e assinatura **VAPID** ES256 (RFC 8292). Há lembretes às 10h e às 20h, este citando a sequência de dias ("Não perca a sua sequência de 12 dias").
-- **Comunidade:** amizades, bloqueios e duelos diários com placar ao vivo.
+- **Correção no servidor:** a questão chega ao app sem gabarito, análise ou resolução. O app envia só a alternativa marcada e o tempo gasto. O backend corrige, calcula o XP (com bônus de sequência) e bloqueia uma segunda resposta para a mesma área no dia.
+- **Cliente OpenAI próprio:** Responses API, Structured Outputs, background mode e retentativas, sem SDK.
+- **Web Push implementado com a criptografia do JDK:** cifragem `aes128gcm` (RFC 8291) e assinatura VAPID ES256 (RFC 8292). Envia lembretes às 10h e às 20h; o das 20h menciona a sequência atual.
+- **Comunidade:** amizades, bloqueios e duelos diários com placar.
 - **Painel de admin:**
-  - números do dia e calendário de atividade;
-  - busca de usuários e **exclusão em cascata** em transação única, inclusive as fotos no Firebase;
-  - gestão dos assuntos da fila de geração;
-  - botão para gerar as questões do dia.
-- **Configurações da conta:** troca de nome de usuário com checagem de disponibilidade, e-mail e senha, com as regras validadas no servidor.
+  - métricas do dia e calendário de atividade;
+  - busca de usuários e exclusão em cascata em uma única transação, incluindo as fotos no Firebase;
+  - gestão da fila de assuntos;
+  - disparo manual da geração.
+- **Conta:** troca de nome de usuário (com checagem de disponibilidade), e-mail e senha, validada no servidor.
 
 <p align="center">
   <img src="docs/readme/admin.jpg" width="620" alt="Painel de admin">
 </p>
 
-## Frontend (este repositório)
+## Frontend
 
-- **Angular 19** com componentes *standalone*, control flow novo (`@if`, `@for`, `@defer`) e design system próprio em tokens CSS, com tema claro e escuro.
-- **Motor isométrico do campus em SVG, feito do zero:**
+**Stack:** Angular 19 com componentes *standalone* e control flow novo (`@if`, `@for`, `@defer`).
+
+- **Design system próprio** em tokens CSS, com tema claro e escuro.
+- **Motor isométrico do campus em SVG:**
   - mais de 400 peças entre prédios, andares, terrenos e acabamentos;
-  - versão de dia e de noite;
-  - animação de construção e câmera que vai até a obra nova;
+  - versões de dia e de noite;
+  - animação de construção e câmera que acompanha a obra nova;
   - estruturas especiais liberadas por metas (acertos, dias ativos, XP).
-- **PWA instalável:** abertura animada só no app instalado, aviso de nova versão e notificações push.
-- **Sons gerados pela Web Audio API**, sem nenhum arquivo de áudio: a caneta marcando a bolha, o "pop" da construção, uma nota por bolinha no resumo do dia, o fogo da sequência. Tudo pode ser desligado no menu.
-- **Resumo do dia compartilhável:** a imagem é desenhada em `canvas` e enviada pelo menu de compartilhar do celular.
-- **Desempenho:** rotas carregadas sob demanda e landing só para visitantes. O carregamento inicial caiu de **1,86 MB para 1,19 MB**.
-- **SEO sem reescrever o app para SSR:** um script roda no build da Vercel e gera o HTML pronto de cada página de conteúdo, mais o `sitemap.xml` e o `robots.txt`. O Google lê o texto completo, e o Angular assume em seguida. Publicar um conteúdo no admin dispara um novo deploy por *deploy hook*.
+- **PWA instalável**, com aviso de nova versão e notificações push.
+- **Sons sintetizados com Web Audio API**, sem arquivos de áudio, com opção de desligar.
+- **Resumo do dia compartilhável**, com a imagem desenhada em `canvas` e enviada pelo compartilhamento nativo do celular.
+- **Desempenho:** rotas lazy e landing carregada só para visitantes. O bundle inicial caiu de **1,86 MB para 1,19 MB**.
+- **SEO sem SSR:** no build da Vercel, um script gera o HTML estático de cada página de conteúdo, além do `sitemap.xml` e do `robots.txt`. Publicar um conteúdo no admin dispara um novo deploy por *deploy hook*.
 
 ---
 
-## Rodando localmente
+## Como rodar
 
 ```bash
 npm install
 npx ng serve
 ```
 
-O app abre em `http://localhost:4200` e espera o backend em `http://localhost:8080`.
+O app abre em `http://localhost:4200` e usa o backend em `http://localhost:8080`.
 
-Para o build de produção com as páginas de conteúdo pré-renderizadas:
+Build de produção com as páginas de conteúdo pré-renderizadas:
 
 ```bash
 API_URL=https://sua-api SITE_URL=https://seu-site npm run build:vercel
@@ -205,5 +244,5 @@ API_URL=https://sua-api SITE_URL=https://seu-site npm run build:vercel
 ---
 
 <p align="center">
-  Feito por <a href="https://github.com/joaopedro1422">João Pedro</a>, do design do campus ao pipeline de IA.
+  Desenvolvido por <a href="https://github.com/joaopedro1422">João Pedro</a>.
 </p>
