@@ -172,7 +172,8 @@ Tudo o que pode ser verificado por código é verificado antes das etapas de IA:
 
 ### 9. Blog de estudos sobre os conteúdos
 
-Aqui a ideia é que o aluno também possa obter mais conhecimentos dentro da própria plataforma, com páginas de estudo sobre os principais assuntos presentes no ENEM, também geradas por IA.
+Aqui a ideia é que o aluno também possa obter mais conhecimentos dentro da própria plataforma, com páginas de estudo sobre os principais assuntos presentes no ENEM, também geradas por IA. Além de também poder servir como porta de entrada da plataforma para pessoas que pesquisem sobre estes conteúdos no GOOGLE, através de SEO.
+
 Ex: "1° Guerra mundial" -> O modelo de IA é orientado a gerar um resumo inicial do assunto, seguido de um tópico "Como cai no enem" explicando exatamente as estratégias de estudo específicas para a prova e posteriormente uma questão de exemplo para resolver.
 
 <p align="center">
