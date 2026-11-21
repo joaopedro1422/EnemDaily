@@ -1,0 +1,41 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["problemas", "notas", "veredito", "resumo"],
+  "properties": {
+    "problemas": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["gravidade", "onde", "descricao", "como_corrigir"],
+        "properties": {
+          "gravidade": { "type": "string", "enum": ["critica", "alta", "media", "baixa"] },
+          "onde": { "type": "string", "enum": ["texto_base", "tabela", "fonte", "enunciado", "alternativas", "gabarito", "resolucao", "analise", "explicacao_assunto", "outro"] },
+          "descricao": { "type": "string" },
+          "como_corrigir": { "type": "string" }
+        }
+      }
+    },
+    "notas": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fidelidade_enem", "contextualizacao", "texto_base_indispensavel", "clareza_do_comando", "unicidade_do_gabarito", "correcao_conceitual", "plausibilidade_dos_distratores", "homogeneidade_das_alternativas", "adequacao_a_habilidade", "norma_padrao", "qualidade_do_material_de_estudo"],
+      "properties": {
+        "fidelidade_enem": { "type": "integer", "enum": [1, 2, 3, 4, 5] },
+        "contextualizacao": { "type": "integer", "enum": [1, 2, 3, 4, 5] },
+        "texto_base_indispensavel": { "type": "integer", "enum": [1, 2, 3, 4, 5] },
+        "clareza_do_comando": { "type": "integer", "enum": [1, 2, 3, 4, 5] },
+        "unicidade_do_gabarito": { "type": "integer", "enum": [1, 2, 3, 4, 5] },
+        "correcao_conceitual": { "type": "integer", "enum": [1, 2, 3, 4, 5] },
+        "plausibilidade_dos_distratores": { "type": "integer", "enum": [1, 2, 3, 4, 5] },
+        "homogeneidade_das_alternativas": { "type": "integer", "enum": [1, 2, 3, 4, 5] },
+        "adequacao_a_habilidade": { "type": "integer", "enum": [1, 2, 3, 4, 5] },
+        "norma_padrao": { "type": "integer", "enum": [1, 2, 3, 4, 5] },
+        "qualidade_do_material_de_estudo": { "type": "integer", "enum": [1, 2, 3, 4, 5] }
+      }
+    },
+    "veredito": { "type": "string", "enum": ["aprovar", "revisar", "descartar"] },
+    "resumo": { "type": "string" }
+  }
+}

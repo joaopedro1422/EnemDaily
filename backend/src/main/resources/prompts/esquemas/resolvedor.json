@@ -1,0 +1,39 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["resolucao", "alternativas", "letra_escolhida", "confianca", "problemas", "comentario"],
+  "properties": {
+    "resolucao": { "type": "string", "description": "Seu raciocínio e suas contas, de forma objetiva." },
+    "alternativas": {
+      "type": "array",
+      "description": "Julgamento de cada uma das 5 alternativas, de A a E.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["letra", "veredito", "motivo"],
+        "properties": {
+          "letra": { "type": "string", "enum": ["A", "B", "C", "D", "E"] },
+          "veredito": { "type": "string", "enum": ["correta", "incorreta", "defensavel"] },
+          "motivo": { "type": "string" }
+        }
+      }
+    },
+    "letra_escolhida": { "type": "string", "enum": ["A", "B", "C", "D", "E"] },
+    "confianca": { "type": "number", "description": "De 0 a 1." },
+    "problemas": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mais_de_uma_defensavel", "nenhuma_correta", "erro_conceitual_ou_de_calculo", "dados_insuficientes", "texto_base_dispensavel", "resposta_obvia_sem_conhecimento", "distrator_absurdo"],
+      "properties": {
+        "mais_de_uma_defensavel": { "type": "boolean" },
+        "nenhuma_correta": { "type": "boolean" },
+        "erro_conceitual_ou_de_calculo": { "type": "boolean" },
+        "dados_insuficientes": { "type": "boolean" },
+        "texto_base_dispensavel": { "type": "boolean" },
+        "resposta_obvia_sem_conhecimento": { "type": "boolean" },
+        "distrator_absurdo": { "type": "boolean" }
+      }
+    },
+    "comentario": { "type": "string", "description": "Problemas encontrados no item, com detalhes. 'Nenhum' se não houver." }
+  }
+}

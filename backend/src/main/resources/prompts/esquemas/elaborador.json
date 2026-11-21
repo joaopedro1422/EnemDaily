@@ -1,0 +1,71 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["disciplina", "competencia", "habilidade", "conceito_chave", "texto_base", "enunciado", "tipo_alternativas", "verificacao_numerica", "alternativas", "resolucao", "explicacao_assunto"],
+  "properties": {
+    "disciplina": { "type": "string", "description": "Disciplina escolar do item. Ex.: Física, Geografia, Língua Portuguesa, Matemática." },
+    "competencia": { "type": "string", "description": "Competência de área da Matriz de Referência, no formato 'C4 - texto resumido'." },
+    "habilidade": { "type": "string", "description": "Habilidade da Matriz de Referência, no formato 'H16 - texto da habilidade'." },
+    "conceito_chave": { "type": "string", "description": "Conceito central cobrado, em 1 a 4 palavras, para buscar material de estudo. Ex.: 'Regra de três composta'." },
+    "texto_base": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["paragrafos", "tabela", "fonte"],
+      "properties": {
+        "paragrafos": { "type": "array", "items": { "type": "string" }, "description": "Parágrafos do texto-base, na ordem, sem a fonte." },
+        "tabela": {
+          "anyOf": [
+            { "type": "null" },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["titulo", "colunas", "linhas", "nota"],
+              "properties": {
+                "titulo": { "type": ["string", "null"] },
+                "colunas": { "type": "array", "items": { "type": "string" } },
+                "linhas": { "type": "array", "items": { "type": "array", "items": { "type": "string" } } },
+                "nota": { "type": ["string", "null"], "description": "Informação complementar necessária para resolver o item. null na maioria dos casos; nunca 'Dados hipotéticos' ou 'Dados fictícios'." }
+              }
+            }
+          ]
+        },
+        "fonte": { "type": ["string", "null"], "description": "Referência no padrão Inep/ABNT, só para texto real de domínio público ou documento oficial. null para texto próprio." }
+      }
+    },
+    "enunciado": { "type": "string", "description": "Comando direto, impessoal e positivo." },
+    "tipo_alternativas": { "type": "string", "enum": ["numerica", "textual"] },
+    "verificacao_numerica": {
+      "anyOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["expressao", "resultado", "unidade"],
+          "properties": {
+            "expressao": { "type": "string", "description": "Conta que leva ao gabarito: números com ponto decimal, + - * / ^, parênteses e sqrt()." },
+            "resultado": { "type": "number" },
+            "unidade": { "type": ["string", "null"] }
+          }
+        }
+      ]
+    },
+    "alternativas": {
+      "type": "array",
+      "description": "Exatamente 5 alternativas, exatamente 1 correta.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["correta", "hipotese_de_erro", "texto", "valor_numerico", "analise"],
+        "properties": {
+          "correta": { "type": "boolean" },
+          "hipotese_de_erro": { "type": ["string", "null"], "description": "Nos distratores, o erro de raciocínio específico que leva a esta alternativa. null no gabarito." },
+          "texto": { "type": "string" },
+          "valor_numerico": { "type": ["number", "null"], "description": "Número exatamente como aparece na alternativa, quando numérica. null nas textuais." },
+          "analise": { "type": "string", "description": "Começa com 'CERTA.' ou 'ERRADA.' e explica o motivo específico. HTML simples, sem mencionar letras." }
+        }
+      }
+    },
+    "resolucao": { "type": "string", "description": "Raciocínio passo a passo até o gabarito, com as contas. HTML simples." },
+    "explicacao_assunto": { "type": "string", "description": "Explicação geral do assunto, de 120 a 260 palavras. HTML simples." }
+  }
+}

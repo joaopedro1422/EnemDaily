@@ -34,7 +34,6 @@
   - [Conteúdo de estudo com revisão humana](#9-conteúdo-de-estudo-com-revisão-humana)
 - [Backend](#backend)
 - [Frontend](#frontend)
-- [Como rodar](#como-rodar)
 
 ---
 
@@ -214,12 +213,8 @@ Ex: "1° Guerra mundial" -> O modelo de IA é orientado a gerar um resumo inicia
 - **Resumo do dia compartilhável**, com a imagem desenhada em `canvas` e enviada pelo compartilhamento nativo do celular.
 - **Desempenho:** rotas lazy e landing carregada só para visitantes. O bundle inicial caiu de **1,86 MB para 1,19 MB**.
 
-
 ---
 
-
-
----
 
 <p align="center">
   Desenvolvido por <a href="https://github.com/joaopedro1422">João Pedro</a>.
