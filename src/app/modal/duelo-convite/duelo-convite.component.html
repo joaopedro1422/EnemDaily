@@ -1,0 +1,59 @@
+<div class="dm" [class.fechando]="fechando" role="dialog" aria-modal="true" aria-labelledby="dc-titulo">
+  <div class="dm-fundo" (click)="sair()"></div>
+  <section class="dm-folha">
+    <header class="arena">
+      <button class="arena-fechar" type="button" (click)="sair()" aria-label="Fechar"><ed-icone nome="x" [tamanho]="18" /></button>
+      <span class="arena-sobre">{{ pronto ? 'Desafio enviado' : 'Duelo direto' }}</span>
+      <div class="versus">
+        <div class="versus-lado">
+          <span class="versus-av"><ed-avatar [valor]="eu?.avatar" [nome]="eu?.nome || eu?.usuario || ''" [tamanho]="68" [encher]="true" /></span>
+          <b>Você</b>
+        </div>
+        <div class="versus-meio"><ed-espadas [tamanho]="120" /></div>
+        <div class="versus-lado">
+          <span class="versus-av"><ed-avatar [valor]="alvo.avatar" [nome]="alvo.nome || alvo.usuario" [tamanho]="68" [encher]="true" /></span>
+          <b>&#64;{{ alvo.usuario }}</b>
+        </div>
+      </div>
+      @if (pronto) {
+        <h2 id="dc-titulo">Agora é com &#64;{{ alvo.usuario }}</h2>
+        <p>Assim que aceitar, o duelo fica marcado para {{ diaEscolhido?.titulo }}. Você vê tudo em Amigos › Duelos.</p>
+      } @else {
+        <h2 id="dc-titulo">Desafiar &#64;{{ alvo.usuario }}</h2>
+        <p>No dia marcado, vence quem fizer mais XP no desafio diário.</p>
+      }
+    </header>
+
+    <div class="dm-corpo">
+      @if (carregando) {
+        <ed-carregando />
+      } @else if (pronto) {
+        <button class="dm-pri" type="button" (click)="sair()">Fechar</button>
+      } @else if (motivoGeral) {
+        <p class="aviso-dia"><ed-icone nome="lock" [tamanho]="16" />{{ motivoGeral }}</p>
+        <button class="dm-sec" type="button" (click)="sair()">Entendi</button>
+      } @else {
+        <div>
+          <span class="dm-rotulo">Quando?</span>
+          <div class="dias" role="radiogroup" aria-label="Dia do duelo">
+            @for (d of dias; track d.iso) {
+              <button type="button" class="dia" role="radio" [class.sel]="escolhido === d.iso" [attr.aria-checked]="escolhido === d.iso" [disabled]="!d.ok" (click)="escolhido = d.iso">
+                <small>{{ d.topo }}</small><b>{{ d.numero }}</b>
+              </button>
+            }
+          </div>
+        </div>
+        @if (motivoHoje) { <p class="aviso-dia"><ed-icone nome="clock" [tamanho]="16" />{{ motivoHoje }}</p> }
+        <ul class="regras">
+          <li><i>1</i>Conta o XP das 4 questões do dia, sem o bônus de sequência.</li>
+          <li><i>2</i>Empatou no XP? Ganha quem acertou mais e, depois, quem foi mais rápido.</li>
+          <li><i>3</i>O resultado sai à meia-noite e entra no placar de vocês.</li>
+        </ul>
+        @if (erro) { <p class="dm-erro" role="alert">{{ erro }}</p> }
+        <button class="dm-pri" type="button" (click)="enviar()" [disabled]="!escolhido || enviando">
+          @if (enviando) { <ed-carregando [mini]="true" /> } @else { <ed-icone nome="swords" [tamanho]="18" />Enviar desafio para {{ diaEscolhido?.titulo }} }
+        </button>
+      }
+    </div>
+  </section>
+</div>

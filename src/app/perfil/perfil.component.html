@@ -1,0 +1,122 @@
+<div class="av-modal" [class.fechando]="fechando" role="dialog" aria-modal="true" aria-labelledby="av-titulo">
+  <div class="av-fundo" (click)="fechar()"></div>
+
+  <section class="av-folha">
+    <div class="av-alca" aria-hidden="true"></div>
+    <header class="av-cab">
+      <div>
+        <h2 id="av-titulo">Seu avatar</h2>
+        <p>É assim que você aparece nos grupos e no ranking.</p>
+      </div>
+      <button class="av-fechar" type="button" (click)="fechar()" aria-label="Fechar"><ed-icone nome="x" [tamanho]="18" /></button>
+    </header>
+
+    @if (!config) {
+      <div class="av-carregando"><ed-carregando /></div>
+    } @else if (recorte) {
+      <div class="av-recorte">
+        <p class="av-recorte-dica">Arraste para enquadrar e use o controle para aproximar.</p>
+        <div class="av-janela" [style.width.px]="janela" [style.height.px]="janela"
+             (pointerdown)="iniciarArrasto($event)" (pointermove)="arrastar($event)" (pointerup)="soltar()" (pointercancel)="soltar()">
+          <img [src]="recorte.url" alt="Prévia da foto" draggable="false"
+               [style.width.px]="larguraImg" [style.height.px]="alturaImg"
+               [style.transform]="'translate(-50%, -50%) translate(' + recorte.x + 'px, ' + recorte.y + 'px)'" />
+          <span class="av-mascara" aria-hidden="true"></span>
+        </div>
+        <label class="av-zoom">
+          <span aria-hidden="true">−</span>
+          <input type="range" min="1" max="3" step="0.01" [value]="recorte.zoom" (input)="mudarZoom($event)" aria-label="Aproximar a foto" />
+          <span aria-hidden="true">+</span>
+        </label>
+        @if (erro) { <p class="av-erro" role="alert">{{ erro }}</p> }
+        <div class="av-acoes">
+          <button class="btn-sec" type="button" (click)="cancelarRecorte()" [disabled]="salvando">Cancelar</button>
+          <button class="btn-pri" type="button" (click)="usarFoto()" [disabled]="salvando">
+            @if (salvando) { <ed-carregando [mini]="true" /> } @else { Usar esta foto }
+          </button>
+        </div>
+      </div>
+    } @else {
+      <div class="av-previa">
+        <div class="av-previa-img">
+          <ed-avatar [config]="config" [nome]="nome" [tamanho]="124" />
+        </div>
+        <div class="av-previa-info">
+          <b>{{ nome }}</b>
+          <span>&#64;{{ usuario?.usuario }}</span>
+          <div class="av-foto-botoes">
+            <label class="btn-foto">
+              <input type="file" accept="image/jpeg,image/png,image/webp" (change)="abrirArquivo($event)" />
+              <ed-icone nome="plus" [tamanho]="16" />{{ temFoto ? 'Trocar foto' : 'Usar uma foto' }}
+            </label>
+            @if (temFoto) { <button type="button" class="link" (click)="removerFoto()">Remover foto</button> }
+          </div>
+        </div>
+      </div>
+      @if (erro) { <p class="av-erro" role="alert">{{ erro }}</p> }
+
+      <nav class="av-abas" role="tablist" aria-label="Personalizar avatar">
+        <button role="tab" type="button" [attr.aria-selected]="aba === 'cor'" [class.ativa]="aba === 'cor'" (click)="aba = 'cor'" [disabled]="temFoto">Cor</button>
+        <button role="tab" type="button" [attr.aria-selected]="aba === 'motivo'" [class.ativa]="aba === 'motivo'" (click)="aba = 'motivo'" [disabled]="temFoto">Motivo</button>
+        <button role="tab" type="button" [attr.aria-selected]="aba === 'moldura'" [class.ativa]="aba === 'moldura' || (temFoto && aba !== 'curso')" (click)="aba = 'moldura'">Moldura</button>
+        <button role="tab" type="button" [attr.aria-selected]="aba === 'curso'" [class.ativa]="aba === 'curso'" (click)="aba = 'curso'">Curso</button>
+      </nav>
+
+      <div class="av-painel" role="tabpanel">
+        @switch (temFoto && (aba === 'cor' || aba === 'motivo') ? 'moldura' : aba) {
+          @case ('cor') {
+            <div class="av-grade">
+              @for (t of tintas; track t.chave) {
+                <button type="button" class="av-op" [class.sel]="config.tinta === t.chave" (click)="escolherTinta(t.chave)" [attr.aria-pressed]="config.tinta === t.chave">
+                  <ed-avatar [config]="com({ tinta: t.chave })" [nome]="nome" [tamanho]="56" />
+                  <span>{{ t.nome }}</span>
+                </button>
+              }
+            </div>
+          }
+          @case ('motivo') {
+            <div class="av-grade">
+              @for (m of motivos; track m.chave) {
+                <button type="button" class="av-op" [class.sel]="config.motivo === m.chave" [class.preso]="!livreMotivo(m.chave)" (click)="escolherMotivo(m.chave)" [attr.aria-pressed]="config.motivo === m.chave" [attr.aria-disabled]="!livreMotivo(m.chave)">
+                  <ed-avatar [config]="com({ motivo: m.chave })" [nome]="nome" [tamanho]="56" />
+                  <span>{{ m.nome }}</span>
+                  @if (!livreMotivo(m.chave)) { <small class="cadeado"><ed-icone nome="lock" [tamanho]="11" />{{ m.xp }} XP</small> }
+                </button>
+              }
+            </div>
+            <p class="av-nota">Os motivos com as cores das 4 áreas liberam com XP. Você tem {{ xp }} XP.</p>
+          }
+          @case ('moldura') {
+            <div class="av-grade">
+              @for (m of molduras; track m.chave) {
+                <button type="button" class="av-op" [class.sel]="config.moldura === m.chave" [class.preso]="!livreMoldura(m.chave)" (click)="escolherMoldura(m.chave)" [attr.aria-pressed]="config.moldura === m.chave" [attr.aria-disabled]="!livreMoldura(m.chave)">
+                  <ed-avatar [config]="com({ moldura: m.chave })" [nome]="nome" [tamanho]="56" />
+                  <span>{{ m.nome }}</span>
+                  <small [class.cadeado]="!livreMoldura(m.chave)">@if (!livreMoldura(m.chave)) { <ed-icone nome="lock" [tamanho]="11" /> }{{ m.texto }}</small>
+                </button>
+              }
+            </div>
+            <p class="av-nota">Molduras são conquistas de dias seguidos. Sua maior sequência é de {{ maiorSequencia }} {{ maiorSequencia === 1 ? 'dia' : 'dias' }}.</p>
+          }
+          @case ('curso') {
+            <div class="av-grade">
+              @for (s of selos; track s.chave) {
+                <button type="button" class="av-op" [class.sel]="config.selo === s.chave" (click)="escolherSelo(s.chave)" [attr.aria-pressed]="config.selo === s.chave">
+                  <ed-avatar [config]="com({ selo: s.chave })" [nome]="nome" [tamanho]="56" [seloDesde]="0" />
+                  <span>{{ s.nome }}</span>
+                </button>
+              }
+            </div>
+            <p class="av-nota">O selo mostra o curso que você quer passar. Ele aparece no seu perfil e nos tamanhos maiores.</p>
+          }
+        }
+      </div>
+
+      <div class="av-acoes">
+        <button class="btn-pri" type="button" (click)="salvar()" [disabled]="salvando">
+          @if (salvando) { <ed-carregando [mini]="true" /> } @else { {{ mudou ? 'Salvar avatar' : 'Pronto' }} }
+        </button>
+      </div>
+    }
+  </section>
+</div>

@@ -1,0 +1,33 @@
+:host { display: block; min-height: 100svh; background: var(--ed-papel); color: var(--ed-tinta); font-family: var(--ed-fonte); }
+.ci { max-width: var(--ed-largura); margin: 0 auto; padding: 28px 16px 72px; display: grid; gap: 32px; }
+
+.ci-topo { display: grid; gap: 12px; max-width: 760px; }
+.ci-rot { font-size: 12px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--ed-caneta-texto); }
+.ci-topo h1 { margin: 0; font-size: clamp(30px, 6.5vw, 44px); font-weight: 800; letter-spacing: -.035em; line-height: 1.08; text-wrap: balance; }
+.ci-topo p { margin: 0; font-family: var(--ed-fonte-leitura); font-size: 17.5px; line-height: 1.6; color: var(--ed-tinta-2); }
+.ci-busca { display: flex; align-items: center; gap: 10px; height: 52px; margin-top: 8px; padding: 0 16px; border-radius: 14px; border: 1.5px solid var(--ed-pauta-forte); background: var(--ed-folha); color: var(--ed-tinta-3); }
+.ci-busca:focus-within { border-color: var(--ed-caneta); box-shadow: 0 0 0 4px var(--ed-caneta-suave); }
+.ci-busca input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; color: var(--ed-tinta); font: 500 16px var(--ed-fonte); }
+.ci-areas { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; margin: 0 -16px; padding: 0 16px; }
+.ci-areas::-webkit-scrollbar { display: none; }
+.ci-areas button { flex: none; display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 12px; border-radius: 999px; border: 1.5px solid var(--ed-pauta); background: var(--ed-folha); color: var(--ed-tinta-2); font: 700 13.5px var(--ed-fonte); cursor: pointer; }
+.ci-areas button ed-icone { color: var(--c); }
+.ci-areas button small { padding: 1px 7px; border-radius: 999px; background: var(--ed-fundo-2); font-size: 11.5px; }
+.ci-areas button.on { border-color: var(--c, var(--ed-tinta)); background: color-mix(in srgb, var(--c, var(--ed-tinta)) 10%, var(--ed-folha)); color: var(--ed-tinta); }
+
+.ci-vazio { display: grid; justify-items: center; gap: 6px; padding: 48px 16px; text-align: center; color: var(--ed-tinta-2); }
+.ci-vazio b { font-size: 18px; color: var(--ed-tinta); }
+.ci-vazio p { margin: 0; }
+
+.ci-grupo h2 { display: flex; align-items: center; gap: 10px; margin: 0 0 14px; font-size: 20px; font-weight: 800; letter-spacing: -.02em; }
+.ci-grupo h2 ed-icone { color: var(--ct); }
+.ci-cards { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.ci-card { height: 100%; display: grid; grid-template-rows: auto 1fr auto; gap: 8px; padding: 18px; border-radius: 16px; background: var(--ed-folha); border: 1px solid var(--ed-pauta); border-top: 4px solid var(--c); color: var(--ed-tinta); text-decoration: none; transition: transform var(--ed-t-rapido), box-shadow var(--ed-t-rapido); }
+.ci-card:hover { transform: translateY(-2px); box-shadow: var(--ed-sombra); }
+.ci-card b { font-size: 17px; font-weight: 800; letter-spacing: -.015em; line-height: 1.25; }
+.ci-card span { font-size: 14px; line-height: 1.5; color: var(--ed-tinta-2); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.ci-card i { display: inline-flex; align-items: center; gap: 6px; font-style: normal; font-size: 13.5px; font-weight: 700; color: var(--ct); }
+
+@media (min-width: 760px) {
+  .ci { padding: 44px 24px 88px; gap: 40px; }
+}

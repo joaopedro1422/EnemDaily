@@ -1,0 +1,33 @@
+.weekly-fab {
+  position: fixed;
+  right: 16px;
+  bottom: 600px;
+  background: linear-gradient(135deg, #581dfc, #7354E3);
+  color: #fff;
+  padding: 12px 16px;
+  border-radius: 999px;
+
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+
+  box-shadow: 0 12px 30px rgba(79, 140, 255, 0.4);
+  cursor: pointer;
+  animation: pulse 3s infinite;
+  z-index: 1001;
+}
+@media (min-width: 1000px) {
+  .weekly-fab{
+    bottom: 400px;
+  }
+}
+
+.weekly-fab i {
+  font-size: 18px;
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(9, 6, 204, 0.6); }
+  70% { box-shadow: 0 0 0 15px rgba(79, 140, 255, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(79, 140, 255, 0); }
+}

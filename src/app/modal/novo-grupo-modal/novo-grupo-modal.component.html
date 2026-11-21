@@ -1,0 +1,85 @@
+<div class="ng" [class.fechando]="fechando" role="dialog" aria-modal="true" aria-labelledby="ng-titulo">
+  <div class="ng-fundo" (click)="fechar()"></div>
+
+  <section class="ng-folha">
+    <span class="ng-alca" aria-hidden="true"></span>
+
+    @if (criado) {
+      <div class="ng-pronto" aria-live="polite">
+        <span class="ng-pronto-ico">
+          <svg viewBox="0 0 52 52" aria-hidden="true"><circle cx="26" cy="26" r="24" /><path d="M15 27l7 7 15-16" /></svg>
+        </span>
+        <h2>Grupo criado!</h2>
+        <p>Abrindo {{ nome }}…</p>
+      </div>
+    } @else {
+      <header class="ng-cab">
+        <div>
+          <h2 id="ng-titulo">Novo grupo</h2>
+          <p>Monte uma competição com seus amigos.</p>
+        </div>
+        <button class="ng-fechar" type="button" (click)="fechar()" aria-label="Fechar"><ed-icone nome="x" [tamanho]="20" /></button>
+      </header>
+
+      <div class="ng-identidade">
+        <label class="ng-foto" [class.com]="previa">
+          <input type="file" accept="image/*" (change)="escolherImagem($event)" />
+          @if (previa) {
+            <img [src]="previa" alt="Foto do grupo" />
+            <span class="ng-foto-trocar"><ed-icone nome="pen-line" [tamanho]="13" /></span>
+          } @else {
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+            <span>Foto</span>
+          }
+        </label>
+        <div class="ng-campo">
+          <label for="ng-nome">Nome do grupo</label>
+          <input id="ng-nome" type="text" [(ngModel)]="nome" [maxlength]="limiteNome" placeholder="Ex.: Rumo à federal" autocomplete="off" />
+          <span class="ng-dica" [class.ok]="nome.trim().length >= 4">
+            {{ nome.trim().length < 4 ? 'Pelo menos 4 letras' : 'Ótimo nome' }}
+            <b>{{ nome.length }}/{{ limiteNome }}</b>
+          </span>
+        </div>
+      </div>
+
+      <fieldset class="ng-bloco">
+        <legend>Quem pode entrar</legend>
+        <div class="ng-privacidade">
+          <label class="opcao" [class.ativa]="privacidade === 'privado'">
+            <input type="radio" name="privacidade" value="privado" [(ngModel)]="privacidade" />
+            <span class="opcao-ico"><ed-icone nome="lock" [tamanho]="18" /></span>
+            <b>Privado</b>
+            <small>Só quem tiver o link de convite</small>
+          </label>
+          <label class="opcao" [class.ativa]="privacidade === 'publico'">
+            <input type="radio" name="privacidade" value="publico" [(ngModel)]="privacidade" />
+            <span class="opcao-ico"><ed-icone nome="globe" [tamanho]="18" /></span>
+            <b>Público</b>
+            <small>Aparece para todos em Grupos</small>
+          </label>
+        </div>
+      </fieldset>
+
+      <fieldset class="ng-bloco">
+        <legend>Áreas que pontuam <span>{{ qtdAreas }} de 4</span></legend>
+        <div class="ng-areas">
+          @for (a of areas; track a.chave) {
+            <button type="button" class="area" [class.ativa]="selecionadas[a.chave]" [style.--c]="a.cor" [style.--ct]="a.corTexto"
+                    [attr.aria-pressed]="selecionadas[a.chave]" (click)="alternar(a.chave)">
+              <span class="area-ico"><ed-icone [nome]="a.icone" [tamanho]="17" /></span>
+              <span class="area-nome">{{ a.nome }}</span>
+              <span class="area-check"><ed-icone nome="check" [tamanho]="13" [traco]="3" /></span>
+            </button>
+          }
+        </div>
+        <p class="ng-nota">{{ qtdAreas === 0 ? 'Escolha pelo menos uma área.' : 'Só os acertos dessas áreas somam pontos no ranking do grupo.' }}</p>
+      </fieldset>
+
+      @if (erro) { <p class="ng-erro">{{ erro }}</p> }
+
+      <button class="ng-criar" type="button" [disabled]="!valido || enviando" (click)="criar()">
+        @if (enviando) { <ed-carregando [mini]="true" />Criando grupo } @else { <ed-icone nome="plus" [tamanho]="18" />Criar grupo }
+      </button>
+    }
+  </section>
+</div>

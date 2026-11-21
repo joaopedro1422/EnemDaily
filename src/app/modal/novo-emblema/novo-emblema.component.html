@@ -1,0 +1,34 @@
+<div class="ne" [class.fechando]="fechando" role="dialog" aria-modal="true" aria-labelledby="ne-titulo">
+  <div class="ne-fundo"></div>
+
+  @if (emblema; as e) {
+    @for (k of [ciclo]; track k) {
+      <section class="ne-palco">
+        <div class="ne-luzes" aria-hidden="true"><i></i><i></i><i></i></div>
+
+        <header class="ne-cab">
+          <span class="ne-rotulo"><ed-icone nome="trophy" [tamanho]="14" />Nova conquista{{ emblemas.length > 1 ? ' · ' + (atual + 1) + ' de ' + emblemas.length : '' }}</span>
+          <h1 id="ne-titulo">Emblema desbloqueado</h1>
+        </header>
+
+        <div class="vitrine">
+          <span class="lampada" aria-hidden="true"></span>
+          <span class="feixe" aria-hidden="true"></span>
+          <span class="raios" aria-hidden="true"></span>
+          <div class="trofeu-wrap">
+            <img class="trofeu" [src]="e.url" alt="" />
+          </div>
+          <span class="brilho-base" aria-hidden="true"></span>
+          <span class="tabua" aria-hidden="true"></span>
+          <span class="tabua-placa">{{ e.desc }}</span>
+        </div>
+
+        <p class="ne-texto">Agora ele brilha na sua estante de conquistas, à vista de todo o seu grupo.</p>
+
+        <button class="ne-botao" type="button" (click)="continuar()">
+          {{ ultimo ? 'Guardar na estante' : 'Próximo emblema' }}<ed-icone nome="arrow-right" [tamanho]="18" />
+        </button>
+      </section>
+    }
+  }
+</div>

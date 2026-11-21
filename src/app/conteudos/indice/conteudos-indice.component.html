@@ -1,0 +1,45 @@
+<main class="ci">
+  <header class="ci-topo">
+    <span class="ci-rot">Conteúdos</span>
+    <h1>Os assuntos do ENEM, do jeito que caem na prova</h1>
+    <p>Resumo de cada assunto, como ele é cobrado no ENEM, os erros mais comuns e uma questão para treinar.</p>
+    <label class="ci-busca">
+      <ed-icone nome="search" [tamanho]="18" />
+      <input type="search" [(ngModel)]="busca" name="busca" placeholder="Buscar assunto, por exemplo: Primeira Guerra" autocomplete="off" />
+    </label>
+    <div class="ci-areas" role="group" aria-label="Filtrar por área">
+      <button type="button" [class.on]="area === ''" (click)="area = ''">Todas<small>{{ todos.length }}</small></button>
+      @for (a of areas; track a.chave) {
+        <button type="button" [class.on]="area === a.chave" [style.--c]="a.cor" (click)="area = area === a.chave ? '' : a.chave">
+          <ed-icone [nome]="a.icone" [tamanho]="15" />{{ a.curto }}<small>{{ contar(a.chave) }}</small>
+        </button>
+      }
+    </div>
+  </header>
+
+  @if (carregando) {
+    <div class="ci-vazio"><ed-carregando [tamanho]="44" /></div>
+  } @else if (!grupos.length) {
+    <div class="ci-vazio">
+      <b>{{ todos.length ? 'Nenhum assunto encontrado' : 'Os primeiros conteúdos estão sendo preparados' }}</b>
+      <p>{{ todos.length ? 'Tente outro termo ou outra área.' : 'Volte em breve.' }}</p>
+    </div>
+  } @else {
+    @for (g of grupos; track g.area) {
+      <section class="ci-grupo" [style.--c]="info(g.area).cor" [style.--ct]="info(g.area).corTexto">
+        <h2><ed-icone [nome]="info(g.area).icone" [tamanho]="18" />{{ info(g.area).nome }}</h2>
+        <ul class="ci-cards">
+          @for (c of g.itens; track c.slug) {
+            <li>
+              <a class="ci-card" [routerLink]="['/conteudos', c.area, c.slug]">
+                <b>{{ c.assunto }}</b>
+                <span>{{ c.descricao }}</span>
+                <i>Ler conteúdo<ed-icone nome="arrow-right" [tamanho]="15" /></i>
+              </a>
+            </li>
+          }
+        </ul>
+      </section>
+    }
+  }
+</main>

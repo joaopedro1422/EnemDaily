@@ -1,0 +1,244 @@
+@if (perfilAberto) {
+  <app-perfil-externo [usuarioExternoBoolean]="true" [usuarioExterno]="perfilAberto" (close)="perfilAberto = null" />
+}
+@if (exibirPodio && grupo) {
+  <app-podio-mensal [idGrupo]="idGrupo" [nomeGrupo]="grupo.nome" (close)="exibirPodio = false" />
+}
+@if (exibirConfig && grupo) {
+  <app-grupo-config [grupo]="grupo" [usuarioDemo]="!!usuario?.demo" (close)="exibirConfig = false" />
+}
+@if (mostrarLogin) {
+  <app-auth-modal (close)="mostrarLogin = false" />
+}
+
+@if (carregando) {
+  <main class="gp gp-carregando"><ed-carregando [tamanho]="56" texto="Abrindo o grupo" /></main>
+} @else if (!grupo) {
+  <main class="gp">
+    <div class="nao-achou">
+      <ed-icone nome="users" [tamanho]="28" />
+      <h1>Grupo não encontrado</h1>
+      <p>O link pode estar errado ou o grupo foi removido.</p>
+      <button class="btn-pri" type="button" (click)="voltar()">Ver meus grupos</button>
+    </div>
+  </main>
+} @else if (mostrarConvite) {
+  <main class="convite" [class.saindo]="saindoConvite">
+    <div class="convite-card">
+      <div class="convite-brilho" aria-hidden="true"></div>
+      <img class="convite-img" [src]="grupo.img" alt="" />
+      <span class="convite-rotulo">Convite para competir</span>
+      <h1>{{ grupo.nome }}</h1>
+      <div class="chips claros">
+        <span><ed-icone nome="users" [tamanho]="14" />{{ qntMembros }} {{ qntMembros === 1 ? 'membro' : 'membros' }}</span>
+        <span><ed-icone nome="zap" [tamanho]="14" />{{ formatarNumero(mediaXp) }} XP de média</span>
+      </div>
+      @if (ranking.length) {
+        <div class="pilha" aria-hidden="true">
+          @for (u of ranking.slice(0, 5); track u.usuario) {
+            <span class="av"><ed-avatar [valor]="u.avatar" [nome]="u.usuario" [tamanho]="40" [encher]="true" /></span>
+          }
+          @if (ranking.length > 5) { <span class="av mais">+{{ ranking.length - 5 }}</span> }
+        </div>
+      }
+      <p>Responda o desafio diário e dispute o topo do ranking com o grupo.</p>
+      <button class="btn-entrar" type="button" [disabled]="entrando" (click)="entrarNoGrupo()">
+        @if (entrando) { <ed-carregando [mini]="true" />Entrando } @else { <ed-icone nome="user-plus" [tamanho]="18" />Entrar no grupo }
+      </button>
+      @if (msgErro) { <p class="convite-erro">{{ msgErro }}</p> }
+    </div>
+  </main>
+} @else {
+<main class="gp">
+
+  <header class="hero">
+    <div class="hero-barra">
+      <button class="btn-ico" type="button" (click)="voltar()" aria-label="Voltar aos grupos"><ed-icone class="volta" nome="chevron-right" [tamanho]="20" /></button>
+      <div class="hero-acoes">
+        <button class="btn-ico" type="button" (click)="copiarConvite()" [attr.aria-label]="copiado ? 'Link copiado' : 'Copiar link de convite'">
+          <ed-icone [nome]="copiado ? 'check' : 'link'" [tamanho]="18" />
+        </button>
+        @if (usuarioAdmin) {
+          <button class="btn-ico" type="button" (click)="exibirConfig = true" aria-label="Configurações do grupo"><ed-icone nome="settings-2" [tamanho]="18" /></button>
+        }
+      </div>
+    </div>
+    <div class="hero-corpo">
+      <img class="hero-img" [src]="grupo.img" alt="" />
+      <div class="hero-txt">
+        <h1>{{ grupo.nome }}</h1>
+        <div class="chips">
+          <span><ed-icone nome="users" [tamanho]="14" />{{ qntMembros }} {{ qntMembros === 1 ? 'membro' : 'membros' }}</span>
+          <span class="chip-icone" [attr.title]="grupo.publico ? 'Grupo público' : 'Grupo privado'" [attr.aria-label]="grupo.publico ? 'Grupo público' : 'Grupo privado'"><ed-icone [nome]="grupo.publico ? 'globe' : 'lock'" [tamanho]="14" /></span>
+          <span><ed-icone nome="zap" [tamanho]="14" />{{ formatarNumero(mediaXp) }} XP de média</span>
+        </div>
+      </div>
+    </div>
+    <button class="btn-convidar" type="button" (click)="compartilharWhatsApp()"><ed-icone nome="message-circle" [tamanho]="18" />Convidar amigos</button>
+    @if (copiado) { <span class="toast-copia">Link de convite copiado</span> }
+  </header>
+
+  <div class="grade">
+    <div class="col-a">
+
+      <section class="dest" aria-roledescription="carrossel" aria-label="Destaques do grupo"
+               (mouseenter)="pausado = true" (mouseleave)="pausado = false">
+        <div class="dest-cab">
+          <h2><ed-icone nome="sparkles" [tamanho]="16" />Destaques</h2>
+          @if (destaques.length > 1) {
+            <div class="dest-pontos" role="tablist">
+              @for (d of destaques; track d.chave; let i = $index) {
+                <button type="button" role="tab" [attr.aria-selected]="i === atual" [attr.aria-label]="d.rotulo" [class.ativo]="i === atual" (click)="irPara(i)">
+                  @if (i === atual) {
+                    @for (c of [cicloDestaque]; track c) { <i [class.parado]="pausado"></i> }
+                  }
+                </button>
+              }
+            </div>
+          }
+        </div>
+        <div class="dest-janela" (pointerdown)="toqueInicio($event)" (pointerup)="toqueFim($event)" (pointercancel)="toqueFim($event)">
+          <div class="dest-trilho" [style.transform]="'translateX(' + (-100 * atual) + '%)'">
+            @for (d of destaques; track d.chave; let i = $index) {
+              <article class="slide" [class.ativo]="i === atual" [style.--c]="d.cor" [attr.aria-hidden]="i !== atual">
+                <div class="slide-luz" aria-hidden="true"></div>
+                @if (d.chave === 'vazio') {
+                  <div class="slide-vazio">
+                    <span class="slide-ico grande"><ed-icone [nome]="d.icone" [tamanho]="26" /></span>
+                    <div>
+                      <b>Seja o primeiro destaque</b>
+                      <p>{{ d.frase }}</p>
+                    </div>
+                  </div>
+                } @else {
+                  @if (d.rival; as r) {
+                    <div class="slide-duo">
+                      <span class="av grande"><ed-avatar [valor]="d.avatar" [nome]="d.nome" [tamanho]="84" [encher]="true" /></span>
+                      <span class="av grande rival"><ed-avatar [valor]="r.avatar" [nome]="r.nome" [tamanho]="84" [encher]="true" /></span>
+                      <span class="slide-vs">VS</span>
+                    </div>
+                  } @else {
+                    <div class="slide-av">
+                      <span class="av grande"><ed-avatar [valor]="d.avatar" [nome]="d.nome" [tamanho]="84" [encher]="true" /></span>
+                      <span class="slide-ico"><ed-icone [nome]="d.icone" [tamanho]="15" /></span>
+                    </div>
+                  }
+                  <div class="slide-txt">
+                    <span class="slide-rot">{{ d.rotulo }}</span>
+                    <b class="slide-nome">{{ d.nome }}</b>
+                    <span class="slide-metrica"><b>{{ d.valor }}</b> {{ d.unidade }}</span>
+                    <p>{{ d.frase }}</p>
+                  </div>
+                }
+              </article>
+            }
+          </div>
+        </div>
+      </section>
+
+      <section class="ativ" aria-labelledby="t-ativ">
+        <div class="ativ-cab">
+          <h2 id="t-ativ">Atividade recente</h2>
+          <span class="ao-vivo"><i></i>ao vivo</span>
+        </div>
+        @if (atividades.length) {
+          <ol class="ativ-lista">
+            @for (a of atividadesVisiveis; track a.dataHora + a.usuario) {
+              <li>
+                <span class="av peq"><ed-avatar [valor]="avatarDe(a.usuario)" [nome]="a.usuario" [tamanho]="30" [encher]="true" /></span>
+                <p><b>{{ a.usuario === usuario?.usuario ? 'Você' : a.usuario }}</b> acertou uma questão</p>
+                <time>{{ tempoRelativo(a.dataHora) }}</time>
+              </li>
+            }
+          </ol>
+          @if (atividades.length > 5) {
+            <button class="btn-link" type="button" (click)="verTodasAtividades = !verTodasAtividades">
+              {{ verTodasAtividades ? 'Mostrar menos' : 'Ver todas (' + atividades.length + ')' }}
+              <ed-icone nome="chevron-down" [tamanho]="15" [class.virado]="verTodasAtividades" />
+            </button>
+          }
+        } @else {
+          <p class="ativ-vazio">Nenhuma atividade ainda. Os acertos do grupo aparecem aqui em tempo real.</p>
+        }
+      </section>
+
+      <footer class="rodape">
+        @if (areasDoGrupo.length) {
+          <div class="rodape-areas">
+            <span>Áreas do grupo</span>
+            <div>
+              @for (a of areasDoGrupo; track a.chave) {
+                <span class="area-chip" [style.--c]="a.cor" [style.--ct]="a.corTexto"><ed-icone [nome]="a.icone" [tamanho]="14" />{{ a.nome }}</span>
+              }
+            </div>
+          </div>
+        }
+        <div class="rodape-acoes">
+          @if (usuarioAdmin) {
+            <button class="btn-sec" type="button" (click)="exibirConfig = true"><ed-icone nome="settings-2" [tamanho]="16" />Gerenciar grupo</button>
+          }
+          @if (usuarioPresente) {
+            <button class="btn-sair" type="button" (click)="sairDoGrupo()"><ed-icone nome="log-out" [tamanho]="16" />Sair do grupo</button>
+          }
+        </div>
+      </footer>
+    </div>
+
+    <section class="rank" aria-labelledby="t-rank">
+      <div class="rank-cab">
+        <h2 id="t-rank">Ranking</h2>
+        <div class="abas" role="tablist" [style.--idx]="aba === 'geral' ? 0 : aba === 'mensal' ? 1 : 2">
+          <span class="abas-marca" aria-hidden="true"></span>
+          @for (t of abas; track t.chave) {
+            <button type="button" role="tab" [attr.aria-selected]="aba === t.chave" (click)="trocarAba(t.chave)">
+              <ed-icone [nome]="t.icone" [tamanho]="15" />{{ t.nome }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <ol class="linhas">
+        @for (u of ranking; track u.usuario; let i = $index) {
+          <li class="linha" [class.top]="i < 3" [class.m1]="i === 0" [class.m2]="i === 1" [class.m3]="i === 2" [attr.data-id]="u.usuario" [class.eu]="ehEu(u)" [class.ganhou]="ganhou[u.usuario]" [class.subiu]="subiu[u.usuario]">
+            <button type="button" (click)="perfilAberto = u">
+              <span class="linha-pos">@if (i === 0) { <ed-icone nome="crown" [tamanho]="16" /> } @else { {{ i + 1 }} }</span>
+              <span class="av"><ed-avatar [valor]="u.avatar" [nome]="u.usuario" [tamanho]="40" [encher]="true" /></span>
+              <span class="linha-nome">
+                <b>{{ ehEu(u) ? 'Você' : u.usuario }}</b>
+                @if (u.titulosMensais > 0) { <span class="tag ouro" title="Títulos mensais"><ed-icone nome="medal" [tamanho]="12" />{{ u.titulosMensais }}</span> }
+                @if (u.isAdm) { <span class="tag" title="Administrador"><ed-icone nome="shield" [tamanho]="12" /></span> }
+              </span>
+              <span class="linha-val">
+                @if (subiu[u.usuario]) { <ed-icone class="seta-sobe" nome="arrow-up" [tamanho]="14" /> }
+                {{ formatarNumero(valorExibido(u)) }} <small>{{ unidade }}</small>
+              </span>
+              @if (ganhou[u.usuario]) { <span class="mais-xp">+{{ ganhou[u.usuario] }}</span> }
+            </button>
+          </li>
+        }
+      </ol>
+      <p class="nota"><ed-icone nome="circle-help" [tamanho]="14" />Os pontos contam a partir da entrada de cada membro no grupo.</p>
+    </section>
+  </div>
+
+</main>
+
+@if (exibirBannerPodio && !exibirPodio) {
+  <button class="selo-podio" type="button" [class.recolhido]="bannerRecolhido" (click)="exibirPodio = true">
+    <span class="selo-ico"><ed-icone nome="medal" [tamanho]="20" /></span>
+    <span class="selo-txt">Pódio de {{ mesPassado }}</span>
+  </button>
+}
+
+@if (confirmandoSaida) {
+  <div class="veu" (click)="confirmandoSaida = false"></div>
+  <section class="folha-sair" role="dialog" aria-modal="true" aria-labelledby="t-sair">
+    <h2 id="t-sair">Sair de {{ grupo.nome }}?</h2>
+    <p>Sua pontuação neste grupo será perdida. Você pode voltar depois pelo link de convite, começando do zero.</p>
+    <div class="folha-sair-acoes">
+      <button class="btn-pri perigo" type="button" (click)="confirmarSaida()">Sair do grupo</button>
+      <button class="btn-sec" type="button" (click)="confirmandoSaida = false">Cancelar</button>
+    </div>
+  </section>
+}
+}

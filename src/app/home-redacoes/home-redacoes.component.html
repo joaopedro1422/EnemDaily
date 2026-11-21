@@ -1,0 +1,221 @@
+@if (mostrarModal) {
+  <app-nova-redacao-modal [usuarioDemo]="!!usuario?.demo" (close)="fecharModal($event)" />
+}
+
+@if (usuario) {
+<main class="red">
+  <header class="red-topo" [class.compacto]="redacoes.length">
+    <div class="red-titulo">
+      <span class="red-ico"><ed-icone nome="pen-line" [tamanho]="redacoes.length ? 19 : 24" /></span>
+      <div>
+        <h1>Redações</h1>
+        @if (!carregando && !redacoes.length) { <p>Registre as notas das suas redações e acompanhe cada competência até o ENEM.</p> }
+      </div>
+    </div>
+    <button class="estrela" type="button" [class.ativa]="favorito" (click)="toggleFavorito()" [attr.aria-pressed]="favorito"
+            [title]="favorito ? 'Página inicial do app' : 'Definir como página inicial'" [attr.aria-label]="favorito ? 'Remover dos favoritos' : 'Favoritar página'">
+      <ed-icone nome="star" [tamanho]="20" />
+    </button>
+  </header>
+
+  @if (carregando) {
+    <div class="carregando-pagina"><ed-carregando [tamanho]="56" texto="Carregando suas redações" /></div>
+  } @else if (!redacoes.length) {
+    <section class="vazio">
+      <div class="vazio-folha" aria-hidden="true"><i></i><i></i><i></i><i></i><b>960</b></div>
+      <h2>Sua primeira redação começa aqui</h2>
+      <p>Depois de receber a correção, registre a nota de cada competência. Você vê sua evolução, a projeção de nota e qual competência mais vale a pena treinar.</p>
+      <button class="btn-pri" type="button" (click)="abrirModal()"><ed-icone nome="plus" [tamanho]="18" />Registrar redação</button>
+    </section>
+  } @else {
+
+    <section class="kpis" aria-label="Resumo">
+      <article class="kpi kpi-hero">
+        <span class="kpi-rot"><ed-icone nome="target" [tamanho]="15" />Nota média</span>
+        <b class="kpi-num">{{ media }}<small>/1000</small></b>
+        <span class="kpi-sub">{{ redacoes.length }} {{ redacoes.length === 1 ? 'redação registrada' : 'redações registradas' }}</span>
+        <span class="kpi-barra"><i [style.width.%]="media / 10"></i></span>
+      </article>
+      <article class="kpi">
+        <span class="kpi-rot"><ed-icone nome="trophy" [tamanho]="15" />Melhor nota</span>
+        <b class="kpi-num">{{ melhor.nota }}</b>
+        <span class="kpi-sub">em {{ dataCurta(melhor.data) }}</span>
+      </article>
+      <article class="kpi">
+        <span class="kpi-rot"><ed-icone nome="clock" [tamanho]="15" />Última</span>
+        <b class="kpi-num">{{ ultima?.nota ?? '—' }}</b>
+        <span class="kpi-sub">
+          @if (ultima?.delta !== null && ultima?.delta !== undefined) {
+            <em class="delta" [class.sobe]="ultima!.delta! > 0" [class.cai]="ultima!.delta! < 0">{{ sinal(ultima!.delta) || '=' }}</em> vs. anterior
+          } @else { primeira registrada }
+        </span>
+      </article>
+    </section>
+
+    <div class="grade">
+      <section class="card comp-card" aria-labelledby="t-comp">
+        <div class="card-cab"><h2 id="t-comp">Competências</h2><span class="card-dica">média de 200 · toque para ver dicas</span></div>
+        <ul class="comps">
+          @for (c of resumoC; track c.info.chave; let i = $index) {
+            <li [style.--c]="c.info.cor" [style.--i]="i">
+              <button type="button" class="comp" [class.foco]="foco === c" [class.sem]="!c.qtd" (click)="abrirDetalhe(c)">
+                <span class="comp-sigla">{{ c.info.sigla }}</span>
+                <span class="comp-corpo">
+                  <span class="comp-linha">
+                    <b>{{ c.info.nome }}</b>
+                    <span class="comp-val">
+                      @if (c.qtd) { {{ c.media }}<small>/200</small> } @else { — }
+                      @if (c.delta) { <em class="delta" [class.sobe]="c.delta > 0" [class.cai]="c.delta < 0">{{ sinal(c.delta) }}</em> }
+                    </span>
+                  </span>
+                  <span class="niveis" [attr.aria-label]="'Nível ' + c.nivel + ' de 5'">
+                    @for (n of [1, 2, 3, 4, 5]; track n) { <i [class.cheio]="n <= c.nivel"></i> }
+                  </span>
+                  <span class="comp-sub">
+                    @if (foco === c) { <b class="tag-foco">Foco</b> }
+                    {{ c.info.resumo }}
+                  </span>
+                </span>
+                <ed-icone class="comp-seta" nome="chevron-right" [tamanho]="16" />
+              </button>
+            </li>
+          }
+        </ul>
+      </section>
+
+      <section class="card grafico-card" aria-labelledby="t-evol">
+        <div class="card-cab">
+          <h2 id="t-evol">Evolução</h2>
+          <div class="seg" role="tablist" [style.--idx]="visao === 'nota' ? 0 : 1">
+            <span class="seg-marca" aria-hidden="true"></span>
+            <button type="button" role="tab" [attr.aria-selected]="visao === 'nota'" (click)="trocarVisao('nota')">Nota</button>
+            <button type="button" role="tab" [attr.aria-selected]="visao === 'comp'" (click)="trocarVisao('comp')">Competências</button>
+          </div>
+        </div>
+        @if (legenda.length) {
+          <ul class="legenda">
+            @for (l of legenda; track l.nome) { <li><i [style.background]="l.cor"></i>{{ l.nome }}@if (l.valor !== null) { <b>{{ l.valor }}</b> }</li> }
+          </ul>
+        }
+        <div class="grafico"><canvas #grafico role="img" aria-label="Gráfico de notas por redação"></canvas></div>
+        <p class="grafico-nota">{{ visao === 'nota' ? 'Nota de cada redação, de 0 a 1000.' : 'Nota de cada competência por redação, de 0 a 200.' }}</p>
+      </section>
+
+      <section class="card insights-card" aria-labelledby="t-analise">
+        <div class="card-cab"><h2 id="t-analise"><ed-icone nome="sparkles" [tamanho]="16" />Análise</h2>
+          @if (analise === 'pronta') { <button class="btn-txt" type="button" (click)="analise = 'fechada'">Recolher<ed-icone nome="chevron-down" [tamanho]="14" class="virado" /></button> }
+        </div>
+        @if (analise === 'fechada') {
+          <div class="gerar">
+            <p>Leia suas {{ redacoes.length }} redações e descubra tendências, pontos fortes e a competência que mais rende treinar.</p>
+            <button class="btn-gerar" type="button" (click)="gerarAnalise()"><ed-icone nome="sparkles" [tamanho]="17" />Gerar análise</button>
+          </div>
+        } @else if (analise === 'gerando') {
+          <div class="gerando" aria-live="polite"><span class="gerando-barra"><i></i></span><p>{{ etapaAnalise }}</p></div>
+        } @else {
+          <ul class="insights">
+            @for (i of insights; track i.titulo; let k = $index) {
+              <li class="insight {{ i.tom }}" [style.--k]="k">
+                <span class="insight-ico"><ed-icone [nome]="i.icone" [tamanho]="17" /></span>
+                <div><b>{{ i.titulo }}</b><p>{{ i.texto }}</p></div>
+              </li>
+            }
+          </ul>
+        }
+      </section>
+
+      <section class="card hist-card" aria-labelledby="t-hist">
+        <div class="card-cab"><h2 id="t-hist">Histórico</h2><span class="card-dica">{{ redacoes.length }} no total</span></div>
+        @for (g of historico; track g.chave) {
+          <div class="mes">
+            <h3>{{ g.rotulo }}</h3>
+            <ul class="hist">
+              @for (it of g.itens; track it.r.id) {
+                <li class="item">
+                  <div class="item-titulo">
+                    <b>Redação #{{ it.numero }}</b>
+                  </div>
+                  <div class="item-linha">
+                    <span class="item-data"><b>{{ it.dia }}</b><small>{{ it.mes }}</small></span>
+                    <button type="button" class="item-tema" [class.aberto]="abertas.has(it.r.id)" (click)="alternar(it.r.id)" [attr.aria-expanded]="abertas.has(it.r.id)">
+                      {{ it.r.tema ? '“' + it.r.tema + '”' : 'Sem tema registrado' }}
+                    </button>
+                    <div class="item-nota">
+                      <b>{{ it.r.nota }}</b>
+                      @if (it.r.dif) { <em class="delta" [class.sobe]="it.r.dif > 0" [class.cai]="it.r.dif < 0">{{ sinal(it.r.dif) }}</em> }
+                    </div>
+                  </div>
+                  @if (it.temComp) {
+                    <div class="item-comps">
+                      @for (c of competencias; track c.chave) {
+                        <span class="mini" [style.--c]="c.cor" [title]="c.sigla + ' · ' + c.nome">
+                          <small>{{ c.sigla }}</small>
+                          <span class="mini-barra"><i [style.height.%]="(it.r[c.chave] / 200) * 100"></i></span>
+                          <b>{{ it.r[c.chave] }}</b>
+                        </span>
+                      }
+                    </div>
+                  } @else {
+                    <p class="item-sem">Só a nota final foi registrada.</p>
+                  }
+                  @if (excluindo === it.r.id) {
+                    <div class="item-confirma">
+                      <span>Excluir esta redação?</span>
+                      <button type="button" class="btn-mini" (click)="excluindo = null">Cancelar</button>
+                      <button type="button" class="btn-mini perigo" (click)="excluir(it.r.id)">Excluir</button>
+                    </div>
+                  } @else {
+                    <div class="item-acoes">
+                      <span></span>
+                      <button type="button" class="btn-txt perigo" (click)="pedirExclusao(it.r.id)"><ed-icone nome="circle-x" [tamanho]="15" />Excluir</button>
+                    </div>
+                  }
+                </li>
+              }
+            </ul>
+          </div>
+        }
+      </section>
+    </div>
+  }
+
+  <button class="fab" type="button" [class.recolhido]="fabRecolhido" (click)="abrirModal()" aria-label="Registrar redação">
+    <ed-icone nome="plus" [tamanho]="24" [traco]="2.5" />
+    <span class="fab-txt">Registrar redação</span>
+  </button>
+</main>
+
+@if (detalhe; as d) {
+  <div class="dt" [class.fechando]="fechandoDetalhe" role="dialog" aria-modal="true" aria-labelledby="dt-titulo" [style.--c]="d.info.cor">
+    <div class="dt-fundo" (click)="fecharDetalhe()"></div>
+    <section class="dt-folha">
+      <span class="dt-alca" aria-hidden="true"></span>
+      <header class="dt-cab">
+        <span class="dt-sigla">{{ d.info.sigla }}</span>
+        <div>
+          <span class="dt-rot">Competência {{ d.info.sigla.slice(1) }}</span>
+          <h2 id="dt-titulo">{{ d.info.nome }}</h2>
+        </div>
+        <button class="dt-fechar" type="button" (click)="fecharDetalhe()" aria-label="Fechar"><ed-icone nome="x" [tamanho]="20" /></button>
+      </header>
+
+      <div class="dt-voce">
+        <div>
+          <span>Sua média</span>
+          <b>{{ d.qtd ? d.media : '—' }}<small>/200</small></b>
+        </div>
+        <span class="niveis grandes">@for (n of [1, 2, 3, 4, 5]; track n) { <i [class.cheio]="n <= d.nivel"></i> }</span>
+        <span class="dt-status" [class.ok]="d.media >= 180" [class.foco]="d.qtd && d.media < 160">
+          {{ !d.qtd ? 'Sem registros' : d.media >= 180 ? 'Muito bom' : d.media >= 160 ? 'No caminho' : 'Precisa de atenção' }}
+        </span>
+      </div>
+
+      <div class="dt-blocos">
+        <div class="dt-bloco"><span class="dt-ico"><ed-icone nome="target" [tamanho]="16" /></span><div><b>O que é avaliado</b><p>{{ d.info.avaliado }}</p></div></div>
+        <div class="dt-bloco"><span class="dt-ico ok"><ed-icone nome="book-open" [tamanho]="16" /></span><div><b>O que estudar</b><p>{{ d.info.estudar }}</p></div></div>
+        <div class="dt-bloco"><span class="dt-ico mal"><ed-icone nome="circle-x" [tamanho]="16" /></span><div><b>Onde se perde ponto</b><p>{{ d.info.perde }}</p></div></div>
+      </div>
+    </section>
+  </div>
+}
+}

@@ -1,0 +1,119 @@
+@if (usuario && atual; as a) {
+<main class="est" [style.--a]="a.info.cor" [style.--at]="a.info.corTexto">
+
+  <header class="est-topo">
+    <div>
+      <h1>Estatísticas</h1>
+      <p>Seu desempenho no desafio diário, área por área.</p>
+    </div>
+    <button class="btn-semana" type="button" (click)="mostrarResumo = true"><ed-icone nome="sparkles" [tamanho]="16" />Sua semana</button>
+    <dl class="est-geral">
+      <div><dt>Respondidas</dt><dd>{{ formatarNumero(totalRespondidas) }}</dd></div>
+      <div><dt>Aproveitamento</dt><dd>{{ pctGeral }}%</dd></div>
+    </dl>
+  </header>
+
+  <div class="areas" role="tablist" aria-label="Áreas">
+    @for (r of resumos; track r.info.chave) {
+      <button type="button" role="tab" class="area" [class.ativa]="r.info.chave === ativa"
+              [attr.aria-selected]="r.info.chave === ativa" [style.--c]="r.info.cor" [style.--ct]="r.info.corTexto"
+              (click)="escolher(r.info.chave)">
+        <span class="area-cab">
+          <span class="area-ico"><ed-icone [nome]="r.info.icone" [tamanho]="16" /></span>
+          <span class="area-nome">{{ r.info.nome }}</span>
+        </span>
+        <span class="area-pct">{{ r.area.questoesRespondidas ? r.pct + '%' : '—' }}</span>
+        <span class="area-barra"><b [style.width.%]="r.pct"></b></span>
+        <span class="area-sub">{{ r.area.acertos }} de {{ r.area.questoesRespondidas }} certas</span>
+      </button>
+    }
+  </div>
+
+  <div class="grade">
+    <div class="col-lado">
+      <section class="painel" aria-labelledby="titulo-area">
+        <div class="painel-cab">
+          <span class="painel-ico"><ed-icone [nome]="a.info.icone" [tamanho]="18" /></span>
+          <h2 id="titulo-area">{{ a.info.nome }}</h2>
+        </div>
+
+        <div class="anel-wrap">
+          <svg class="anel" viewBox="0 0 120 120" aria-hidden="true">
+            <circle class="anel-fundo" cx="60" cy="60" [attr.r]="raio" />
+            <circle class="anel-valor" cx="60" cy="60" [attr.r]="raio"
+                    [attr.stroke-dasharray]="circunferencia" [style.stroke-dashoffset]="offset" />
+          </svg>
+          <div class="anel-txt">
+            <b>{{ a.area.questoesRespondidas ? a.pct : 0 }}<small>%</small></b>
+            <span>de acerto</span>
+          </div>
+        </div>
+
+        <dl class="numeros">
+          <div><dt><ed-icone nome="target" [tamanho]="15" />Acertos</dt><dd>{{ a.area.acertos }}<small>/{{ a.area.questoesRespondidas }}</small></dd></div>
+          <div><dt><ed-icone nome="clock" [tamanho]="15" />Tempo médio</dt><dd>{{ tempoMedio }}</dd></div>
+          <div><dt><ed-icone nome="sparkles" [tamanho]="15" />XP na área</dt><dd>{{ formatarNumero(a.area.xp) }}</dd></div>
+          <div><dt><ed-icone nome="flame" [tamanho]="15" />Acertos seguidos</dt><dd>{{ a.area.streak }}</dd></div>
+        </dl>
+      </section>
+
+      @if (paraRevisar.length) {
+        <section class="revisar" aria-labelledby="titulo-revisar">
+          <h2 id="titulo-revisar"><ed-icone nome="book-open" [tamanho]="17" />Revise primeiro</h2>
+          <ol>
+            @for (l of paraRevisar; track l.nome) {
+              <li><span>{{ l.nome }}</span><b>{{ l.acertos }}/{{ l.total }}</b></li>
+            }
+          </ol>
+        </section>
+      }
+    </div>
+
+    <section class="assuntos" aria-labelledby="titulo-assuntos">
+      <div class="assuntos-cab">
+        <h2 id="titulo-assuntos">Assuntos</h2>
+        <span>{{ linhas.length }} {{ linhas.length === 1 ? 'assunto' : 'assuntos' }}</span>
+      </div>
+
+      @if (linhas.length) {
+        <div class="filtros" role="group" aria-label="Filtrar assuntos">
+          <button type="button" [attr.aria-pressed]="filtro === 'todos'" (click)="filtro = 'todos'">Todos</button>
+          <button type="button" class="f-dominado" [attr.aria-pressed]="filtro === 'dominado'" (click)="filtro = 'dominado'">Dominados <b>{{ contar('dominado') }}</b></button>
+          <button type="button" class="f-progresso" [attr.aria-pressed]="filtro === 'progresso'" (click)="filtro = 'progresso'">Em progresso <b>{{ contar('progresso') }}</b></button>
+          <button type="button" class="f-revisar" [attr.aria-pressed]="filtro === 'revisar'" (click)="filtro = 'revisar'">Revisar <b>{{ contar('revisar') }}</b></button>
+        </div>
+
+        <ul class="lista">
+          @for (l of linhasFiltradas; track l.nome) {
+            <li [class]="'linha ' + l.nivel">
+              <div class="linha-top">
+                <span class="linha-nome">{{ l.nome }}</span>
+                <span class="linha-num">{{ l.acertos }}/{{ l.total }}</span>
+                <span class="selo">{{ l.pct }}%</span>
+              </div>
+              <span class="linha-barra"><b [style.width.%]="l.pct"></b></span>
+            </li>
+          } @empty {
+            <li class="vazio-filtro">Nenhum assunto nesta categoria.</li>
+          }
+        </ul>
+        <p class="legenda">
+          <span class="dominado">70% ou mais</span>
+          <span class="progresso">40 a 69%</span>
+          <span class="revisar">abaixo de 40%</span>
+        </p>
+      } @else if (carregandoAssuntos) {
+        <div class="carregando-bloco"><ed-carregando [tamanho]="44" texto="Carregando assuntos" /></div>
+      } @else {
+        <div class="vazio">
+          <span class="vazio-ico"><ed-icone [nome]="a.info.icone" [tamanho]="22" /></span>
+          <p><b>Nenhuma questão de {{ a.info.nome }} ainda.</b> Os assuntos aparecem aqui conforme você responde o desafio do dia.</p>
+        </div>
+      }
+    </section>
+  </div>
+</main>
+@if (mostrarResumo) {
+  <app-resumo-semanal (fechar)="mostrarResumo = false" />
+}
+}

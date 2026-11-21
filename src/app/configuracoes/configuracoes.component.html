@@ -1,0 +1,86 @@
+@if (usuario; as u) {
+  <main class="cf">
+    <header class="cf-topo">
+      <span class="cf-rot">Conta</span>
+      <h1>Configurações</h1>
+    </header>
+
+    <section class="cf-bloco" aria-labelledby="t-perfil">
+      <h2 id="t-perfil">Perfil</h2>
+      <div class="cf-avatar">
+        <ed-avatar [valor]="u.avatar" [nome]="u.nome || u.usuario" [tamanho]="72" />
+        <div>
+          <b>Foto e avatar</b>
+          <p>Envie uma foto ou personalize as cores, o motivo e a moldura do seu avatar.</p>
+          <button class="cf-btn cf-btn-sec" type="button" (click)="editandoAvatar = true"><ed-icone nome="circle-user" [tamanho]="16" />Editar foto e avatar</button>
+        </div>
+      </div>
+
+      <form class="cf-campo" (ngSubmit)="salvarNome()">
+        <label for="cf-nome">Nome</label>
+        <div class="cf-linha">
+          <input id="cf-nome" name="nome" type="text" [(ngModel)]="nome" maxlength="60" autocomplete="name" />
+          <button class="cf-btn" type="submit" [disabled]="!nomeMudou || eNome.salvando">{{ eNome.salvando ? 'Salvando...' : 'Salvar' }}</button>
+        </div>
+        @if (eNome.ok) { <p class="cf-ok">{{ eNome.ok }}</p> }
+        @if (eNome.erro) { <p class="cf-erro">{{ eNome.erro }}</p> }
+      </form>
+
+      <form class="cf-campo" (ngSubmit)="salvarUsuario()">
+        <label for="cf-usuario">Nome de usuário</label>
+        <div class="cf-linha">
+          <span class="cf-arroba">
+            <i>&#64;</i>
+            <input id="cf-usuario" name="usuario" type="text" [(ngModel)]="nomeUsuario" (ngModelChange)="aoDigitarUsuario($event)" maxlength="20" autocomplete="username" autocapitalize="none" spellcheck="false" />
+          </span>
+          <button class="cf-btn" type="submit" [disabled]="!usuarioMudou || !disponibilidade?.disponivel || eUsuario.salvando">{{ eUsuario.salvando ? 'Salvando...' : 'Salvar' }}</button>
+        </div>
+        @if (usuarioMudou) {
+          @if (verificando) { <p class="cf-dica">Verificando disponibilidade...</p> }
+          @else if (disponibilidade?.disponivel) { <p class="cf-ok"><ed-icone nome="check" [tamanho]="14" />&#64;{{ nomeUsuario }} está disponível.</p> }
+          @else if (disponibilidade) { <p class="cf-erro">{{ disponibilidade.motivo }}</p> }
+        } @else {
+          <p class="cf-dica">É como seus amigos encontram você. Letras minúsculas, números, ponto ou sublinhado.</p>
+        }
+        @if (eUsuario.ok) { <p class="cf-ok">{{ eUsuario.ok }}</p> }
+        @if (eUsuario.erro) { <p class="cf-erro">{{ eUsuario.erro }}</p> }
+      </form>
+    </section>
+
+    <section class="cf-bloco" aria-labelledby="t-acesso">
+      <h2 id="t-acesso">Acesso</h2>
+
+      <form class="cf-campo" (ngSubmit)="salvarEmail()">
+        <label for="cf-email">E-mail</label>
+        <input id="cf-email" name="email" type="email" [(ngModel)]="email" autocomplete="email" />
+        @if (emailMudou) {
+          <label class="cf-sub" for="cf-senha-email">Confirme com sua senha atual</label>
+          <div class="cf-linha">
+            <input id="cf-senha-email" name="senhaEmail" type="password" [(ngModel)]="senhaEmail" autocomplete="current-password" />
+            <button class="cf-btn" type="submit" [disabled]="!senhaEmail || eEmail.salvando">{{ eEmail.salvando ? 'Salvando...' : 'Salvar e-mail' }}</button>
+          </div>
+        }
+        @if (eEmail.ok) { <p class="cf-ok">{{ eEmail.ok }}</p> }
+        @if (eEmail.erro) { <p class="cf-erro">{{ eEmail.erro }}</p> }
+      </form>
+
+      <form class="cf-campo" (ngSubmit)="salvarSenha()">
+        <div class="cf-label-linha">
+          <label for="cf-senha-atual">Alterar senha</label>
+          <button class="cf-link" type="button" (click)="mostrarSenhas = !mostrarSenhas">{{ mostrarSenhas ? 'Ocultar' : 'Mostrar' }}</button>
+        </div>
+        <input id="cf-senha-atual" name="senhaAtual" [type]="mostrarSenhas ? 'text' : 'password'" [(ngModel)]="senhaAtual" placeholder="Senha atual" autocomplete="current-password" />
+        <input name="novaSenha" [type]="mostrarSenhas ? 'text' : 'password'" [(ngModel)]="novaSenha" placeholder="Nova senha (mínimo 8 caracteres)" autocomplete="new-password" />
+        <input name="confirmacao" [type]="mostrarSenhas ? 'text' : 'password'" [(ngModel)]="confirmacao" placeholder="Repita a nova senha" autocomplete="new-password" />
+        @if (confirmacao && novaSenha !== confirmacao) { <p class="cf-erro">As senhas não coincidem.</p> }
+        <button class="cf-btn cf-btn-largo" type="submit" [disabled]="!senhaValida || eSenha.salvando">{{ eSenha.salvando ? 'Salvando...' : 'Alterar senha' }}</button>
+        @if (eSenha.ok) { <p class="cf-ok">{{ eSenha.ok }}</p> }
+        @if (eSenha.erro) { <p class="cf-erro">{{ eSenha.erro }}</p> }
+      </form>
+    </section>
+  </main>
+
+  @if (editandoAvatar) {
+    <app-perfil (close)="editandoAvatar = false" />
+  }
+}

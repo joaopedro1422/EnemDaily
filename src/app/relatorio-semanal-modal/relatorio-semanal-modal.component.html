@@ -1,0 +1,104 @@
+<div class="overlay"></div>
+<div class="modal">
+
+<button class="close" (click)="fechar()">✕</button>
+
+<div class="header">
+    <ed-avatar [valor]="usuarioLogado?.avatar" [nome]="usuarioLogado?.nome || ''" [tamanho]="64" />
+    <h2>{{ usuarioLogado?.nome }}</h2>
+    <p>Resumo semanal | últimos 7 dias</p>
+</div>
+
+<div class="stats-main">
+    <div class="stat ">
+      <i class="fa-regular fa-check-circle"></i>
+      <div class="division">
+         <p>Acertos totais</p>
+        <span>{{ resumo.acertosTotais }}</span>
+      </div>
+    </div>
+    <div class="stat">
+     <i class="fa-solid fa-list-check"></i>
+      <div class="division">
+         <p style="font-size: 10px;">Questões feitas</p>
+        <span>{{ resumo.questoesRespondidas }}</span>
+      </div>
+    </div>
+     <div class="stat ">
+     <i class="fa-solid fa-chart-line"></i>
+      <div class="division">
+         <p style="font-size: 10px;">Percentual geral</p>
+        <span>{{ resumo.acertosSemana }}%</span>
+      </div>
+    </div>
+    <div class="stat">
+      <img src="xp.png" alt="">
+      <div class="division">
+         <p>XP Ganho</p>
+        <span>{{ resumo.xpSemana }}</span>
+      </div>
+    </div>
+    <div class="stat">
+        <i class="fa-solid fa-fire" ></i>
+      <div class="division">
+         <p style="font-size: 10px;">Acertos seguidos</p>
+        <span>{{  resumo.acertosConsecutivos }}</span>
+      </div>
+    </div>
+    <div class="stat">
+        <i class="fa-regular fa-calendar" ></i>
+      <div class="division">
+         <p style="font-size: 10px;">Presença diária</p>
+        <span>{{ resumo.diasConsecutivos }}</span>
+      </div>
+    </div>
+    
+ 
+    
+</div>
+
+
+<div class="areas">
+    <h4>Desempenho por área</h4>
+
+    <div class="areas-circulares">
+        <div class="area-circle">
+            <div class="progress-circle"
+                [style.background]="getCircle(humanas, '#4f9cff')">
+                <span>{{ humanas }}%</span>
+            </div>
+            <small>Humanas</small>
+        </div>
+
+        <div class="area-circle">
+            <div class="progress-circle"
+                [style.background]="getCircle(humanas, '#F48526')">
+            <span>{{ linguagens }}%</span>
+            </div>
+            <small>Linguagens</small>
+        </div>
+
+        <div class="area-circle">
+            
+            <div class="progress-circle"
+                [style.background]="getCircle(humanas, '#7fb77e')">
+            <span>{{ naturezas }}%</span>
+            </div>
+            <small>Naturezas</small>
+        </div>
+
+        <div class="area-circle">
+            <div class="progress-circle"
+                [style.background]="getCircle(humanas, '#FDC900')">
+                <span>{{ exatas }}%</span>
+            </div>
+            <small>Exatas</small>
+        </div>
+    </div>    
+</div>
+
+
+
+</div>
+
+

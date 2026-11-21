@@ -1,0 +1,316 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+
+  background: rgba(0, 0, 0, 0.432);
+  backdrop-filter: blur(3px);
+  z-index: 1000;
+}
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+.modal-header{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-header-externo{
+    display: flex;
+    width: 90%;
+    justify-content: space-between !important;
+    align-items: center;
+    padding-right: 30px;
+}
+/* Container do Modal Branco */
+.modal {
+  position: fixed;
+  top: 380px;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 95%;
+  border: 1px solid white;
+background: linear-gradient(to bottom,#fcfcfc,#ffffff);
+  background-size: cover;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 15px;
+  z-index: 1001;
+  height: 480px;
+     
+  
+   animation: enemFade 2.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.modal-container{
+     position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+    padding-top: 15px;
+    background: linear-gradient(to bottom,#fafbff,#ffffff);
+  background-size: cover;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  z-index: 1001;
+  height: 100%;
+     
+ 
+   animation: enemFade 2.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+
+
+@keyframes enemFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.modal.closing {
+  animation: enemFadeOut 0.7s ease forwards;
+}
+@keyframes enemFadeOut {
+  from {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, -55%) scale(0.99);
+  }
+}
+
+@media (min-width: 1000px) {
+  .modal{
+    width: 350px;
+  }
+}
+.close {
+  position: absolute;
+  right: 0;
+  top: 4px;
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.close-button {
+  position: absolute;
+  top: 15px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 28px;
+  color: #666;
+  cursor: pointer;
+}
+
+.level-title {
+  font-size: 15px;
+  font-weight: bold;
+  margin: 0;
+  color: #1e008a;
+}
+
+.subtitle {
+  color: #18006e;
+  font-size: 14px;
+  margin-top: 4px;
+  font-weight: bold;
+}
+
+/* Imagem com bordas arredondadas */
+.image-wrapper {
+  margin: 10px 0;
+
+  overflow: hidden;
+  height: 440px;
+  width: 100%;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.university-image {
+  width: 100%;
+  height: 100%;
+  display: block;
+ 
+  border-radius: 0px;
+}
+.nivel{
+    width: 90%;
+    justify-content: start;
+    margin-top: 6px;
+    margin-bottom: 18px;
+}
+
+/* Barra de XP */
+.xp-container {
+ 
+  width: 90%;
+}
+
+.xp-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: bold;
+  align-items: center;
+  color: #444;
+  margin-bottom: 6px;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 9px;
+  background: #e0e0e0;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  width: 91.27%; /* Dinâmico no Angular */
+  height: 100%;
+ background: linear-gradient(90deg, #5557cf, #5c6ae4);
+}
+
+/* Grid de Status */
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.stat-card {
+  background: #f8f9fa;
+  border: 1px solid #eee;
+  padding: 12px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-card.highlight {
+  grid-column: span 2; /* Ocupa as duas colunas */
+  background: #fffdf0;
+  border-color: #ffeeba;
+}
+
+.stat-icon {
+  font-size: 20px;
+  margin-bottom: 4px;
+}
+
+.stat-value {
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+}
+
+.stat-label {
+  font-size: 11px;
+  color: #777;
+}
+.loading{
+  position: fixed; /* Garante que ele fique sobre a tela toda */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 70vh;
+  background: rgba(255, 255, 255, 0); /* Ou a cor do seu app */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999; /* Fica acima de qualquer outro elemento */
+}
+
+.swal2-title {
+  font-size: 1.2rem !important;
+  font-weight: 700 !important;
+}
+.container-user{
+    width: 90%;
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+
+.container-user img{
+    height: 29px;
+}
+
+.container-user span{
+    font-size: 15px;
+    font-weight: bold;
+}
+.subtitle{
+    display: flex;
+    align-items: end;
+    gap: 4px;
+}
+.subtitle img{
+    height: 20px;
+    
+}
+@media (min-width: 768px) and (max-width: 1000px) {
+  .modal{
+    height: 780px;
+    width: 80%;
+    margin-top: 100px;
+  }
+
+  .image-wrapper{
+    height: 100%;
+  }
+  .xp-labels{
+    font-size: 15px;
+  }
+}
+
+.btn-excluir {
+  background-color: red;
+  color: white;
+  padding: 9px;
+  border-radius: 999px;
+  border: none;
+  box-shadow: 0px 0px 8px rgba(2, 0, 0, 0.342);
+}
+.quadro-emblemas img{
+  height: 55px;
+  width: auto;
+}
+.container-emblemas{
+  width: 100%;
+  padding: 0px 0px;
+
+}
+.quadro-emblemas{
+  background-color: #fdfdfd;
+  width: 100%;
+  border-radius: 6px;
+  padding: 10px;
+}
+.campus-vivo { position: relative; aspect-ratio: 4 / 3; max-width: 100%; border-radius: 16px; overflow: hidden; margin-top: 8px; }
+.campus-vivo ed-campus { position: absolute; inset: 0; border-radius: 16px; }
+.campus-resumo { margin: 12px 2px 4px; font-family: var(--ed-fonte); font-size: 14.5px; color: var(--ed-tinta-2); }
+.campus-resumo b { color: var(--ed-tinta); font-weight: 800; }

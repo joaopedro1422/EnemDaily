@@ -1,0 +1,40 @@
+<div class="overlay" (click)="solicitarFechamento()"></div>
+
+<div class="modal">
+    
+   
+    <div class="modal-container">
+
+   
+    <button class="close-button" (click)="solicitarFechamento()">&times;</button>
+
+    <header class="modal-header" *ngIf="!usuarioExternoBoolean" >
+     
+      <p class="subtitle">Meu campus</p>
+    </header>
+    <header class="modal-header-externo" *ngIf="usuarioExternoBoolean">
+        <div class="container-user" >
+        <ed-avatar [valor]="usuarioExterno?.avatar" [nome]="usuarioExterno?.usuario || ''" [tamanho]="40" />
+        <span>{{usuarioExterno?.usuario}}</span>
+          
+      </div>
+      <button class="btn-excluir"(click)="removeUsuario()" *ngIf="usuarioLogadoIsAdm">   <i class="fa-solid fa-user-xmark"></i></button>
+   
+      
+    </header>
+    <div class="container-emblemas" *ngIf="usuarioExternoBoolean">
+      <div class="quadro-emblemas">
+           <img src="4dias.png" alt="">
+        <img src="ling_3.png" alt="">
+        <img src="natu_3.png" alt="">
+        <img src="exatas_3.png" alt="">
+      </div>
+    </div>
+    <div class="campus-vivo">
+      <ed-campus [progresso]="progresso" modo="auto" [avisos]="false" />
+    </div>
+    <p class="campus-resumo"><b>{{ pecas }}</b> de {{ totalCampus }} peças construídas</p>
+   
+     </div>
+   
+  </div>

@@ -1,0 +1,119 @@
+<div class="qe" [class.fechando]="fechando" role="dialog" aria-modal="true" aria-labelledby="qe-titulo" [style.--a]="info.cor" [style.--at]="info.corTexto">
+  <div class="qe-fundo" (click)="sair()"></div>
+  <section class="qe-folha">
+    <header class="qe-topo">
+      <div class="qe-topo-txt">
+        <span class="qe-selo"><ed-icone nome="sparkles" [tamanho]="13" />Questão de exemplo</span>
+        <h2 id="qe-titulo">Experimente o desafio</h2>
+      </div>
+      <button class="qe-fechar" type="button" (click)="sair()" aria-label="Fechar"><ed-icone nome="x" [tamanho]="18" /></button>
+    </header>
+
+    <div class="qe-rolagem">
+
+      <nav class="qe-areas" aria-label="Escolher área">
+        @for (a of areas; track a.chave) {
+          <button type="button" [class.ativa]="a.chave === area" [style.--c]="a.cor" (click)="carregar(a.chave)" [disabled]="fase === 'carregando'">
+            <ed-icone [nome]="a.icone" [tamanho]="15" />{{ a.nome }}
+          </button>
+        }
+      </nav>
+
+      @switch (fase) {
+        @case ('carregando') { <div class="qe-carregando"><ed-carregando [tamanho]="48" texto="Buscando a questão" /></div> }
+        @case ('vazia') {
+          <div class="qe-vazia">
+            <ed-icone nome="hourglass" [tamanho]="26" />
+            <b>Ainda não temos um exemplo de {{ info.nome }}</b>
+            <p>Crie sua conta e responda as questões de hoje direto no desafio.</p>
+            <button class="qe-btn qe-btn-pri" type="button" (click)="criarConta()">Criar conta grátis</button>
+          </div>
+        }
+        @default {
+          @if (questao; as q) {
+            <article class="folha" aria-label="Questão">
+              <div class="folha-cab">
+                <div class="folha-q"><span>Questão</span><b>01</b></div>
+                <div class="folha-meta">
+                  <span class="folha-caderno">Caderno de {{ info.nome }}</span>
+                  <span class="folha-assunto">{{ q.assunto }}</span>
+                </div>
+                @if (fase === 'resultado') { <span class="carimbo" [class.ok]="acertou">{{ acertou ? 'Certa' : 'Errada' }}</span> }
+              </div>
+              <div class="folha-corpo">
+                <ed-texto-base [questao]="q" />
+                <p class="folha-enunciado" [innerHTML]="q.enunciado"></p>
+                <ol class="alts" aria-label="Alternativas">
+                  @for (alt of q.alternativas; track $index; let i = $index) {
+                    <li>
+                      <button type="button" class="alt {{ estadoAlt(i) }}" [disabled]="fase !== 'prova'" [attr.aria-pressed]="selecionada === i" (click)="selecionar(i)">
+                        <span class="bolha">
+                          <svg class="tinta" viewBox="0 0 34 34" aria-hidden="true"><path class="rabisco" d="M9 9 22 6 6 14 27 9 5 19 29 14 6 24 29 20 9 28 27 25 14 30"/><circle class="cheia" cx="17" cy="17" r="16"/></svg>
+                          <span class="letra">{{ letras[i] }}</span>
+                          <svg class="marca-ok" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 4C11 3.5 3.6 12.5 4.2 24.6 4.8 36 13 44 24.8 43.6 36.4 43.2 44.4 35 43.8 23.2 43.2 12 35.6 4.6 23 5.2 18 5.5 13 7.4 10 10"/></svg>
+                          <svg class="marca-erro" viewBox="0 0 48 48" aria-hidden="true"><path d="M10 10 38 38M38 10 10 38"/></svg>
+                        </span>
+                        <span class="alt-texto" [innerHTML]="alt.texto"></span>
+                      </button>
+                    </li>
+                  }
+                </ol>
+              </div>
+              <footer class="folha-pe"><span>EXEMPLO</span><span>enem<span class="pt"></span>daily</span></footer>
+            </article>
+
+            @if (fase === 'prova') {
+              <button class="qe-btn qe-btn-pri qe-confirmar" type="button" (click)="confirmar()" [disabled]="selecionada === null">
+                {{ selecionada === null ? 'Escolha uma alternativa' : 'Confirmar resposta' }}
+              </button>
+            } @else if (fase === 'corrigindo') {
+              <button class="qe-btn qe-btn-pri qe-confirmar qe-corrigindo" type="button" disabled>
+                <ed-icone nome="pen-line" [tamanho]="17" />Corrigindo
+              </button>
+            } @else {
+              <section class="res qe-res" aria-live="polite">
+                <div class="res-placar" [class.ok]="acertou">
+                  <div class="res-xp">
+                    <span class="res-rot">{{ acertou ? 'Você acertou!' : 'Não foi dessa vez' }}</span>
+                    @if (acertou) {
+                      <b>+70<small>XP</small></b>
+                      <span class="res-bonus">Com uma conta, um acerto rápido vale até 70 XP.</span>
+                    } @else {
+                      <b class="res-zero">0<small>XP</small></b>
+                      <span class="res-bonus">A resposta certa é a <strong>{{ letraCerta }}</strong>. Veja a resolução abaixo.</span>
+                    }
+                  </div>
+                </div>
+
+                @if (obra; as o) {
+                  <div class="res-campus">
+                    <div class="cv-palco res-cena" [class.cv-noite]="o.noite">
+                      <div class="cv-cena" [innerHTML]="o.svg"></div>
+                      @if (o.construindo) { <span class="res-mais qe-mais">+1 peça</span> }
+                    </div>
+                    <div class="res-campus-txt">
+                      <span class="res-rot">Seu campus universitário evolui a cada acerto</span>
+                      <h2>{{ o.nome }}</h2>
+                      <p><span class="chip-regiao"><i [style.background]="o.cor"></i>{{ o.regiao }}</span></p>
+                    </div>
+                  </div>
+                }
+
+                <div class="qe-cta">
+                  <b>Agora é pra valer</b>
+                  <p>Crie sua conta grátis e responda as 4 questões de hoje valendo XP, com uma animação de campus universitário que evolui a cada acerto seu.</p>
+                  <div class="qe-cta-botoes">
+                    <button class="qe-btn qe-btn-branco" type="button" (click)="criarConta()">Criar conta grátis<ed-icone nome="arrow-right" [tamanho]="18" /></button>
+                    <button class="qe-btn qe-btn-vazado" type="button" (click)="outraArea()">Testar outra área</button>
+                  </div>
+                </div>
+
+                <ed-resolucao [questao]="q" [selecionada]="selecionada" />
+              </section>
+            }
+          }
+        }
+      }
+    </div>
+  </section>
+</div>

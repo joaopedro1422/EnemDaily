@@ -1,0 +1,119 @@
+<main class="ld le">
+
+  <section class="le-hero">
+    <div class="le-hero-texto">
+      <a class="le-voltar" routerLink="/"><ed-icone nome="arrow-right" [tamanho]="16" />enem.daily</a>
+      <span class="ld-sobre">Gestão de estudos</span>
+      <h1>Sua preparação para o ENEM <span class="le-palma">na palma da mão.</span></h1>
+      <p class="ld-lead">Registre cada simulado e cada redação em segundos. O enem.daily transforma esses números em evolução, nota estimada e um foco claro para a próxima semana de estudo.</p>
+      <div class="ld-ctas">
+        <button class="ld-btn ld-btn-pri" type="button" (click)="comecar()">{{ logado ? 'Abrir meus simulados' : 'Começar grátis' }}<ed-icone nome="arrow-right" [tamanho]="18" /></button>
+        @if (!logado) { <button class="ld-btn ld-btn-sec" type="button" (click)="comecar()">Já tenho conta</button> }
+      </div>
+      <ul class="ld-garantias">
+        <li><ed-icone nome="check" [tamanho]="15" [traco]="2.5" />Simulados de qualquer lugar</li>
+        <li><ed-icone nome="check" [tamanho]="15" [traco]="2.5" />Funciona no celular</li>
+      </ul>
+    </div>
+    <div class="le-hero-cels" aria-hidden="true">
+      <div class="le-cel-tras"><ld-celular [escala]=".7"><ld-mock-redacoes [fab]="false" /></ld-celular></div>
+      <div class="le-cel-frente"><ld-celular [escala]=".78"><ld-mock-simulados /></ld-celular></div>
+    </div>
+  </section>
+
+  <section class="le-passos" aria-label="Como funciona">
+    <ol>
+      <li><span>1</span><div><b>Faça um simulado onde quiser</b><p>Cursinho, escola, provas antigas do ENEM ou outro app.</p></div></li>
+      <li><span>2</span><div><b>Registre em 30 segundos</b><p>Os acertos de cada área ou a nota de cada competência.</p></div></li>
+      <li><span>3</span><div><b>Veja onde está e para onde ir</b><p>Projeção, evolução e a área que mais rende estudar.</p></div></li>
+    </ol>
+  </section>
+
+  <section class="ld-sec le-modulo" aria-labelledby="t-sim">
+    <div class="le-texto">
+      <span class="le-tag"><ed-icone nome="clipboard-list" [tamanho]="16" />Simulados</span>
+      <h2 id="t-sim">Saiba quantas questões você acerta hoje, de 180</h2>
+      <p class="le-desc">Cada simulado registrado vira um ponto na sua curva. Toque nos itens para ver na tela.</p>
+      <ul class="le-recursos">
+        @for (r of recursosSim; track r.titulo; let i = $index) {
+          <li><button type="button" [class.ativo]="simAtivo === i" (click)="mostrarSim(i)" [attr.aria-pressed]="simAtivo === i">
+            <span class="le-rec-ico"><ed-icone [nome]="r.icone" [tamanho]="17" /></span>
+            <span><b>{{ r.titulo }}</b><small>{{ r.texto }}</small></span>
+          </button></li>
+        }
+      </ul>
+    </div>
+    <div class="le-cel"><ld-celular #celSim [escala]=".8" [paradas]="['.kpis', '.areas-card', '.grafico-card', '.insights-card', '.hist-card']"><ld-mock-simulados /></ld-celular></div>
+  </section>
+
+  <section class="ld-sec le-modulo invertido" aria-labelledby="t-red">
+    <div class="le-texto">
+      <span class="le-tag"><ed-icone nome="pen-line" [tamanho]="16" />Redações</span>
+      <h2 id="t-red">Descubra qual competência separa você dos 900</h2>
+      <p class="le-desc">Registre a nota de cada competência e veja exatamente onde os pontos estão ficando.</p>
+      <ul class="le-recursos">
+        @for (r of recursosRed; track r.titulo; let i = $index) {
+          <li><button type="button" [class.ativo]="redAtivo === i" (click)="mostrarRed(i)" [attr.aria-pressed]="redAtivo === i">
+            <span class="le-rec-ico"><ed-icone [nome]="r.icone" [tamanho]="17" /></span>
+            <span><b>{{ r.titulo }}</b><small>{{ r.texto }}</small></span>
+          </button></li>
+        }
+      </ul>
+    </div>
+    <div class="le-cel"><ld-celular #celRed [escala]=".8" [paradas]="['.kpis', '.comp-card', '.grafico-card', '.insights-card', '.hist-card']"><ld-mock-redacoes /></ld-celular></div>
+  </section>
+
+  <section class="ld-sec le-dica" aria-labelledby="t-dica">
+    <div class="le-dica-cel" aria-hidden="true"><ld-celular [escala]=".72"><ld-mock-redacoes [detalhe]="4" [fab]="false" /></ld-celular></div>
+    <div class="le-texto">
+      <span class="le-tag"><ed-icone nome="book-open" [tamanho]="16" />Em cada competência</span>
+      <h2 id="t-dica">O que é avaliado, o que estudar e onde se perde ponto</h2>
+      <p class="le-desc">Toque em uma competência e veja o guia dela: o que a banca observa, o que revisar e os erros que mais tiram pontos. Sem precisar procurar em outro lugar.</p>
+    </div>
+  </section>
+
+  <section class="ld-sec le-boletim" aria-labelledby="t-boletim">
+    <header class="ld-cab">
+      <span class="ld-sobre">Nota estimada</span>
+      <h2 id="t-boletim">Simulados e redações juntos, como no boletim</h2>
+      <p>A nota do ENEM é a média das cinco provas. O enem.daily estima as quatro objetivas pela TRI a partir dos seus simulados e junta com a média das suas redações.</p>
+    </header>
+    <div class="le-notas" role="img" aria-label="Exemplo de nota estimada: Linguagens 604, Humanas 631, Naturezas 589, Matemática 621, Redação 760, média 641">
+      @for (n of [{ s: 'LC', v: 604, c: 'var(--ed-lc)' }, { s: 'CH', v: 631, c: 'var(--ed-ch)' }, { s: 'CN', v: 589, c: 'var(--ed-cn)' }, { s: 'MT', v: 621, c: 'var(--ed-mt)' }, { s: 'RED', v: 760, c: 'var(--ed-caneta)' }]; track n.s; let i = $index) {
+        <div class="le-nota" [style.--c]="n.c" [style.--h]="(n.v - 300) / 6 + '%'" [style.--i]="i"><span class="le-barra"><i></i></span><b>{{ n.v }}</b><small>{{ n.s }}</small></div>
+      }
+      <div class="le-media"><small>Nota estimada</small><b>~641</b><span>média das 5</span></div>
+    </div>
+    <p class="le-aviso"><ed-icone nome="circle-help" [tamanho]="15" />É uma estimativa para acompanhar sua evolução: a nota oficial depende da TRI de cada edição do ENEM.</p>
+  </section>
+
+  <section class="ld-sec le-faq" aria-labelledby="t-faq">
+    <header class="ld-cab"><h2 id="t-faq">Perguntas frequentes</h2></header>
+    <div class="le-perguntas">
+      <details><summary>Preciso fazer os simulados no enem.daily?</summary><p>Não. Você faz o simulado onde preferir (cursinho, escola, provas antigas, outro app) e registra aqui os acertos de cada área.</p></details>
+      <details><summary>E as redações, quem corrige?</summary><p>Quem corrigiu a sua redação: professor, cursinho ou plataforma de correção. Você registra a nota de cada competência e o enem.daily acompanha a evolução.</p></details>
+      <details><summary>Como a nota é estimada?</summary><p>As quatro provas objetivas são estimadas pela TRI a partir dos seus acertos, e a redação entra com a média das suas notas. É uma referência para acompanhar o progresso, não a nota oficial.</p></details>
+      <details><summary>Funciona no celular?</summary><p>Sim. O enem.daily abre no navegador e pode ser instalado na tela inicial, como um app, sem passar pela loja.</p></details>
+    </div>
+  </section>
+
+  <section class="ld-final" aria-labelledby="t-le-final">
+    <ed-simbolo-dia class="ld-final-simbolo" [cores]="['#FFFFFF', '#FFFFFF', '#FFFFFF', '#FFD66B']" corAnel="#FFFFFF" />
+    <h2 id="t-le-final">Seu próximo simulado já tem onde morar.</h2>
+    <p>Registre, acompanhe e chegue no ENEM sabendo onde está.</p>
+    <div class="ld-ctas">
+      <button class="ld-btn ld-btn-branco" type="button" (click)="comecar()">{{ logado ? 'Abrir meus simulados' : 'Começar grátis' }}<ed-icone nome="arrow-right" [tamanho]="18" /></button>
+      <a class="ld-btn ld-btn-vazado" routerLink="/">Conhecer o desafio diário</a>
+    </div>
+  </section>
+
+  <footer class="ld-rodape">
+    <span class="ld-rodape-marca"><ed-simbolo-dia [animar]="false" /><span class="wm">enem<i class="pt"></i>daily</span></span>
+    <nav aria-label="Links institucionais">
+      <a routerLink="/">Desafio diário</a>
+      <a routerLink="/contato">Contato</a>
+      <a routerLink="/privacidade">Privacidade</a>
+    </nav>
+    <small>© {{ ano }} enem.daily · Feito para quem vai fazer o ENEM.</small>
+  </footer>
+</main>

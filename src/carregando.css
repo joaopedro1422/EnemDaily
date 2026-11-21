@@ -1,0 +1,35 @@
+/* Carregando: o símbolo "O dia em 4" se pinta bolinha por bolinha e tomba para recomeçar */
+.ed-carregando { --tam: 48px; --anel: var(--ed-caneta, #2836C6); --c1: var(--ed-lc, #C7455A); --c2: var(--ed-ch, #12A5E1); --c3: var(--ed-cn, #36B37D); --c4: var(--ed-mt, #D08C21); --ciclo: 2.6s;
+  display: inline-grid; justify-items: center; gap: 12px; color: var(--ed-tinta-3, #626A80); font: 600 14px var(--ed-fonte, 'Schibsted Grotesk', Arial, sans-serif); }
+.ed-carregando svg { width: var(--tam); height: var(--tam); display: block; overflow: visible; }
+.ed-carregando .q { transform-box: view-box; transform-origin: 50% 50%; animation: edc-tombar var(--ciclo) cubic-bezier(.55, 0, .3, 1) infinite; }
+.ed-carregando .a { fill: none; stroke: var(--anel); stroke-width: 5.6; }
+.ed-carregando .p { transform-box: fill-box; transform-origin: center; transform: scale(0); }
+.ed-carregando .p1 { fill: var(--c1); animation: edc-p1 var(--ciclo) linear infinite; }
+.ed-carregando .p2 { fill: var(--c2); animation: edc-p2 var(--ciclo) linear infinite; }
+.ed-carregando .p3 { fill: var(--c3); animation: edc-p3 var(--ciclo) linear infinite; }
+.ed-carregando .p4 { fill: var(--c4); animation: edc-p4 var(--ciclo) linear infinite; }
+.ed-carregando.claro { --anel: rgba(255, 255, 255, .95); --c1: #FFFFFF; --c2: #FFFFFF; --c3: #FFFFFF; --c4: #FFFFFF; }
+.ed-carregando.mini { --tam: 20px; gap: 0; }
+.ed-carregando.mini span { display: none; }
+
+@keyframes edc-p1 { 0%, 4% { transform: scale(0); } 10% { transform: scale(1.25); } 14%, 76% { transform: scale(1); } 84%, 100% { transform: scale(0); } }
+@keyframes edc-p2 { 0%, 17% { transform: scale(0); } 23% { transform: scale(1.25); } 27%, 76% { transform: scale(1); } 84%, 100% { transform: scale(0); } }
+@keyframes edc-p3 { 0%, 30% { transform: scale(0); } 36% { transform: scale(1.25); } 40%, 76% { transform: scale(1); } 84%, 100% { transform: scale(0); } }
+@keyframes edc-p4 { 0%, 43% { transform: scale(0); } 49% { transform: scale(1.25); } 53%, 76% { transform: scale(1); } 84%, 100% { transform: scale(0); } }
+@keyframes edc-tombar {
+  0%, 56% { transform: none; }
+  66% { transform: translate(4px, -6px) rotate(52deg); }
+  74% { transform: translate(0, 0) rotate(96deg); }
+  78% { transform: rotate(88deg); }
+  82%, 100% { transform: rotate(90deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ed-carregando .q { animation: none; }
+  .ed-carregando .p { animation-duration: 5s; }
+}
+
+/* tela de abertura, antes do app carregar */
+.ed-abertura { position: fixed; inset: 0; display: grid; place-items: center; background: var(--ed-papel, #F3F5F9); }
+.ed-abertura .ed-carregando { --tam: 64px; }

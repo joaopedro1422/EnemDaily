@@ -1,0 +1,145 @@
+<div class="rs" [class.fechando]="fechando" role="dialog" aria-modal="true" aria-labelledby="rs-titulo">
+  <div class="rs-fundo" (click)="sair()"></div>
+
+  <section class="rs-folha">
+    <span class="rs-alca" aria-hidden="true"></span>
+    <header class="rs-cab">
+      <div>
+        <span class="rs-rotulo">Resumo da semana · {{ periodo }}</span>
+        <h2 id="rs-titulo">{{ frase }}</h2>
+      </div>
+      <button class="rs-fechar" type="button" (click)="sair()" aria-label="Fechar"><ed-icone nome="x" [tamanho]="20" /></button>
+    </header>
+
+    @if (carregando) {
+      <div class="rs-carregando"><ed-carregando [tamanho]="56" texto="Montando sua semana" /></div>
+    } @else {
+      <div class="lapse" [class.noite]="noite">
+        @for (k of [ciclo]; track k) {
+          <div class="lapse-cena cv-palco" [class.cv-noite]="noite" [innerHTML]="timelapse"></div>
+        }
+        <div class="lapse-topo">
+          <span class="lapse-chip"><ed-icone nome="school" [tamanho]="14" />Seu campus nesta semana</span>
+          <button class="lapse-rever" type="button" (click)="rodarLapse()" aria-label="Rever a construção"><ed-icone nome="activity" [tamanho]="15" />Rever</button>
+        </div>
+        <div class="lapse-contador" [class.zero]="!pecasNovas">
+          @if (pecasNovas) {
+            <b>+{{ pecasMostradas }}</b><span>{{ pecasNovas === 1 ? 'peça construída' : 'peças construídas' }}</span>
+          } @else {
+            <b>{{ totalPecas }}</b><span>peças no campus</span>
+          }
+        </div>
+      </div>
+
+      <dl class="rs-numeros">
+        <div><dt>XP na semana</dt><dd>{{ formatarNumero(xp) }}</dd></div>
+        <div><dt>Acertos</dt><dd>{{ acertos }}<small>/{{ respondidas }}</small></dd></div>
+        <div><dt>Dias ativos</dt><dd>{{ diasAtivos }}<small>/7</small></dd></div>
+        <div><dt>Sequência</dt><dd>{{ sequencia }}<small> {{ sequencia === 1 ? 'dia' : 'dias' }}</small></dd></div>
+      </dl>
+
+      <section class="semana" aria-label="Seus dias na semana">
+        <div class="semana-cab">
+          <h3>Sua semana em 4 cores</h3>
+          <span>cada bolinha é uma área que você acertou</span>
+        </div>
+        <ol class="semana-dias">
+          @for (d of dias; track $index; let i = $index) {
+            <li [class.vazio]="!d.respondidas" [class.hoje]="d.hoje" [class.cheio]="d.acertos === 4" [style.--i]="i">
+              <svg viewBox="0 0 100 100" aria-hidden="true">
+                <circle cx="32.5" cy="32.5" r="13.2" class="anel"/><circle cx="67.5" cy="32.5" r="13.2" class="anel"/>
+                <circle cx="32.5" cy="67.5" r="13.2" class="anel"/><circle cx="67.5" cy="67.5" r="13.2" class="anel"/>
+                @if (d.cores[0]) { <circle class="ponto" cx="32.5" cy="32.5" r="8.4" [attr.fill]="d.cores[0]"/> }
+                @if (d.cores[1]) { <circle class="ponto" cx="67.5" cy="32.5" r="8.4" [attr.fill]="d.cores[1]"/> }
+                @if (d.cores[2]) { <circle class="ponto" cx="32.5" cy="67.5" r="8.4" [attr.fill]="d.cores[2]"/> }
+                @if (d.cores[3]) { <circle class="ponto" cx="67.5" cy="67.5" r="8.4" [attr.fill]="d.cores[3]"/> }
+              </svg>
+              <b>{{ d.letra }}</b>
+              <small>{{ d.respondidas ? d.acertos + '/' + d.respondidas : '—' }}</small>
+            </li>
+          }
+        </ol>
+        <ul class="semana-legenda">
+          <li style="--c: var(--ed-lc)">Linguagens</li><li style="--c: var(--ed-ch)">Humanas</li><li style="--c: var(--ed-cn)">Naturezas</li><li style="--c: var(--ed-mt)">Matemática</li>
+        </ul>
+      </section>
+
+      <div class="rs-post">
+        <div class="rs-post-cab">
+          <h3><ed-icone nome="sparkles" [tamanho]="16" />Poste sua semana</h3>
+          <p>Uma imagem pronta para os stories. Marque seus amigos e chame para o desafio.</p>
+        </div>
+
+        <div class="moldura" #moldura>
+          <div class="arte-escala" [style.transform]="'scale(' + escala + ')'">
+            <div class="arte" #arte>
+              <div class="arte-luz" aria-hidden="true"><i></i><i></i><i></i></div>
+              <header class="arte-topo">
+                <span class="arte-marca">
+                  <svg viewBox="0 0 100 100" aria-hidden="true">
+                    <circle cx="32.5" cy="32.5" r="13.2" fill="none" stroke="#FFFFFF" stroke-width="5.6"/><circle cx="67.5" cy="32.5" r="13.2" fill="none" stroke="#FFFFFF" stroke-width="5.6"/>
+                    <circle cx="32.5" cy="67.5" r="13.2" fill="none" stroke="#FFFFFF" stroke-width="5.6"/><circle cx="67.5" cy="67.5" r="13.2" fill="none" stroke="#FFFFFF" stroke-width="5.6"/>
+                    <circle cx="32.5" cy="32.5" r="7.6" fill="#FFFFFF"/><circle cx="67.5" cy="32.5" r="7.6" fill="#FFFFFF"/><circle cx="32.5" cy="67.5" r="7.6" fill="#FFFFFF"/>
+                  </svg>
+                  enem<i></i>daily
+                </span>
+                <span class="arte-periodo">{{ periodo }}</span>
+              </header>
+
+              <div class="arte-hero">
+                <span class="arte-rot">Minha semana no desafio diário</span>
+                <b class="arte-xp">{{ acertos }}<small>/{{ respondidas }}</small></b>
+                <span class="arte-xp-rot">acertos em {{ diasAtivos }} {{ diasAtivos === 1 ? 'dia' : 'dias' }}</span>
+                <span class="arte-frase">{{ frase }}</span>
+              </div>
+
+              <ol class="arte-semana">
+                @for (d of dias; track $index) {
+                  <li [class.vazio]="!d.respondidas" [class.hoje]="d.hoje">
+                    <svg viewBox="0 0 100 100" aria-hidden="true">
+                      <circle cx="32.5" cy="32.5" r="13.2" class="anel"/><circle cx="67.5" cy="32.5" r="13.2" class="anel"/>
+                      <circle cx="32.5" cy="67.5" r="13.2" class="anel"/><circle cx="67.5" cy="67.5" r="13.2" class="anel"/>
+                      @if (d.cores[0]) { <circle cx="32.5" cy="32.5" r="8.4" [attr.fill]="d.cores[0]"/> }
+                      @if (d.cores[1]) { <circle cx="67.5" cy="32.5" r="8.4" [attr.fill]="d.cores[1]"/> }
+                      @if (d.cores[2]) { <circle cx="32.5" cy="67.5" r="8.4" [attr.fill]="d.cores[2]"/> }
+                      @if (d.cores[3]) { <circle cx="67.5" cy="67.5" r="8.4" [attr.fill]="d.cores[3]"/> }
+                    </svg>
+                    <span>{{ d.letra }}</span>
+                  </li>
+                }
+              </ol>
+
+              <div class="arte-grade">
+                <div><b>+{{ formatarNumero(xp) }}</b><span>XP conquistados</span></div>
+                <div><b>{{ taxa }}%</b><span>de aproveitamento</span></div>
+                <div><b>{{ sequencia }}</b><span>{{ sequencia === 1 ? 'dia seguido' : 'dias seguidos' }}</span></div>
+                <div><b>+{{ pecasNovas }}</b><span>peças no campus</span></div>
+              </div>
+
+              <div class="arte-campus">
+                <div class="arte-campus-cena" [innerHTML]="campusArte"></div>
+                <span class="arte-campus-rot">Meu campus · {{ totalPecas }} peças</span>
+              </div>
+
+              <footer class="arte-pe">
+                <b>4 questões por dia. Bora competir?</b>
+                <span>{{ site }}</span>
+              </footer>
+            </div>
+          </div>
+        </div>
+
+        <div class="rs-acoes">
+          <button class="btn-insta" type="button" [disabled]="gerando" (click)="compartilhar()">
+            @if (gerando) { <ed-carregando [mini]="true" [claro]="true" />Gerando imagem } @else {
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17.3" cy="6.7" r="1.2" fill="currentColor"/></svg>
+              Compartilhar nos stories
+            }
+          </button>
+          <button class="btn-baixar" type="button" [disabled]="gerando" (click)="baixar()" aria-label="Baixar imagem"><ed-icone nome="arrow-up" [tamanho]="18" class="vira" /></button>
+        </div>
+        @if (aviso) { <p class="rs-aviso">{{ aviso }}</p> }
+      </div>
+    }
+  </section>
+</div>

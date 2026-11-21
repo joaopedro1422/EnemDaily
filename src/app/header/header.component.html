@@ -1,0 +1,129 @@
+<header class="topo" [class.rolou]="rolou">
+  <div class="topo-interno">
+    <div class="topo-esq">
+      @if (usuarioLogado) {
+        <button class="icone-btn menu-btn" type="button" (click)="alternarMenu()" aria-label="Abrir menu">
+          <ed-icone nome="menu" [tamanho]="22" />
+          @if (pendentesComunidade) { <i class="menu-ponto" aria-hidden="true"></i> }
+        </button>
+      }
+      <a routerLink="/Home" class="assinatura" aria-label="enem.daily, ir para o início">
+        <ed-simbolo-dia [animar]="false" />
+        <span class="wm">enem<i class="pt"></i>daily</span>
+      </a>
+    </div>
+
+    @if (usuarioLogado) {
+      <nav class="nav-larga" aria-label="Navegação principal">
+        <a routerLink="/Home" routerLinkActive="ativo" [routerLinkActiveOptions]="{ exact: true }">Início</a>
+        <a routerLink="/homeGrupos" routerLinkActive="ativo">Grupos</a>
+        <a routerLink="/amigos" routerLinkActive="ativo">Amigos@if (pendentesComunidade) { <i class="nav-bolha">{{ pendentesComunidade }}</i> }</a>
+        <a routerLink="/simulados" routerLinkActive="ativo">Simulados</a>
+        <a routerLink="/redacoes" routerLinkActive="ativo">Redações</a>
+        <a routerLink="/conteudos" routerLinkActive="ativo">Conteúdos</a>
+      </nav>
+    }
+
+    <div class="topo-dir">
+      @if (usuarioLogado) {
+        <span class="xp" [class.subiu]="ganhouXpUsuario" title="XP total">{{ formatarNumero(usuarioLogado.xpTotal) }} XP</span>
+        <button class="avatar-btn" type="button" (click)="abrirPerfil()" aria-label="Abrir meu perfil">
+          <ed-avatar [valor]="usuarioLogado.avatar" [nome]="usuarioLogado.nome || usuarioLogado.usuario" [tamanho]="40" [encher]="true" />
+        </button>
+      } @else {
+        <button class="btn-entrar" type="button" (click)="abrirLogin()">Entrar</button>
+      }
+    </div>
+  </div>
+</header>
+
+@if (menuOpen) {
+  <div class="veu" (click)="alternarMenu()"></div>
+}
+
+<aside class="gaveta" [class.aberta]="menuOpen" [attr.aria-hidden]="!menuOpen" aria-label="Menu">
+  <div class="gaveta-topo">
+    <div class="perfil">
+      <div class="perfil-avatar">
+        <ed-avatar [valor]="usuarioLogado?.avatar" [nome]="usuarioLogado?.nome || usuarioLogado?.usuario || ''" [tamanho]="52" [encher]="true" />
+        <button class="perfil-editar" type="button" (click)="abrirAvatares()" aria-label="Trocar avatar">
+          <ed-icone nome="pen-line" [tamanho]="13" />
+        </button>
+      </div>
+      <div class="perfil-texto">
+        <b>{{ usuarioLogado?.nome }}</b>
+        <span>&#64;{{ usuarioLogado?.usuario }} · {{ pecasCampus }} peças no campus</span>
+      </div>
+    </div>
+    <button class="icone-btn" type="button" (click)="alternarMenu()" aria-label="Fechar menu">
+      <ed-icone nome="x" [tamanho]="20" />
+    </button>
+  </div>
+
+  <button class="ver-perfil" type="button" (click)="abrirPerfil()">
+    <span>Meu perfil</span>
+    <ed-icone nome="chevron-right" [tamanho]="18" />
+  </button>
+
+  <nav class="gaveta-nav">
+    <span class="gaveta-rotulo">Desafio Diário</span>
+    <a routerLink="/Home" routerLinkActive="ativo" [routerLinkActiveOptions]="{ exact: true }" (click)="fecharMenu()"><ed-icone nome="house" />Início</a>
+    <a routerLink="/progresso" routerLinkActive="ativo" (click)="fecharMenu()"><ed-icone nome="school" />Meu campus</a>
+    <a routerLink="/homeGrupos" routerLinkActive="ativo" (click)="fecharMenu()"><ed-icone nome="podio" />Grupos de competição</a>
+    <a routerLink="/amigos" routerLinkActive="ativo" (click)="fecharMenu()"><ed-icone nome="users" />Amigos@if (pendentesComunidade) { <i class="nav-bolha">{{ pendentesComunidade }}</i> }</a>
+    <a routerLink="/estatisticas" routerLinkActive="ativo" (click)="fecharMenu()"><ed-icone nome="chart-column" />Estatísticas</a>
+    <span class="gaveta-rotulo">Estudos</span>
+    <a routerLink="/simulados" routerLinkActive="ativo" (click)="fecharMenu()"><ed-icone nome="clipboard-list" />Simulados</a>
+    <a routerLink="/redacoes" routerLinkActive="ativo" (click)="fecharMenu()"><ed-icone nome="pen-line" />Redações</a>
+    <a routerLink="/conteudos" routerLinkActive="ativo" (click)="fecharMenu()"><ed-icone nome="book-open" />Conteúdos</a>
+  </nav>
+
+  <div class="gaveta-pe">
+    @if (mostrarInstalar) {
+      <div class="app-instalar">
+        <img class="app-ico" src="icons/icon-96x96.png" alt="" width="40" height="40" />
+        <div class="app-txt">
+          <b>Instale o enem.daily</b>
+          @if (instalacao === 'ios') {
+            <small>Toque em <ed-icone nome="arrow-up" [tamanho]="12" /> Compartilhar e depois em <b>Adicionar à Tela de Início</b>.</small>
+          } @else {
+            <small>Abra direto da tela inicial, em tela cheia.</small>
+          }
+        </div>
+        <button class="app-fechar" type="button" (click)="dispensarInstalacao()" aria-label="Agora não"><ed-icone nome="x" [tamanho]="14" /></button>
+        @if (instalacao === 'disponivel') {
+          <button class="app-btn" type="button" (click)="instalarApp()"><ed-icone nome="smartphone" [tamanho]="16" />Instalar app</button>
+        }
+      </div>
+    }
+    <label class="app-lembrete" [class.ativo]="sons">
+      <span class="app-sino"><ed-icone [nome]="sons ? 'volume-2' : 'volume-x'" [tamanho]="17" /></span>
+      <span class="app-txt"><b>Sons</b><small>{{ sons ? 'Efeitos sonoros ligados' : 'Efeitos sonoros desligados' }}</small></span>
+      <input type="checkbox" role="switch" [checked]="sons" (change)="alternarSons($event)" aria-label="Efeitos sonoros" />
+    </label>
+    @if (lembrete !== 'indisponivel') {
+      <label class="app-lembrete" [class.ativo]="lembrete === 'ativo'">
+        <span class="app-sino"><ed-icone nome="bell" [tamanho]="17" /></span>
+        <span class="app-txt"><b>Lembrete às 10h</b><small>{{ textoLembrete }}</small></span>
+        <input type="checkbox" role="switch" [checked]="lembrete === 'ativo'" [disabled]="lembrete === 'carregando' || lembrete === 'negado' || lembrete === 'precisa-instalar'" (change)="alternarLembrete($event)" aria-label="Lembrete diário às 10h" />
+      </label>
+    }
+    @if (!confirmandoSaida) {
+      <div class="gaveta-rodape">
+        <button class="gaveta-acao" type="button" (click)="confirmandoSaida = true"><ed-icone nome="log-out" />Sair</button>
+        <a class="gaveta-config" routerLink="/configuracoes" (click)="fecharMenu()" aria-label="Configurações" title="Configurações"><ed-icone nome="engrenagem" [tamanho]="19" /></a>
+      </div>
+    } @else {
+      <div class="confirma-saida">
+        <span>Sair da sua conta?</span>
+        <div>
+          <button class="btn-sair" type="button" (click)="logout()">Sair</button>
+          <button class="btn-cancelar" type="button" (click)="confirmandoSaida = false">Cancelar</button>
+        </div>
+      </div>
+    }
+  </div>
+</aside>
+
+<app-perfil *ngIf="mostrarModalAvatar" (close)="fecharAvatares()"></app-perfil>
+<app-perfil-externo *ngIf="mostrarModalUniversidade" (close)="fecharUniversidade()" (trocarAvatar)="fecharUniversidade(); mostrarModalAvatar = true" [usuarioExternoBoolean]="false" [usuarioSessao]="usuarioLogado"></app-perfil-externo>

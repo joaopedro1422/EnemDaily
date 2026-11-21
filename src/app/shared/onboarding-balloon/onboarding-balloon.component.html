@@ -1,0 +1,23 @@
+<div class="overlay" *ngIf="visible"></div>
+<div class="onboarding-wrapper" *ngIf="visible">
+  <div class="balloon">
+    <div class="text">
+      {{ displayedText }}<span class="cursor">|</span>
+    </div>
+
+    <button class="next-btn" (click)="next()" *ngIf="stepIndex !== steps.length - 1">
+     Próximo →
+    </button>
+    <div class="container-buttons" *ngIf="stepIndex === steps.length - 1">
+      <button class="next-btn cadastro" (click)="cadastro()">
+          Cadastre-se
+        </button>
+         <button class="next-btn" (click)="logarDemo()">
+          Continuar →
+        </button>
+    </div>
+ 
+  </div>
+
+  <div class="arrow"></div>
+</div>

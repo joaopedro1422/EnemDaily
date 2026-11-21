@@ -1,0 +1,74 @@
+@if (atual; as a) {
+  <div class="dm" [class.fechando]="fechando" role="dialog" aria-modal="true" aria-labelledby="da-titulo">
+    <div class="dm-fundo"></div>
+    <section class="dm-folha">
+      @if (a.tipo === 'convite') {
+        <header class="arena">
+          <span class="arena-sobre">{{ aceito ? 'Duelo marcado' : 'Você foi desafiado' }}</span>
+          <div class="versus">
+            <div class="versus-lado">
+              <span class="versus-av"><ed-avatar [valor]="a.duelo.oponente.avatar" [nome]="a.duelo.oponente.nome || a.duelo.oponente.usuario" [tamanho]="68" [encher]="true" /></span>
+              <b>&#64;{{ a.duelo.oponente.usuario }}</b>
+            </div>
+            <div class="versus-meio"><ed-espadas [tamanho]="120" /></div>
+            <div class="versus-lado">
+              <span class="versus-av"><ed-avatar [valor]="eu?.avatar" [nome]="eu?.nome || eu?.usuario || ''" [tamanho]="68" [encher]="true" /></span>
+              <b>Você</b>
+            </div>
+          </div>
+          @if (aceito) {
+            <h2 id="da-titulo">Combinado: {{ nomeDoDia(aceito.dia) }}!</h2>
+            <p>No dia, responda as 4 questões do desafio diário. Vence quem fizer mais XP. Boa sorte!</p>
+          } @else {
+            <h2 id="da-titulo">&#64;{{ a.duelo.oponente.usuario }} te chamou para um duelo</h2>
+            <p>Marcado para <b>{{ nomeDoDia(a.duelo.dia) }}</b>. Vence quem fizer mais XP no desafio diário desse dia.</p>
+          }
+        </header>
+        <div class="dm-corpo">
+          @if (erro) { <p class="dm-erro" role="alert">{{ erro }}</p> }
+          @if (aceito) {
+            <button class="dm-pri" type="button" (click)="seguir()">Fechar</button>
+          } @else {
+            <div class="dm-acoes">
+              <button class="dm-sec" type="button" (click)="depois()" [disabled]="ocupado">Agora não</button>
+              <button class="dm-pri" type="button" (click)="aceitar()" [disabled]="ocupado">
+                @if (ocupado) { <ed-carregando [mini]="true" /> } @else { <ed-icone nome="swords" [tamanho]="18" />Aceitar }
+              </button>
+            </div>
+            <div class="dm-acoes dm-links">
+              <button class="dm-link" type="button" (click)="verPerfil()">Ver perfil</button>
+              <button class="dm-link" type="button" (click)="recusar()" [disabled]="ocupado">Recusar</button>
+            </div>
+          }
+          @if (total > 1) { <div class="contador" aria-hidden="true">@for (i of pontos; track i) { <i [class.at]="i === posicao - 1"></i> }</div> }
+        </div>
+      } @else {
+        <header class="arena">
+          <span class="arena-sobre">Resultado do duelo · {{ nomeDoDia(a.duelo.dia) }}</span>
+          <ed-espadas [tamanho]="110" />
+          <span class="selo-resultado" [class.vitoria]="a.duelo.resultado === 'VITORIA'">
+            <ed-icone [nome]="a.duelo.resultado === 'VITORIA' ? 'trophy' : a.duelo.resultado === 'EMPATE' ? 'swords' : 'flame'" [tamanho]="14" />
+            {{ a.duelo.resultado === 'VITORIA' ? 'Vitória' : a.duelo.resultado === 'EMPATE' ? 'Empate' : 'Derrota' }}
+          </span>
+          <h2 id="da-titulo">{{ tituloResultado }}</h2>
+          <div class="placar-grande">
+            <div><small>Você</small><b>{{ a.duelo.meuXp }}</b></div>
+            <span>×</span>
+            <div><small>&#64;{{ a.duelo.oponente.usuario }}</small><b>{{ a.duelo.xpOponente }}</b></div>
+          </div>
+          <p>XP do dia · {{ a.duelo.meusAcertos }} × {{ a.duelo.acertosOponente }} acertos</p>
+        </header>
+        <div class="dm-corpo">
+          <div class="dm-acoes">
+            <button class="dm-sec" type="button" (click)="fecharResultado()">Fechar</button>
+            <button class="dm-pri" type="button" (click)="pedirRevanche()"><ed-icone nome="rotate-ccw" [tamanho]="18" />{{ a.duelo.resultado === 'VITORIA' ? 'Duelar de novo' : 'Pedir revanche' }}</button>
+          </div>
+          @if (total > 1) { <div class="contador" aria-hidden="true">@for (i of pontos; track i) { <i [class.at]="i === posicao - 1"></i> }</div> }
+        </div>
+      }
+    </section>
+  </div>
+}
+@if (revanche) {
+  <app-duelo-convite [alvo]="revanche" (fechar)="revanche = null" />
+}

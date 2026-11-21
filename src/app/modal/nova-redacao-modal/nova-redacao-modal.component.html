@@ -1,0 +1,73 @@
+<div class="nr" [class.fechando]="fechando" role="dialog" aria-modal="true" aria-labelledby="nr-titulo">
+  <div class="nr-fundo" (click)="fechar()"></div>
+
+  <form class="nr-folha" (ngSubmit)="salvar()">
+    <span class="nr-alca" aria-hidden="true"></span>
+    <header class="nr-cab">
+      <div>
+        <h2 id="nr-titulo">Registrar redação</h2>
+        <p>Anote a nota que você recebeu na correção.</p>
+      </div>
+      <button class="nr-fechar" type="button" (click)="fechar()" aria-label="Fechar"><ed-icone nome="x" [tamanho]="20" /></button>
+    </header>
+
+    <div class="seg" role="radiogroup" aria-label="Como registrar" [style.--idx]="modo === 'comp' ? 0 : 1">
+      <span class="seg-marca" aria-hidden="true"></span>
+      <button type="button" role="radio" [attr.aria-checked]="modo === 'comp'" (click)="modo = 'comp'; erro = ''"><b>Por competência</b><small>Análise completa</small></button>
+      <button type="button" role="radio" [attr.aria-checked]="modo === 'nota'" (click)="modo = 'nota'; erro = ''"><b>Só a nota final</b><small>Mais rápido</small></button>
+    </div>
+
+    @if (modo === 'comp') {
+      <div class="comps">
+        @for (c of competencias; track c.chave; let i = $index) {
+          <fieldset class="comp" [style.--c]="c.cor" [style.--i]="i">
+            <legend>
+              <span class="comp-sigla">{{ c.sigla }}</span>
+              <span class="comp-nome"><b>{{ c.nome }}</b><small>{{ c.resumo }}</small></span>
+              <span class="comp-val">{{ comp[c.chave] ?? '—' }}</span>
+            </legend>
+            <div class="pilulas" role="radiogroup" [attr.aria-label]="'Nota em ' + c.sigla">
+              @for (n of niveis; track n) {
+                <button type="button" role="radio" [attr.aria-checked]="comp[c.chave] === n" [class.sel]="comp[c.chave] === n"
+                        [class.ate]="comp[c.chave] !== null && n <= comp[c.chave]!" (click)="escolher(c.chave, n)">{{ n }}</button>
+              }
+            </div>
+          </fieldset>
+        }
+      </div>
+    } @else {
+      <div class="manual">
+        <span>Nota final</span>
+        <div class="manual-ctrl">
+          <button type="button" (click)="ajustarNota(-20)" aria-label="Menos 20 pontos">−</button>
+          <input type="number" inputmode="numeric" min="0" max="1000" step="20" name="nota" [(ngModel)]="notaManual" (blur)="normalizarNota()" placeholder="0" aria-label="Nota final" />
+          <button type="button" (click)="ajustarNota(20)" aria-label="Mais 20 pontos">+</button>
+        </div>
+        <span class="manual-barra"><i [style.width.%]="(notaManual ?? 0) / 10"></i></span>
+        <small>Sem as competências, a análise por competência não inclui esta redação.</small>
+      </div>
+    }
+
+    <div class="nr-total">
+      <span>{{ modo === 'comp' ? 'Nota total · ' + preenchidas + ' de 5' : 'Nota total' }}</span>
+      <b>{{ total }}<small>/1000</small></b>
+    </div>
+
+    <div class="nr-linha">
+      <label class="campo">
+        <span>Data</span>
+        <input type="date" name="data" [(ngModel)]="data" required />
+      </label>
+      <label class="campo">
+        <span>Tema <i>(opcional)</i></span>
+        <input type="text" name="tema" [(ngModel)]="tema" maxlength="160" placeholder="Ex.: Desafios da mobilidade urbana" />
+      </label>
+    </div>
+
+    @if (erro) { <p class="nr-erro">{{ erro }}</p> }
+
+    <button class="nr-salvar" type="submit" [disabled]="enviando">
+      @if (enviando) { <ed-carregando [mini]="true" [claro]="true" />Salvando } @else { <ed-icone nome="check" [tamanho]="18" />Salvar redação }
+    </button>
+  </form>
+</div>

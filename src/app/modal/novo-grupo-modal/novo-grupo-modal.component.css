@@ -1,0 +1,93 @@
+.ng { position: fixed; inset: 0; z-index: 1100; display: flex; align-items: flex-end; justify-content: center; font-family: var(--ed-fonte); color: var(--ed-tinta); }
+.ng-fundo { position: absolute; inset: 0; background: rgba(12, 16, 38, .55); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); animation: aparecer 240ms ease both; }
+@keyframes aparecer { from { opacity: 0; } }
+.ng-folha { position: relative; width: 100%; max-width: 500px; max-height: 94svh; overflow-y: auto; overscroll-behavior: contain; display: grid; gap: 20px; padding: 10px 18px calc(20px + env(safe-area-inset-bottom)); border-radius: 26px 26px 0 0; background: var(--ed-folha); box-shadow: 0 -20px 50px -20px rgba(12, 16, 38, .5); animation: subir 360ms cubic-bezier(.2, .9, .25, 1) both; }
+@keyframes subir { from { transform: translateY(100%); } }
+.ng.fechando .ng-fundo { opacity: 0; transition: opacity 220ms; }
+.ng.fechando .ng-folha { transform: translateY(100%); transition: transform 240ms ease-in; }
+.ng-alca { justify-self: center; width: 40px; height: 4px; border-radius: 2px; background: var(--ed-pauta-forte); }
+
+.ng-cab { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.ng-cab h2 { font-size: 24px; font-weight: 800; letter-spacing: -.035em; }
+.ng-cab p { margin-top: 2px; font-size: 14.5px; color: var(--ed-tinta-2); }
+.ng-fechar { width: 38px; height: 38px; flex-shrink: 0; border-radius: 50%; border: 0; display: grid; place-items: center; background: var(--ed-fundo-2); color: var(--ed-tinta-2); cursor: pointer; }
+
+.ng-identidade { display: flex; gap: 14px; align-items: flex-start; }
+.ng-foto { position: relative; width: 84px; height: 84px; flex-shrink: 0; border-radius: 24px; display: grid; place-content: center; justify-items: center; gap: 2px; border: 1.5px dashed var(--ed-pauta-forte); background: var(--ed-fundo-2); color: var(--ed-tinta-3); cursor: pointer; transition: border-color var(--ed-t-rapido), color var(--ed-t-rapido), background var(--ed-t-rapido); }
+.ng-foto:hover { border-color: var(--ed-caneta); color: var(--ed-caneta-texto); background: var(--ed-caneta-suave); }
+.ng-foto input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.ng-foto:focus-within { outline: 2px solid var(--ed-caneta); outline-offset: 2px; }
+.ng-foto svg { width: 26px; height: 26px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.ng-foto > span { font-size: 12px; font-weight: 700; }
+.ng-foto.com { border: 0; padding: 0; }
+.ng-foto img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 24px; animation: pop 420ms cubic-bezier(.2, 1.5, .5, 1) both; }
+@keyframes pop { from { transform: scale(.7); opacity: 0; } }
+.ng-foto-trocar { position: absolute; right: -6px; bottom: -6px; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; border: 3px solid var(--ed-folha); background: var(--ed-caneta); color: #FFFFFF; }
+
+.ng-campo { flex: 1; min-width: 0; display: grid; gap: 6px; }
+.ng-campo label { font-size: 13px; font-weight: 700; color: var(--ed-tinta-2); }
+.ng-campo input { width: 100%; height: 50px; padding: 0 14px; border-radius: 14px; border: 1.5px solid var(--ed-pauta-forte); background: var(--ed-folha); color: var(--ed-tinta); font: 600 16px var(--ed-fonte); outline: none; transition: border-color var(--ed-t-rapido), box-shadow var(--ed-t-rapido); }
+.ng-campo input::placeholder { color: var(--ed-tinta-3); font-weight: 500; }
+.ng-campo input:focus { border-color: var(--ed-caneta); box-shadow: 0 0 0 4px var(--ed-caneta-suave); }
+.ng-dica { display: flex; justify-content: space-between; font-size: 12.5px; color: var(--ed-tinta-3); }
+.ng-dica.ok { color: var(--ed-ok); }
+.ng-dica b { font-weight: 600; color: var(--ed-tinta-3); font-variant-numeric: tabular-nums; }
+
+.ng-bloco { border: 0; margin: 0; padding: 0; min-width: 0; display: grid; gap: 10px; }
+.ng-bloco legend { display: flex; justify-content: space-between; width: 100%; margin-bottom: 10px; font-size: 13px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--ed-tinta-3); }
+.ng-bloco legend span { letter-spacing: 0; text-transform: none; font-weight: 600; }
+
+.ng-privacidade { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.opcao { position: relative; min-width: 0; display: grid; gap: 2px; padding: 14px; border-radius: 16px; border: 1.5px solid var(--ed-pauta); background: var(--ed-folha); cursor: pointer; transition: border-color var(--ed-t-rapido), background var(--ed-t-rapido), box-shadow var(--ed-t-rapido); }
+.opcao input { position: absolute; opacity: 0; pointer-events: none; }
+.opcao:focus-within { outline: 2px solid var(--ed-caneta); outline-offset: 2px; }
+.opcao-ico { width: 34px; height: 34px; margin-bottom: 6px; border-radius: 11px; display: grid; place-items: center; background: var(--ed-fundo-2); color: var(--ed-tinta-2); transition: background var(--ed-t-rapido), color var(--ed-t-rapido); }
+.opcao b { font-size: 15px; font-weight: 700; }
+.opcao small { font-size: 12.5px; color: var(--ed-tinta-3); line-height: 1.35; }
+.opcao.ativa { border-color: var(--ed-caneta); background: color-mix(in srgb, var(--ed-caneta) 5%, var(--ed-folha)); box-shadow: 0 0 0 1px var(--ed-caneta); }
+.opcao.ativa .opcao-ico { background: var(--ed-caneta); color: #FFFFFF; }
+
+.ng-areas { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.area { position: relative; min-width: 0; width: 100%; display: flex; align-items: center; gap: 8px; padding: 9px 10px; border-radius: 14px; border: 1.5px solid var(--ed-pauta); background: var(--ed-folha); color: var(--ed-tinta-2); font-family: var(--ed-fonte); text-align: left; cursor: pointer; transition: border-color var(--ed-t-rapido), background var(--ed-t-rapido), color var(--ed-t-rapido), transform var(--ed-t-rapido); }
+.area:active { transform: scale(.97); }
+.area:focus-visible { outline: 2px solid var(--ed-caneta); outline-offset: 2px; }
+.area-ico { width: 30px; height: 30px; flex-shrink: 0; border-radius: 10px; display: grid; place-items: center; background: var(--ed-fundo-2); color: var(--ed-tinta-3); transition: background var(--ed-t-rapido), color var(--ed-t-rapido); }
+.area-nome { flex: 1; min-width: 0; font-size: 13.5px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.area-check { width: 20px; height: 20px; flex-shrink: 0; border-radius: 50%; display: grid; place-items: center; border: 1.5px solid var(--ed-pauta-forte); color: transparent; transition: background var(--ed-t-rapido), border-color var(--ed-t-rapido), color var(--ed-t-rapido); }
+.area.ativa { border-color: var(--c); background: color-mix(in srgb, var(--c) 9%, var(--ed-folha)); color: var(--ed-tinta); }
+.area.ativa .area-ico { background: var(--c); color: #FFFFFF; }
+.area.ativa .area-check { background: var(--ct); border-color: var(--ct); color: #FFFFFF; animation: marcar 320ms cubic-bezier(.2, 1.6, .5, 1); }
+@keyframes marcar { from { transform: scale(.4); } }
+.ng-nota { font-size: 13px; color: var(--ed-tinta-3); line-height: 1.4; }
+
+.ng-erro { padding: 10px 12px; border-radius: 12px; background: var(--ed-erro-suave); color: var(--ed-erro); font-size: 14px; font-weight: 600; }
+
+.ng-criar { height: 54px; border: 0; border-radius: 16px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: var(--ed-caneta); color: var(--ed-sobre-caneta); font: 700 16px var(--ed-fonte); cursor: pointer; box-shadow: 0 12px 24px -14px rgba(40, 54, 198, .8); transition: background var(--ed-t-rapido), transform var(--ed-t-rapido); }
+.ng-criar:not(:disabled):hover { background: var(--ed-caneta-hover); }
+.ng-criar:not(:disabled):active { transform: scale(.985); }
+.ng-criar:disabled { background: var(--ed-fundo-2); color: var(--ed-tinta-3); box-shadow: none; cursor: default; }
+.girando { width: 18px; height: 18px; border-radius: 50%; border: 2.5px solid rgba(255, 255, 255, .35); border-top-color: #FFFFFF; animation: girar 700ms linear infinite; }
+.ng-criar:disabled .girando { border-color: var(--ed-pauta-forte); border-top-color: var(--ed-caneta); }
+@keyframes girar { to { transform: rotate(360deg); } }
+
+.ng-pronto { display: grid; justify-items: center; gap: 8px; padding: 36px 8px 28px; text-align: center; }
+.ng-pronto-ico svg { width: 84px; height: 84px; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.ng-pronto-ico circle { stroke: var(--ed-ok); stroke-width: 3; stroke-dasharray: 152; stroke-dashoffset: 152; animation: tracar 600ms ease-out forwards; }
+.ng-pronto-ico path { stroke: var(--ed-ok); stroke-width: 4; stroke-dasharray: 40; stroke-dashoffset: 40; animation: tracar 360ms ease-out 480ms forwards; }
+@keyframes tracar { to { stroke-dashoffset: 0; } }
+.ng-pronto h2 { font-size: 24px; font-weight: 800; letter-spacing: -.03em; animation: ed-surgir 400ms var(--ed-curva) 500ms both; }
+.ng-pronto p { font-size: 15px; color: var(--ed-tinta-2); animation: ed-surgir 400ms var(--ed-curva) 620ms both; }
+
+@media (max-width: 360px) {
+  .area-check { display: none; }
+  .area-nome { font-size: 13px; }
+}
+@media (min-width: 640px) {
+  .area { gap: 10px; padding: 10px 12px; }
+  .area-nome { font-size: 14.5px; }
+  .ng { align-items: center; padding: 24px; }
+  .ng-folha { border-radius: 26px; padding: 22px 26px 26px; max-height: calc(100svh - 48px); animation: entrar 340ms cubic-bezier(.2, 1.1, .4, 1) both; }
+  @keyframes entrar { from { opacity: 0; transform: translateY(18px) scale(.97); } }
+  .ng.fechando .ng-folha { transform: scale(.97); opacity: 0; transition: transform 220ms, opacity 220ms; }
+  .ng-alca { display: none; }
+}

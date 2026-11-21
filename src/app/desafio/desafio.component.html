@@ -1,0 +1,207 @@
+@if (info) {
+<div class="prova" [style.--a]="info.cor" [style.--at]="info.corTexto">
+
+  @if (fase === 'capa' && !direto && !revisao) {
+    <section class="capa" aria-live="polite">
+      <button class="capa-sair" type="button" (click)="sair()" aria-label="Voltar ao painel"><ed-icone nome="x" [tamanho]="20" /></button>
+      <div class="capa-miolo">
+        <span class="capa-selo">enem<span class="pt"></span>daily · {{ dataCurta }}</span>
+        <p class="capa-rotulo">Caderno de</p>
+        <h1>{{ info.nome }}</h1>
+        <p class="capa-num">Questão {{ numero }} de 4</p>
+        @if (questao) {
+          <p class="capa-assunto">{{ questao.assunto }}</p>
+        } @else if (!falhouCarregar) {
+          <p class="capa-assunto esqueleto"></p>
+        }
+        <ul class="capa-regras">
+          <li><ed-icone nome="clock" [tamanho]="17" /><span><b>3min30 para responder.</b> O tempo começa ao abrir.</span></li>
+          <li><ed-icone nome="trophy" [tamanho]="17" /><span><b>Até 70 XP</b> se acertar nos primeiros 40s.</span></li>
+          @if (bonusSequencia) {
+            <li><ed-icone nome="flame" [tamanho]="17" /><span><b>+{{ bonusSequencia }}% de bônus</b> pela sua sequência.</span></li>
+          }
+          <li><ed-icone nome="school" [tamanho]="17" /><span><b>Acertou, +1 peça</b> em {{ nomeRegiao }} no campus.</span></li>
+          <li><ed-icone nome="lock" [tamanho]="17" /><span>Depois de começar, a questão conta como feita.</span></li>
+        </ul>
+      </div>
+      <div class="capa-acoes">
+        @if (falhouCarregar) {
+          <p class="capa-erro">Não foi possível abrir a questão.</p>
+          <button class="btn-claro" type="button" (click)="irPara('painel')">Voltar ao painel</button>
+        } @else {
+          <button class="btn-claro grande" type="button" [disabled]="!questao" (click)="comecar()">
+            @if (!questao) { <ed-carregando [mini]="true" /> }
+            {{ questao ? 'Começar' : 'Preparando a questão…' }}
+            @if (questao) { <ed-icone nome="arrow-right" [tamanho]="18" /> }
+          </button>
+          <button class="capa-depois" type="button" (click)="irPara('painel')">Agora não</button>
+        }
+      </div>
+    </section>
+  } @else if (questao && fase !== 'capa') {
+
+    <header class="faixa" [class.alerta]="alerta">
+      <div class="faixa-in">
+        <button class="faixa-sair" type="button" (click)="sair()" aria-label="Sair da questão"><ed-icone nome="x" [tamanho]="18" /></button>
+        <div class="faixa-area">
+          <span class="faixa-ico"><ed-icone [nome]="info.icone" [tamanho]="15" /></span>
+          <span><b>{{ info.nome }}</b><small>Questão {{ numero }} de 4</small></span>
+        </div>
+        <div class="faixa-tempo" role="timer" [attr.aria-label]="'Tempo restante ' + tempoTexto">
+          <ed-icone nome="clock" [tamanho]="15" />
+          <span>{{ fase === 'prova' ? tempoTexto : tempoGastoTexto }}</span>
+        </div>
+      </div>
+      <div class="faixa-barra"><b [style.width.%]="fase === 'prova' ? pctTempo : 0"></b></div>
+    </header>
+
+    <main class="miolo">
+      <article class="folha" [class.corrigida]="fase === 'resultado'" [class.entrando]="direto">
+        <div class="folha-cab">
+          <div class="folha-q">
+            <span>Questão</span>
+            <b>{{ numero < 10 ? '0' + numero : numero }}</b>
+          </div>
+          <div class="folha-meta">
+            <span class="folha-caderno">Caderno de {{ info.nome }}</span>
+            <span class="folha-assunto">{{ questao.assunto }}</span>
+          </div>
+          @if (fase === 'resultado') {
+            <span class="carimbo" [class.ok]="resultado === 'acerto'">
+              {{ esgotou ? 'Tempo esgotado' : resultado === 'acerto' ? 'Certa' : 'Errada' }}
+            </span>
+          }
+        </div>
+
+        <div class="folha-corpo">
+          <ed-texto-base [questao]="questao" />
+          <p class="folha-enunciado" [innerHTML]="questao.enunciado"></p>
+
+          <ol class="alts" aria-label="Alternativas">
+            @for (alt of questao.alternativas; track $index; let i = $index) {
+              <li>
+                <button type="button" class="alt {{ estadoAlt(i) }}" [disabled]="fase !== 'prova'"
+                        [attr.aria-pressed]="selecionada === i" (click)="selecionar(i)">
+                  <span class="bolha">
+                    <svg class="tinta" viewBox="0 0 34 34" aria-hidden="true"><path class="rabisco" d="M9 9 22 6 6 14 27 9 5 19 29 14 6 24 29 20 9 28 27 25 14 30"/><circle class="cheia" cx="17" cy="17" r="16"/></svg>
+                    <span class="letra">{{ letras[i] }}</span>
+                    <svg class="marca-ok" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 4C11 3.5 3.6 12.5 4.2 24.6 4.8 36 13 44 24.8 43.6 36.4 43.2 44.4 35 43.8 23.2 43.2 12 35.6 4.6 23 5.2 18 5.5 13 7.4 10 10"/></svg>
+                    <svg class="marca-erro" viewBox="0 0 48 48" aria-hidden="true"><path d="M10 10 38 38M38 10 10 38"/></svg>
+                  </span>
+                  <span class="alt-texto" [innerHTML]="alt.texto"></span>
+                </button>
+              </li>
+            }
+          </ol>
+        </div>
+
+        <footer class="folha-pe">
+          <span>{{ codigoPagina }}</span>
+          <span>enem<span class="pt"></span>daily</span>
+        </footer>
+      </article>
+
+      @if (fase === 'resultado') {
+        <section class="res" aria-live="polite">
+
+          <div class="res-placar" [class.ok]="resultado === 'acerto'">
+            @if (resultado === 'acerto') {
+              <div class="res-xp">
+                <span class="res-rot">{{ revisao ? 'Respondida às ' + respondidaEm + ' · você ganhou' : 'Você ganhou' }}</span>
+                <b>+{{ xpMostrado }}<small>XP</small></b>
+                @if (bonusPct && !revisao) {
+                  <span class="res-bonus"><ed-icone nome="flame" [tamanho]="14" />{{ xpBase }} + {{ bonusPct }}% da sequência</span>
+                }
+              </div>
+            } @else {
+              <div class="res-xp">
+                <span class="res-rot">{{ revisao ? 'Respondida às ' + respondidaEm : esgotou ? 'O tempo acabou' : 'Não foi dessa vez' }}</span>
+                <b class="res-zero">0<small>XP</small></b>
+                <span class="res-bonus">A resposta certa é a <strong>{{ letraCerta }}</strong>. Veja a resolução abaixo.</span>
+              </div>
+            }
+            <dl class="res-dados">
+              <div><dt>Tempo</dt><dd>{{ tempoGastoTexto }}</dd></div>
+              <div><dt>Resposta</dt><dd>{{ selecionada !== null ? letras[selecionada] : '—' }}</dd></div>
+            </dl>
+            @if (conquistas.length) {
+              <ul class="res-chips">
+                @for (c of conquistas; track c.texto) {
+                  <li><ed-icone [nome]="c.icone" [tamanho]="14" />{{ c.texto }}</li>
+                }
+              </ul>
+            }
+          </div>
+
+          @if (pecaNova; as p) {
+            <div class="res-campus">
+              <div class="cv-palco res-cena" [class.cv-noite]="p.noite">
+                <div class="cv-cena" [innerHTML]="p.svg"></div>
+                <span class="res-mais">+1 peça</span>
+              </div>
+              <div class="res-campus-txt">
+                <span class="res-rot">Seu campus cresceu</span>
+                <h2>{{ p.nome }}</h2>
+                <p><span class="chip-regiao"><i [style.background]="p.cor"></i>{{ p.regiao }}</span> Peça {{ p.numero }} de {{ totalCampus }}</p>
+                @for (e of p.extras; track e) {
+                  <p class="res-extra">Também: {{ e }}</p>
+                }
+                <button class="btn-link" type="button" (click)="irPara('campus')">Ver no campus<ed-icone nome="arrow-right" [tamanho]="15" /></button>
+              </div>
+            </div>
+          } @else if (pecaEspera) {
+            <div class="res-espera">
+              <span class="res-espera-ico"><ed-icone nome="lock" [tamanho]="16" /></span>
+              <p><span>Peça em espera</span><b>{{ pecaEspera.nome }}</b> Acerte uma questão de {{ pecaEspera.regiao }} para construí-la.</p>
+            </div>
+          } @else if (aguardandoServidor) {
+            <div class="res-espera carregando"><ed-carregando [tamanho]="34" /><p><span>Atualizando seu campus</span></p></div>
+          }
+
+          <ed-resolucao [questao]="questao" [selecionada]="selecionada" />
+        </section>
+      }
+    </main>
+
+    <div class="barra-acao" [class.fim]="fase === 'resultado'">
+      <div class="barra-in">
+        @if (fase === 'prova') {
+          <button class="btn-principal" type="button" [disabled]="selecionada === null" (click)="enviar()">
+            @if (selecionada === null) { Marque uma alternativa } @else { Confirmar alternativa {{ letras[selecionada] }} }
+          </button>
+        } @else if (fase === 'corrigindo') {
+          <button class="btn-principal corrigindo" type="button" disabled>
+            <ed-icone nome="pen-line" [tamanho]="17" />Corrigindo
+          </button>
+        } @else {
+          @if (proxima) {
+            <button class="btn-principal" type="button" (click)="irPara('proxima')">Próxima: {{ proxima.nome }}<ed-icone nome="arrow-right" [tamanho]="17" /></button>
+            <button class="btn-sec" type="button" (click)="irPara('painel')">Painel</button>
+          } @else {
+            <button class="btn-principal" type="button" (click)="irPara('painel')">Voltar ao painel</button>
+          }
+        }
+      </div>
+    </div>
+  } @else {
+    <div class="miolo vazio"><ed-carregando [tamanho]="56" texto="Abrindo a questão" /></div>
+  }
+
+  @if (confirmandoSaida) {
+    <div class="veu" (click)="confirmandoSaida = false"></div>
+    <section class="sair-folha" role="dialog" aria-modal="true" aria-labelledby="titulo-sair">
+      <h2 id="titulo-sair">Sair da questão?</h2>
+      <p>O tempo continua contando e a questão de {{ info.nome }} de hoje fica sem resposta.</p>
+      <div class="sair-acoes">
+        <button class="btn-principal" type="button" (click)="confirmandoSaida = false">Continuar respondendo</button>
+        <button class="btn-sec perigo" type="button" (click)="confirmarSaida()">Sair mesmo assim</button>
+      </div>
+    </section>
+  }
+</div>
+@if (emblemasNovos.length) {
+  <app-novo-emblema [emblemas]="emblemasNovos" (fechar)="emblemasNovos = []" />
+} @else if (resumoDia) {
+  <ed-resumo-dia [resultados]="resumoDia.resultados" [sequencia]="resumoDia.sequencia" [xp]="resumoDia.xp" (fechar)="resumoDia = null" />
+}
+}

@@ -1,0 +1,295 @@
+<div class="adm">
+  <header class="adm-topo">
+    <div>
+      <span class="adm-selo">Admin</span>
+      <h1>Painel do enem<span class="pt"></span>daily</h1>
+    </div>
+    <div class="adm-topo-acoes">
+      <a class="adm-btn-sec" routerLink="/admin/conteudos"><ed-icone nome="book-open" [tamanho]="16" />Conteúdos</a>
+      <button class="adm-btn-sec" type="button" (click)="recarregarTudo()"><ed-icone nome="rotate-ccw" [tamanho]="16" />Atualizar</button>
+    </div>
+  </header>
+
+  @if (semConexao) {
+    <section class="adm-negado" role="alert">
+      <ed-icone nome="circle-x" [tamanho]="18" />
+      <div>
+        <b>Sem conexão com o backend</b>
+        <p>Não consegui falar com o servidor na porta 8080. Tentando de novo a cada 5 segundos.</p>
+        <button class="adm-btn" type="button" (click)="recarregarTudo()">Tentar agora</button>
+      </div>
+    </section>
+  }
+
+  @if (acessoNegado) {
+    <section class="adm-negado">
+      <ed-icone nome="lock" [tamanho]="18" />
+      <div>
+        <b>Acesso negado pelo servidor</b>
+        <p>Sem chave configurada, o painel só funciona com o backend rodando localmente. Em produção, informe a chave definida em <code>ENEMDAILY_ADMIN_CHAVE</code>.</p>
+        <form class="adm-chave" (ngSubmit)="salvarChave()">
+          <input type="password" name="chave" [(ngModel)]="chave" placeholder="Chave de admin" autocomplete="off" />
+          <button class="adm-btn" type="submit">Usar chave</button>
+        </form>
+      </div>
+    </section>
+  }
+
+  <section class="adm-numeros" aria-label="Resumo">
+    <div class="num"><span>Usuários</span><b>{{ resumo?.usuarios ?? '—' }}</b><small>+{{ resumo?.novos7dias ?? 0 }} nos últimos 7 dias</small></div>
+    <div class="num"><span>Ativos hoje</span><b>{{ resumo?.ativosHoje ?? '—' }}</b><small>responderam ao menos 1 questão</small></div>
+    <div class="num"><span>Respostas</span><b>{{ resumo?.respostasTotal ?? '—' }}</b><small>desde o início</small></div>
+    <div class="num"><span>Com simulados</span><b>{{ resumo?.usuariosComSimulados ?? '—' }}</b><small>{{ resumo?.simulados ?? 0 }} simulados registrados</small></div>
+    <div class="num"><span>Com redações</span><b>{{ resumo?.usuariosComRedacoes ?? '—' }}</b><small>{{ resumo?.redacoes ?? 0 }} redações registradas</small></div>
+  </section>
+
+  <div class="adm-grade">
+    <section class="cartao gerar" aria-labelledby="t-gerar">
+      <div class="cartao-cab">
+        <h2 id="t-gerar"><ed-icone nome="sparkles" [tamanho]="17" />Questões do dia</h2>
+        <div class="seg" role="group" aria-label="Dia">
+          <button type="button" [class.on]="diaGeracao === 'hoje'" (click)="escolherDiaGeracao('hoje')">Hoje</button>
+          <button type="button" [class.on]="diaGeracao === 'amanha'" (click)="escolherDiaGeracao('amanha')">Amanhã</button>
+        </div>
+      </div>
+
+      <ul class="gerar-lista">
+        @for (l of linhasGeracao; track l.nome) {
+          <li [style.--c]="l.info.cor">
+            <span class="gerar-ico"><ed-icone [nome]="l.info.icone" [tamanho]="16" /></span>
+            <div class="gerar-txt">
+              <b>{{ l.info.nome }}</b>
+              @if (l.status?.emAndamento) {
+                <span class="andamento"><i></i>{{ l.status!.etapa }}</span>
+              } @else if (l.questao) {
+                <span>{{ l.questao.assunto }} · {{ l.questao.modelo === 'anterior' ? 'gerador antigo' : l.questao.modelo }}</span>
+              } @else if (l.status && l.status.sucesso === false) {
+                <span class="falhou">{{ l.status.etapa }}</span>
+              } @else {
+                <span class="falta">Sem questão</span>
+              }
+            </div>
+            <div class="gerar-fim">
+              @if (custo(l.status); as c) { <small>{{ c }}</small> }
+              @if (l.status?.emAndamento) {
+                <ed-carregando [tamanho]="22" />
+              } @else if (l.questao) {
+                <span class="tag ok"><ed-icone nome="check" [tamanho]="13" />Pronta</span>
+              } @else {
+                <button class="adm-btn-mini" type="button" (click)="gerar(l.nome)" [disabled]="disparando">Gerar</button>
+              }
+            </div>
+          </li>
+        }
+      </ul>
+
+      <label class="checar">
+        <input type="checkbox" [(ngModel)]="substituir" name="substituir" />
+        <span>Substituir as que já existem <small>(quem já respondeu verá outra questão)</small></span>
+      </label>
+
+      <button class="adm-btn largo" type="button" (click)="gerar()" [disabled]="disparando || algumaEmAndamento || (!substituir && faltando === 0)">
+        @if (algumaEmAndamento) { Gerando... }
+        @else if (substituir) { <ed-icone nome="sparkles" [tamanho]="17" />Gerar as 4 áreas de novo }
+        @else if (faltando === 0) { Todas as áreas já têm questão }
+        @else { <ed-icone nome="sparkles" [tamanho]="17" />Gerar {{ faltando === 4 ? 'as 4 áreas' : faltando === 1 ? 'a área que falta' : 'as ' + faltando + ' áreas que faltam' }} }
+      </button>
+      @if (avisoGeracao) { <p class="aviso">{{ avisoGeracao }}</p> }
+    </section>
+
+    <section class="cartao atividade" aria-labelledby="t-ativ">
+      <div class="cartao-cab">
+        <h2 id="t-ativ"><ed-icone nome="calendar" [tamanho]="17" />Atividade</h2>
+        <div class="mes-nav">
+          <button type="button" (click)="mudarMes(-1)" aria-label="Mês anterior"><ed-icone nome="chevron-right" [tamanho]="16" class="vira" /></button>
+          <span>{{ tituloMes }}</span>
+          <button type="button" (click)="mudarMes(1)" [disabled]="!podeAvancarMes" aria-label="Próximo mês"><ed-icone nome="chevron-right" [tamanho]="16" /></button>
+        </div>
+      </div>
+
+      <div class="ativ-corpo">
+        <div class="cal">
+          <div class="cal-sem">@for (s of semana; track $index) { <span>{{ s }}</span> }</div>
+          <div class="cal-dias">
+            @for (c of celulas; track c.data) {
+              <button type="button" class="dia n{{ c.nivel }}" [class.fora]="!c.doMes" [class.hoje]="c.hoje" [class.sel]="c.data === diaSelecionado"
+                      [disabled]="c.futuro" (click)="selecionarDia(c.data)"
+                      [attr.aria-label]="c.data + ': ' + c.ativos + ' ativos, ' + c.respostas + ' respostas'">
+                <span>{{ c.numero }}</span>
+                @if (c.ativos) { <small>{{ c.ativos }}</small> }
+              </button>
+            }
+          </div>
+          <div class="cal-legenda">
+            <span>Menos</span><i class="n1"></i><i class="n2"></i><i class="n3"></i><i class="n4"></i><span>Mais ativos</span>
+          </div>
+          <dl class="cal-mes">
+            <div><dt>Respostas no mês</dt><dd>{{ totalMes.respostas }}</dd></div>
+            <div><dt>Dias com atividade</dt><dd>{{ totalMes.diasAtivos }}</dd></div>
+            <div><dt>Pico de ativos</dt><dd>{{ totalMes.picoAtivos }}</dd></div>
+          </dl>
+        </div>
+
+        <div class="detalhe" [class.carregando]="carregandoDia">
+          <span class="detalhe-dia">{{ diaSelecionadoTexto }}</span>
+          @if (detalhe; as d) {
+            <div class="detalhe-nums">
+              <div><b>{{ d.ativos }}</b><span>usuários ativos</span></div>
+              <div><b>{{ d.respostas }}</b><span>respostas</span></div>
+              <div><b>{{ pct(d.acertos, d.respostas) }}</b><span>de acerto</span></div>
+              <div><b>{{ d.completaram4 }}</b><span>fizeram as 4</span></div>
+            </div>
+            @if (d.porArea.length) {
+              <ul class="por-area">
+                @for (a of d.porArea; track a.area) {
+                  @if (infoAreaEnum(a.area); as info) {
+                    <li [style.--c]="info.cor">
+                      <span><ed-icone [nome]="info.icone" [tamanho]="14" />{{ info.nome }}</span>
+                      <span class="barra"><i [style.width]="pct(a.acertos, a.respostas)"></i></span>
+                      <span class="por-area-num">{{ a.respostas }} · {{ pct(a.acertos, a.respostas) }}</span>
+                    </li>
+                  }
+                }
+              </ul>
+            } @else {
+              <p class="vazio">Ninguém respondeu nesse dia.</p>
+            }
+            <p class="detalhe-rodape">{{ d.novosCadastros }} {{ d.novosCadastros === 1 ? 'novo cadastro' : 'novos cadastros' }} · {{ d.questoes.length }}/4 questões geradas</p>
+          }
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <section class="cartao assuntos" aria-labelledby="t-ass">
+    <div class="cartao-cab">
+      <h2 id="t-ass"><ed-icone nome="clipboard-list" [tamanho]="17" />Assuntos <small>{{ assuntos.length }}</small></h2>
+      <span class="ass-dica">A geração usa o assunto que está há mais tempo sem uso em cada área.</span>
+    </div>
+
+    <div class="ass-areas" role="tablist" aria-label="Área">
+      @for (nome of areasEnum; track nome) {
+        @if (infoAreaEnum(nome); as info) {
+          <button type="button" role="tab" [class.on]="areaAssuntos === nome" [attr.aria-selected]="areaAssuntos === nome"
+                  [style.--c]="info.cor" (click)="escolherAreaAssuntos(nome)">
+            <ed-icone [nome]="info.icone" [tamanho]="15" />{{ info.nome }}<small>{{ contarAssuntos(nome) }}</small>
+          </button>
+        }
+      }
+    </div>
+
+    <form class="ass-novo" (ngSubmit)="adicionarAssunto()">
+      <input type="text" name="novoAssunto" [(ngModel)]="novoAssunto" maxlength="120" autocomplete="off"
+             [placeholder]="'Novo assunto de ' + (infoAreaEnum(areaAssuntos)?.nome ?? '')" />
+      <button class="adm-btn" type="submit" [disabled]="!novoAssunto.trim() || salvandoAssunto"><ed-icone nome="plus" [tamanho]="16" />Adicionar</button>
+    </form>
+    @if (erroAssunto) { <p class="ass-erro">{{ erroAssunto }}</p> }
+
+    <ul class="ass-lista">
+      @for (a of assuntosDaArea; track a.id) {
+        <li [class.prox]="a.proximo">
+          <div class="ass-txt">
+            <b>{{ a.nome }} @if (a.proximo) { <span class="tag prox-tag">Próximo da fila</span> }</b>
+            <span>{{ a.questoes }} {{ a.questoes === 1 ? 'questão gerada' : 'questões geradas' }} · último uso {{ a.questoes ? dataCurta(a.ultimoUso) : 'nunca' }}</span>
+          </div>
+          <button type="button" class="lixo" [class.confirmar]="confirmandoAssunto === a.id" (click)="excluirAssunto(a)">
+            <ed-icone nome="circle-x" [tamanho]="16" />{{ confirmandoAssunto === a.id ? 'Confirmar' : 'Excluir' }}
+          </button>
+        </li>
+      } @empty {
+        <li class="vazio">Nenhum assunto cadastrado nessa área.</li>
+      }
+    </ul>
+  </section>
+
+  <section class="cartao usuarios" aria-labelledby="t-usu">
+    <div class="cartao-cab">
+      <h2 id="t-usu"><ed-icone nome="users" [tamanho]="17" />Usuários <small>{{ totalUsuarios }}</small></h2>
+      <label class="busca">
+        <ed-icone nome="search" [tamanho]="16" />
+        <input type="search" [(ngModel)]="busca" (ngModelChange)="buscar($event)" name="busca" placeholder="Buscar por nome, usuário ou e-mail" autocomplete="off" />
+      </label>
+    </div>
+
+    @if (resultadoExclusao; as r) {
+      <div class="excluido" role="status">
+        <ed-icone nome="check" [tamanho]="16" />
+        <div>
+          <b>{{ r.nome }} foi excluído.</b>
+          @if (r.itens.length) {
+            <span>Também removidos: @for (i of r.itens; track i[0]; let ult = $last) { {{ i[0] }} ({{ i[1] }}){{ ult ? '.' : ',' }} }</span>
+          } @else { <span>Não havia outros dados ligados à conta.</span> }
+        </div>
+        <button type="button" (click)="resultadoExclusao = null" aria-label="Fechar"><ed-icone nome="x" [tamanho]="15" /></button>
+      </div>
+    }
+
+    <div class="tabela-rolagem">
+      <table class="tabela">
+        <thead>
+          <tr>
+            <th scope="col">Usuário</th>
+            <th scope="col" class="num-col">XP</th>
+            <th scope="col" class="num-col">Respostas</th>
+            <th scope="col" class="num-col">Acerto</th>
+            <th scope="col" class="num-col">Simulados</th>
+            <th scope="col" class="num-col">Redações</th>
+            <th scope="col">Cadastro</th>
+            <th scope="col">Último acesso</th>
+            <th scope="col"><span class="sr">Ações</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (u of usuarios; track u.id) {
+            <tr>
+              <td>
+                <div class="quem">
+                  <ed-avatar [valor]="u.avatar" [nome]="u.nome || u.usuario" [tamanho]="34" />
+                  <div>
+                    <b>{{ u.nome || '—' }} @if (u.demo) { <span class="tag">demo</span> }</b>
+                    <span>&#64;{{ u.usuario }} · {{ u.email }}</span>
+                  </div>
+                </div>
+              </td>
+              <td class="num-col">{{ u.xpTotal }}</td>
+              <td class="num-col">{{ u.respondidas }}</td>
+              <td class="num-col">{{ taxa(u) }}</td>
+              <td class="num-col">{{ u.simulados || '—' }}</td>
+              <td class="num-col">{{ u.redacoes || '—' }}</td>
+              <td>{{ dataCurta(u.dataCadastro) }}</td>
+              <td>{{ dataCurta(u.ultimoAcesso) }}</td>
+              <td class="acoes"><button type="button" class="lixo" (click)="pedirExclusao(u)" [attr.aria-label]="'Excluir ' + u.usuario"><ed-icone nome="circle-x" [tamanho]="17" />Excluir</button></td>
+            </tr>
+          } @empty {
+            <tr><td colspan="9" class="vazio">@if (carregandoUsuarios) { Carregando... } @else { Nenhum usuário encontrado. }</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    @if (totalPaginas > 1) {
+      <nav class="paginas" aria-label="Páginas">
+        <button type="button" (click)="irParaPagina(pagina - 1)" [disabled]="pagina === 0">Anterior</button>
+        <span>Página {{ pagina + 1 }} de {{ totalPaginas }}</span>
+        <button type="button" (click)="irParaPagina(pagina + 1)" [disabled]="pagina + 1 >= totalPaginas">Próxima</button>
+      </nav>
+    }
+  </section>
+</div>
+
+@if (excluindo; as u) {
+  <div class="veu" (click)="!apagando && (excluindo = null)"></div>
+  <section class="modal" role="dialog" aria-modal="true" aria-labelledby="t-excluir">
+    <span class="modal-ico"><ed-icone nome="circle-x" [tamanho]="22" /></span>
+    <h2 id="t-excluir">Excluir {{ u.nome || u.usuario }}?</h2>
+    <p>Isso apaga a conta e <b>tudo</b> ligado a ela: {{ u.respondidas }} respostas, {{ u.simulados }} simulados, {{ u.redacoes }} redações, amizades, duelos, participações em grupos, notificações e fotos de perfil no Firebase. Grupos administrados por essa pessoa passam para o membro com mais XP. <b>Não dá para desfazer.</b></p>
+    <label class="modal-conf">
+      <span>Digite <b>{{ u.usuario }}</b> para confirmar</span>
+      <input type="text" [(ngModel)]="confirmacao" name="confirmacao" autocomplete="off" (keyup.enter)="confirmarExclusao()" />
+    </label>
+    <div class="modal-acoes">
+      <button class="adm-btn-sec" type="button" (click)="excluindo = null" [disabled]="apagando">Cancelar</button>
+      <button class="adm-btn perigo" type="button" (click)="confirmarExclusao()" [disabled]="!podeExcluir || apagando">{{ apagando ? 'Excluindo...' : 'Excluir definitivamente' }}</button>
+    </div>
+  </section>
+}

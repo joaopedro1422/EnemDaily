@@ -1,0 +1,108 @@
+@if (mostrarModal && usuario) {
+  <app-novo-grupo-modal [usuarioDemo]="usuario.demo" (close)="mostrarModal = false" />
+}
+
+@if (usuario) {
+<main class="gh">
+  <header class="gh-topo">
+    <div class="gh-titulo">
+      <svg class="podio-ico" viewBox="0 0 56 56" aria-hidden="true">
+        <rect width="56" height="56" rx="16" class="podio-fundo" />
+        <rect x="8" y="30" width="13" height="16" rx="3" class="p2" />
+        <rect x="21.5" y="22" width="13" height="24" rx="3" class="p1" />
+        <rect x="35" y="35" width="13" height="11" rx="3" class="p3" />
+        <path d="M28 9.5l2.1 4.3 4.7.7-3.4 3.3.8 4.7L28 20.3l-4.2 2.2.8-4.7-3.4-3.3 4.7-.7z" class="estrela" />
+      </svg>
+      <div>
+        <h1>Grupos</h1>
+        <p>Dispute o ranking do desafio diário com seus amigos.</p>
+      </div>
+    </div>
+    <button class="btn-novo" type="button" (click)="mostrarModal = true">
+      <ed-icone nome="plus" [tamanho]="18" />Novo grupo
+    </button>
+  </header>
+
+  <section class="gh-sec" aria-labelledby="t-meus">
+    <div class="gh-sec-cab">
+      <h2 id="t-meus">Meus grupos</h2>
+      @if (meus.length) { <span>{{ meus.length }}</span> }
+    </div>
+
+    @if (meus.length) {
+      <ul class="lista">
+        @for (g of meus; track g.id; let i = $index) {
+          <li [style.--i]="i">
+            <button type="button" class="grupo" (click)="abrir(g)">
+              <span class="grupo-img" #gi><img [src]="g.img" alt="" loading="lazy" (load)="gi.classList.add('ok')" (error)="gi.classList.add('ok')" /></span>
+              <span class="grupo-info">
+                <b class="grupo-nome">{{ g.nome }}</b>
+                <span class="grupo-meta">
+                  <span><ed-icone nome="users" [tamanho]="14" />{{ membros(g) }} {{ membros(g) === 1 ? 'membro' : 'membros' }}</span>
+                  @if (areas(g).length && areas(g).length < 4) {
+                    <span class="grupo-areas">
+                      @for (a of areas(g); track a.chave) { <i [style.background]="a.cor" [title]="a.nome"></i> }
+                    </span>
+                  }
+                </span>
+              </span>
+              <span class="pos {{ medalha(posicao(g)) }}">
+                <small>posição</small>
+                <b>{{ posicao(g) }}º</b>
+              </span>
+              <ed-icone class="seta" nome="chevron-right" [tamanho]="18" />
+            </button>
+          </li>
+        }
+      </ul>
+    } @else {
+      <div class="vazio">
+        <span class="vazio-ico"><ed-icone nome="users" [tamanho]="24" /></span>
+        <div>
+          <b>Você ainda não está em um grupo privado.</b>
+          <p>Crie um grupo e mande o link para seus amigos, ou peça o convite de alguém.</p>
+          <button class="btn-link" type="button" (click)="mostrarModal = true">Criar meu grupo<ed-icone nome="arrow-right" [tamanho]="15" /></button>
+        </div>
+      </div>
+    }
+  </section>
+
+  <section class="gh-sec" aria-labelledby="t-publicos">
+    <div class="gh-sec-cab">
+      <h2 id="t-publicos">Grupos públicos</h2>
+      <span class="gh-sec-dica"><ed-icone nome="globe" [tamanho]="14" />Aberto a todos</span>
+    </div>
+
+    @if (carregandoPublicos) {
+      <div class="carregando-bloco"><ed-carregando [tamanho]="44" texto="Buscando grupos públicos" /></div>
+    } @else if (publicos.length) {
+      <ul class="lista">
+        @for (g of publicos; track g.id; let i = $index) {
+          <li [style.--i]="i + meus.length">
+            <button type="button" class="grupo" (click)="abrir(g)">
+              <span class="grupo-img" #gi><img [src]="g.img" alt="" loading="lazy" (load)="gi.classList.add('ok')" (error)="gi.classList.add('ok')" /></span>
+              <span class="grupo-info">
+                <b class="grupo-nome">{{ g.nome }}</b>
+                <span class="grupo-meta">
+                  <span><ed-icone nome="users" [tamanho]="14" />{{ membros(g) }} {{ membros(g) === 1 ? 'membro' : 'membros' }}</span>
+                </span>
+              </span>
+              @if (g.posicao === -1 && g.membros !== 0) {
+                <span class="entrar">Entrar</span>
+              } @else {
+                <span class="pos {{ medalha(posicao(g)) }}">
+                  <small>posição</small>
+                  <b>{{ posicao(g) }}º</b>
+                </span>
+              }
+              <ed-icone class="seta" nome="chevron-right" [tamanho]="18" />
+            </button>
+          </li>
+        }
+      </ul>
+    } @else {
+      <p class="nada">Nenhum grupo público no momento.</p>
+    }
+  </section>
+</main>
+}

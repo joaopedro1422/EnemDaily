@@ -1,0 +1,82 @@
+<article class="art" [style.--c]="area.cor" [style.--ct]="area.corTexto">
+  <header class="art-topo">
+    <nav class="art-trilha" aria-label="Você está em">
+      @if (previa) { <span>Conteúdos</span> } @else { <a routerLink="/conteudos">Conteúdos</a> }
+      <ed-icone nome="chevron-right" [tamanho]="14" />
+      <span>{{ area.curto }}</span>
+    </nav>
+    <h1>{{ pagina.titulo || pagina.assunto }}</h1>
+    @if (pagina.seoDescricao) { <p class="art-lead">{{ pagina.seoDescricao }}</p> }
+    <div class="art-meta">
+      <span class="art-area"><ed-icone [nome]="area.icone" [tamanho]="14" />{{ area.nome }}</span>
+      @if (dataAtualizacao) { <span>Atualizado em {{ dataAtualizacao }}</span> }
+      <span>{{ minutosLeitura }} min de leitura</span>
+    </div>
+  </header>
+
+  <div class="art-grade">
+    <aside class="art-indice" aria-label="Nesta página">
+      <span>Nesta página</span>
+      <button type="button" (click)="irPara('resumo')">Resumo</button>
+      <button type="button" (click)="irPara('como-cai')">Como cai no ENEM</button>
+      @if (pagina.paraNaoErrar) { <button type="button" (click)="irPara('para-nao-errar')">Para não errar</button> }
+      @if (pagina.questao) { <button type="button" (click)="irPara('teste')">Teste seu conhecimento</button> }
+    </aside>
+
+    <div class="art-corpo">
+      <section id="resumo" class="art-sec">
+        <h2>Resumo</h2>
+        <div class="art-texto" [innerHTML]="pagina.resumo"></div>
+      </section>
+
+      <section id="como-cai" class="art-sec art-destaque">
+        <h2><ed-icone nome="target" [tamanho]="20" />Como cai no ENEM</h2>
+        <div class="art-texto" [innerHTML]="pagina.comoCai"></div>
+      </section>
+
+      @if (pagina.paraNaoErrar) {
+        <section id="para-nao-errar" class="art-sec">
+          <h2>Para não errar</h2>
+          <div class="art-texto art-lista" [innerHTML]="pagina.paraNaoErrar"></div>
+        </section>
+      }
+
+      @if (pagina.questao) {
+        <section id="teste" class="art-sec">
+          <h2>Teste seu conhecimento</h2>
+          <p class="art-nota">Uma questão inédita no padrão do ENEM sobre {{ pagina.assunto }}. Marque uma alternativa e veja a resolução.</p>
+          <ed-questao-interativa [questao]="pagina.questao" [caderno]="'Caderno de ' + area.curto" [cor]="area.cor" [corTexto]="area.corTexto" (respondeu)="aoResponder($event)" />
+        </section>
+      }
+
+      <aside class="art-cta" [class.depois]="respondeu" aria-label="Desafio diário do enem.daily">
+        <div class="art-cta-txt">
+          <span class="art-cta-rot">Desafio diário enem<span class="pt"></span>daily</span>
+          <h2>{{ respondeu ? 'Gostou? Todo dia tem 4 questões como essa.' : 'Treine todo dia com questões como essa.' }}</h2>
+          <p>Uma questão inédita de cada área do ENEM por dia, com resolução comentada, XP a cada acerto e uma animação de campus universitário que evolui a cada acerto seu. Dá para disputar com os amigos.</p>
+        </div>
+        @if (previa) {
+          <span class="art-cta-btn">{{ logado ? 'Ir para o desafio de hoje' : 'Criar conta grátis' }}</span>
+        } @else if (logado) {
+          <button class="art-cta-btn" type="button" (click)="irAoDesafio.emit()">Ir para o desafio de hoje<ed-icone nome="arrow-right" [tamanho]="18" /></button>
+        } @else {
+          <button class="art-cta-btn" type="button" (click)="criarConta.emit()">Criar conta grátis<ed-icone nome="arrow-right" [tamanho]="18" /></button>
+        }
+      </aside>
+
+      @if (pagina.relacionados.length) {
+        <nav class="art-rel" aria-label="Outros conteúdos">
+          <h2>Outros conteúdos de {{ area.curto }}</h2>
+          <ul>
+            @for (r of pagina.relacionados; track r.slug) {
+              <li>
+                @if (previa) { <span>{{ r.assunto }}</span> }
+                @else { <a [routerLink]="['/conteudos', r.area, r.slug]">{{ r.assunto }}<ed-icone nome="chevron-right" [tamanho]="16" /></a> }
+              </li>
+            }
+          </ul>
+        </nav>
+      }
+    </div>
+  </div>
+</article>

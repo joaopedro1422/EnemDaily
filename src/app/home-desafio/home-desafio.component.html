@@ -1,0 +1,61 @@
+<div class="home">
+    <div class="espace" ></div>
+    <div class="section">
+        <div class="title-time">
+            <h2>DESAFIO DIÁRIO {{dataHojeExibicao}}</h2>
+            <span>  <i class="fa-regular fa-clock fa-shake" style="color:#000000; font-size:19px;"></i> {{tempoRestante}}</span>
+        </div>
+    </div>
+    <div class="section">
+        <div class="card-info">          
+             <div class="container-paragrafo">
+                <i class="fa-solid fa-circle"></i>
+                  <p> Após iniciar, Você terá <b>3:30 minutos</b> initerruptos para responder a questão.</p>
+            </div>
+         
+             <div class="container-paragrafo">
+                <i class="fa-solid fa-circle"></i>
+                  <p> A recompensa por XP é <b>atribuída proporcionalmente</b> ao tempo gasto para responder corretamente a questão, sendo o máximo 70 XPs para questões assinaladas corretamente nos primeiros <b>40 segundos</b> do relógio.</p>
+            </div>
+          
+        </div>
+    </div>
+    <div class=" section container-respostas-hoje">
+        <div class="icon-pulse-container">
+            <img src="raio-trovao.png" class="status-icon" alt="Ícone de Raio">
+            <div class="pulse-ring"></div>
+        </div>
+        <h3>{{respostasHoje}} Respostas Hoje</h3>
+    </div>
+
+    <div class="section">
+        <div class="container-cards">
+            <div class="card-area" [class.concluido]="naturezasRespondida" style="background-color: #8cc342; padding-top: 18px !important;   box-shadow: 0 0 9px rgba(0, 133, 7, 0.705);">
+                <img src="naturezasEscuro.png" style="height: 100px " alt="">
+                <h3>Naturezas</h3>
+                 <button class="btnArea naturezas" *ngIf="!naturezasRespondida" (click)="goToDesafioNaturezas()">INICIAR <i class="fas fa-caret-right"></i></button>
+                 <h4 style="color: #f3f3f3;" *ngIf="naturezasRespondida"> <i class="fa-regular fa-circle-check"></i> Concluído</h4>
+            </div>
+             <div class="card-area"  [class.concluido]="humanasRespondida" style="background-color: #41b8d5; padding-top: 16px !important;  box-shadow: 0 0 9px rgba(0, 126, 148, 0.726);">
+                 <img src="humanasEscuro.png" alt="" style="height: 103px ">
+                <h3>Humanas</h3>
+                 <button class="btnArea humanas" *ngIf="!humanasRespondida" (click)="goToDesafioHumanas()">INICIAR <i class="fas fa-caret-right"></i></button>
+                  <h4 style="color: #f3f3f3;" *ngIf="humanasRespondida"> <i class="fa-regular fa-circle-check"></i> Concluído</h4>
+            </div>
+             <div class="card-area"  [class.concluido]="linguagensRespondida" style="background-color: #ffaa01;  padding-top: 19px !important;   box-shadow: 0 0 9px rgba(168, 81, 0, 0.74);">
+                 <img src="linguagensEscuro.png"  style="height: 98px " alt="">
+                <h3>Linguagens</h3>
+                 <button class="btnArea linguagens" *ngIf="!linguagensRespondida" (click)="goToDesafioLinguagens()">INICIAR <i class="fas fa-caret-right"></i></button>
+                  <h4 style="color: #f3f3f3;" *ngIf="linguagensRespondida"> <i class="fa-regular fa-circle-check"></i> Concluído</h4>
+            </div>
+             <div class="card-area"  [class.concluido]="exatasRespondida" style="background-color: #ecbc00;   box-shadow: 0 0 9px rgba(134, 109, 0, 0.767);">
+                <img src="exatasEscuro.png" alt="">
+                <h3>Exatas</h3>
+                <button class="btnArea exatas" *ngIf="!exatasRespondida" (click)="goToDesafioExatas()">INICIAR <i class="fas fa-caret-right"></i></button>
+                 <h4 style="color: #f3f3f3;" *ngIf="exatasRespondida"> <i class="fa-regular fa-circle-check"></i> Concluído</h4>
+            </div>
+          
+        </div>
+    </div>
+</div>
+

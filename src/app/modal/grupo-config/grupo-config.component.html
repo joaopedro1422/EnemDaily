@@ -1,0 +1,51 @@
+<div class="overlay" (click)="fecharVoid()"></div>
+<div class="modal">
+    <button class="close" (click)="fecharVoid()">✕</button>
+    <h3><i class="fa-solid fa-gear"></i> Configurações do Grupo</h3>
+    <div class="image-upload" *ngIf = "previewUrl === ''">
+      <label for="groupImage">
+        <div class="upload-box">
+          <span class="upload-icon"><i class="fa-solid fa-camera"></i> </span>
+          <span class="upload-text">Adicionar foto do grupo</span>
+        </div>
+      </label>
+     
+    </div>
+    <label for="groupImage" class="change-image-label">
+        <div class="container-img">
+        <img [src]="previewUrl" alt="Preview">
+            <div class="edit-overlay">
+                <i class="fas fa-pencil-alt"></i>
+            </div>
+        </div>
+    </label>
+    <input type="file" id="groupImage" accept="image/*" hidden (change)="onFileSelected($event)" />
+    
+    <div class="group">
+   
+         <input type="text" class="custom-input" [(ngModel)]="nomeGrupo" >    
+    </div>
+    <div class="container-view">
+        <h5>Visibilidade no Ranking</h5>
+        <div class="container-bottom">
+            <label class="modern-switch">
+                <input type="checkbox" [checked]="isVisible" (change)="onToggleRanking($event)">
+                <span class="modern-slider"></span>
+            
+            </label>
+             <span class="text" *ngIf="isVisible">Você está visível no Ranking</span>
+                <span class="text" *ngIf="!isVisible">Você não está visível no Ranking</span>
+        </div>
+        <div class="container-info">
+            <i class="fa-solid fa-circle-question"></i>
+            <p>Administradores podem optar por não aparecerem no Ranking para não interferirem na competição</p>
+        </div>
+    </div>
+     <button class="btn-salvar" [disabled]="loading" (click)="salvar()"> <ng-container *ngIf="!loading; else loadingTpl">
+                Salvar alterações
+                </ng-container>
+                <ng-template #loadingTpl>
+                    <ed-carregando [mini]="true" [claro]="true" />
+                </ng-template>
+    </button>
+</div>

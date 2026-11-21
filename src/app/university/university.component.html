@@ -1,0 +1,99 @@
+@if (usuario) {
+  <main class="cp">
+    <div class="cp-palco">
+      <ed-campus [progresso]="progresso" [memoria]="'campus-' + usuario.id" [modo]="modo" [interativo]="true" [foco]="foco" [extras]="extras" />
+
+      <div class="cp-sobre">
+        @if (foco) {
+          <button class="cp-vidro cp-voltar" type="button" (click)="foco = null">
+            <ed-icone nome="x" [tamanho]="14" />Campus inteiro
+          </button>
+        } @else {
+          <span class="cp-vidro cp-total"><ed-icone nome="school" [tamanho]="15" /><b>{{ total }}</b>/{{ totalCampus }}</span>
+        }
+        <div class="cp-vidro cp-hora" role="group" aria-label="Hora do dia no campus">
+          <button type="button" [attr.aria-pressed]="modo === 'dia'" (click)="modo = 'dia'">Dia</button>
+          <button type="button" [attr.aria-pressed]="modo === 'noite'" (click)="modo = 'noite'">Noite</button>
+        </div>
+      </div>
+
+      <button class="cp-vidro cp-descer" type="button" (click)="verRegioes()">
+        Regiões<ed-icone nome="chevron-right" [tamanho]="14" />
+      </button>
+    </div>
+
+    <section class="cp-regioes" id="regioes" aria-label="Regiões do campus">
+      @for (c of cartoes; track c.trilha) {
+        <button type="button" class="cp-regiao" [class.ativa]="foco === c.trilha" [class.geral]="c.trilha === 'geral'" [style.--a]="c.cor" (click)="focar(c.trilha)">
+          <span class="cp-cab">
+            <i></i>
+            <b>{{ c.nome }}</b>
+            <span>{{ c.feitas }}/{{ c.total }}</span>
+          </span>
+          <span class="cp-barra"><b [style.width.%]="c.pct"></b></span>
+          @if (c.proxima) {
+            <span class="cp-proxima"><span>Próxima</span><b>{{ c.proxima }}</b></span>
+          } @else {
+            <span class="cp-proxima"><span>Completa</span><b>Todas as peças construídas</b></span>
+          }
+        </button>
+      }
+    </section>
+
+    <section class="cp-premium" aria-labelledby="t-upgrades">
+      <div class="cp-premium-cab">
+        <h2 id="t-upgrades"><ed-icone nome="sparkles" [tamanho]="16" />Upgrades do campus</h2>
+        <p>O campus amadurece com seus acertos: os prédios ganham versões especiais.</p>
+      </div>
+      <div class="cp-premium-lista">
+        @for (p of upgrades; track p.nome) {
+          <article class="premium" [class.liberada]="p.liberada">
+            <div class="premium-cena" [class.noite]="modo === 'noite'" [class.bloq]="!p.liberada" [innerHTML]="p.svg"></div>
+            @if (!p.liberada) { <span class="premium-cadeado"><ed-icone nome="lock" [tamanho]="14" /></span> }
+            <div class="premium-txt">
+              <span class="premium-selo">{{ p.liberada ? 'Liberado' : 'Bloqueado' }}</span>
+              <h3>{{ p.nome }}</h3>
+              <p>{{ p.descricao }}</p>
+              <div class="premium-meta">
+                <span class="premium-req"><ed-icone [nome]="p.icone" [tamanho]="14" />{{ p.requisito }}</span>
+                <b>{{ p.feitas }}/{{ p.meta }}</b>
+              </div>
+              <span class="premium-barra"><i [style.width.%]="p.feitas / p.meta * 100"></i></span>
+              @if (!p.liberada) {
+                <button type="button" class="premium-btn" (click)="p.rota ? irPara(p.rota) : irDesafio()">{{ p.acao }}<ed-icone nome="arrow-right" [tamanho]="15" /></button>
+              }
+            </div>
+          </article>
+        }
+      </div>
+    </section>
+
+    <section class="cp-premium" aria-labelledby="t-distrito">
+      <div class="cp-premium-cab">
+        <h2 id="t-distrito"><ed-icone nome="book-open" [tamanho]="16" />Novos terrenos</h2>
+        <p>Áreas novas do outro lado do rio, liberadas pelos seus dias ativos. O hospital é o desafio final.</p>
+      </div>
+      <div class="cp-premium-lista">
+        @for (p of distrito; track p.nome) {
+          <article class="premium" [class.liberada]="p.liberada">
+            <div class="premium-cena" [class.noite]="modo === 'noite'" [class.bloq]="!p.liberada" [innerHTML]="p.svg"></div>
+            @if (!p.liberada) { <span class="premium-cadeado"><ed-icone nome="lock" [tamanho]="14" /></span> }
+            <div class="premium-txt">
+              <span class="premium-selo">{{ p.liberada ? 'Liberado' : 'Bloqueado' }}</span>
+              <h3>{{ p.nome }}</h3>
+              <p>{{ p.descricao }}</p>
+              <div class="premium-meta">
+                <span class="premium-req"><ed-icone [nome]="p.icone" [tamanho]="14" />{{ p.requisito }}</span>
+                <b>{{ p.feitas }}/{{ p.meta }}</b>
+              </div>
+              <span class="premium-barra"><i [style.width.%]="p.feitas / p.meta * 100"></i></span>
+              @if (!p.liberada) {
+                <button type="button" class="premium-btn" (click)="p.rota ? irPara(p.rota) : irDesafio()">{{ p.acao }}<ed-icone nome="arrow-right" [tamanho]="15" /></button>
+              }
+            </div>
+          </article>
+        }
+      </div>
+    </section>
+  </main>
+}

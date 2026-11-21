@@ -1,0 +1,203 @@
+<div class="au" [class.fechando]="fechando" role="dialog" aria-modal="true" aria-labelledby="au-titulo">
+  <div class="au-fundo" (click)="fechar()"></div>
+
+  <div class="au-caixa">
+    <aside class="au-marca" aria-hidden="true">
+      <div class="au-marca-topo">
+        <ed-simbolo-dia [cores]="null" corAnel="rgba(255,255,255,.9)" corMarca="#FFFFFF" />
+        <span class="wm">enem<span class="pt"></span>daily</span>
+      </div>
+      <div class="au-marca-meio">
+        <h2>Quatro questões por dia.<br />Um passo de cada vez até a aprovação.</h2>
+        <ul>
+          <li><ed-icone nome="target" [tamanho]="17" />Uma questão de cada área, todo dia</li>
+          <li><ed-icone nome="school" [tamanho]="17" />Cada acerto constrói seu campus</li>
+          <li><ed-icone nome="trophy" [tamanho]="17" />Dispute o ranking com seus amigos</li>
+        </ul>
+      </div>
+      <span class="au-marca-pe">Simulados, redações e estatísticas no mesmo lugar.</span>
+    </aside>
+
+    <section class="au-form">
+      <div class="au-barra">
+        @if (modo === 'avatar') {
+          <button class="au-voltar" type="button" (click)="irPara('cadastro')"><ed-icone class="vira" nome="chevron-right" [tamanho]="18" />Voltar</button>
+        } @else if (modo.startsWith('rec')) {
+          <button class="au-voltar" type="button" (click)="irPara('login')"><ed-icone class="vira" nome="chevron-right" [tamanho]="18" />Entrar</button>
+        } @else {
+          <span class="au-mini"><ed-simbolo-dia [cores]="null" /><span class="wm">enem<span class="pt"></span>daily</span></span>
+        }
+        <button class="au-fechar" type="button" (click)="fechar()" aria-label="Fechar"><ed-icone nome="x" [tamanho]="20" /></button>
+      </div>
+
+      @switch (modo) {
+        @case ('login') {
+          <form class="au-passo" (ngSubmit)="login()">
+            <header class="au-cab">
+              <h1 id="au-titulo">Entrar</h1>
+              <p>Bom te ver de novo. Seu desafio de hoje está esperando.</p>
+            </header>
+            @if (aviso) { <p class="au-aviso"><ed-icone nome="check" [tamanho]="16" />{{ aviso }}</p> }
+            <label class="campo">
+              <span>E-mail</span>
+              <input type="email" name="email" [(ngModel)]="emailLogin" autocomplete="email" inputmode="email" placeholder="voce@email.com" required />
+            </label>
+            <label class="campo">
+              <span>Senha</span>
+              <span class="campo-senha">
+                <input [type]="verSenha ? 'text' : 'password'" name="senha" [(ngModel)]="senhaLogin" autocomplete="current-password" placeholder="Sua senha" required />
+                <button type="button" class="olho" (click)="verSenha = !verSenha" [attr.aria-label]="verSenha ? 'Esconder senha' : 'Mostrar senha'">{{ verSenha ? 'Ocultar' : 'Mostrar' }}</button>
+              </span>
+            </label>
+            <div class="au-linha">
+              @if (erroLogin) { <span class="erro">{{ erroLogin }}</span> } @else { <span></span> }
+              <button type="button" class="link" (click)="irPara('rec-email')">Esqueci minha senha</button>
+            </div>
+            <button class="btn-pri" type="submit" [disabled]="carregando || !emailLogin || !senhaLogin">
+              @if (carregando) { <ed-carregando [mini]="true" /> } @else { Entrar }
+            </button>
+            <p class="au-troca">Ainda não tem conta? <button type="button" class="link" (click)="irPara('cadastro')">Criar conta grátis</button></p>
+          </form>
+        }
+
+        @case ('cadastro') {
+          <form class="au-passo" (ngSubmit)="continuarCadastro()">
+            <div class="passos"><i class="feito"></i><i></i><span>Passo 1 de 2</span></div>
+            <header class="au-cab">
+              <h1 id="au-titulo">Criar conta</h1>
+              <p>Leva menos de um minuto.</p>
+            </header>
+            <label class="campo">
+              <span>Nome</span>
+              <input type="text" name="nome" [(ngModel)]="nome" autocomplete="name" placeholder="Como você se chama?" required />
+            </label>
+            <label class="campo" [class.invalido]="erroEmail">
+              <span>E-mail</span>
+              <input type="email" name="email" [(ngModel)]="email" (input)="erroEmail = ''" autocomplete="email" inputmode="email" placeholder="voce@email.com" required />
+              @if (erroEmail) { <small class="erro">{{ erroEmail }}</small> }
+            </label>
+            <label class="campo">
+              <span>Senha</span>
+              <span class="campo-senha">
+                <input [type]="verSenha ? 'text' : 'password'" name="senha" [(ngModel)]="senhaCadastro" autocomplete="new-password" placeholder="Crie uma senha" required />
+                <button type="button" class="olho" (click)="verSenha = !verSenha">{{ verSenha ? 'Ocultar' : 'Mostrar' }}</button>
+              </span>
+            </label>
+            <ul class="regras">
+              @for (r of regras(senhaCadastro); track r.texto) {
+                <li [class.ok]="r.ok"><span><ed-icone nome="check" [tamanho]="11" [traco]="3" /></span>{{ r.texto }}</li>
+              }
+            </ul>
+            <label class="campo" [class.invalido]="senhaConfirmacao && senhaConfirmacao !== senhaCadastro" [class.valido]="senhaConfirmacao && senhaConfirmacao === senhaCadastro">
+              <span>Confirmar senha</span>
+              <input [type]="verSenha ? 'text' : 'password'" name="confirmacao" [(ngModel)]="senhaConfirmacao" autocomplete="new-password" placeholder="Repita a senha" required />
+              @if (senhaConfirmacao && senhaConfirmacao !== senhaCadastro) { <small class="erro">As senhas não são iguais.</small> }
+            </label>
+            <button class="btn-pri" type="submit" [disabled]="!cadastroOk">Continuar<ed-icone nome="arrow-right" [tamanho]="18" /></button>
+            <p class="au-troca">Já tem conta? <button type="button" class="link" (click)="irPara('login')">Entrar</button></p>
+          </form>
+        }
+
+        @case ('avatar') {
+          <form class="au-passo" (ngSubmit)="registrar()">
+            <div class="passos"><i class="feito"></i><i class="feito"></i><span>Passo 2 de 2</span></div>
+            <header class="au-cab">
+              <h1 id="au-titulo">Prazer, {{ primeiroNome }}!</h1>
+              <p>Escolha como você aparece nos grupos e no ranking.</p>
+            </header>
+            <div class="perfil-previa">
+              <ed-avatar class="previa-av" [config]="configCadastro" [nome]="nome" [tamanho]="76" />
+              <label class="campo" [class.invalido]="erroUsuario">
+                <span>Nome de usuário</span>
+                <span class="campo-usuario">
+                  <b>&#64;</b>
+                  <input type="text" name="usuario" [(ngModel)]="usuario" (input)="limparUsuario()" autocomplete="username" autocapitalize="none" maxlength="20" placeholder="seu_usuario" required />
+                </span>
+                @if (erroUsuario) { <small class="erro">{{ erroUsuario }}</small> } @else { <small>Mínimo de 5 caracteres, sem espaços.</small> }
+              </label>
+            </div>
+            <div class="tintas" role="radiogroup" aria-label="Cor do avatar">
+              @for (t of tintas; track t.chave) {
+                <button type="button" class="tinta" role="radio" [attr.aria-checked]="configCadastro.tinta === t.chave" [class.sel]="configCadastro.tinta === t.chave" [style.--c]="t.cor" (click)="escolherTinta(t.chave)" [attr.aria-label]="t.nome"></button>
+              }
+            </div>
+            <p class="au-dica">Depois, no seu perfil, você pode usar uma foto e liberar motivos, molduras e o selo do seu curso.</p>
+            <button class="btn-pri" type="submit" [disabled]="carregando || !usuarioOk">
+              @if (carregando) { <ed-carregando [mini]="true" /> } @else { Criar minha conta }
+            </button>
+          </form>
+        }
+
+        @case ('rec-email') {
+          <form class="au-passo" (ngSubmit)="enviarCodigo()">
+            <span class="au-ico"><ed-icone nome="lock" [tamanho]="22" /></span>
+            <header class="au-cab">
+              <h1 id="au-titulo">Recuperar senha</h1>
+              <p>Enviamos um código de 6 dígitos para o e-mail da sua conta.</p>
+            </header>
+            <label class="campo" [class.invalido]="erroRecuperacao">
+              <span>E-mail</span>
+              <input type="email" name="email" [(ngModel)]="emailRecuperacao" (input)="erroRecuperacao = ''" autocomplete="email" inputmode="email" placeholder="voce@email.com" required />
+              @if (erroRecuperacao) { <small class="erro">{{ erroRecuperacao }}</small> }
+            </label>
+            <button class="btn-pri" type="submit" [disabled]="carregando || !emailRecuperacao">
+              @if (carregando) { <ed-carregando [mini]="true" /> } @else { Enviar código }
+            </button>
+          </form>
+        }
+
+        @case ('rec-codigo') {
+          <form class="au-passo" (ngSubmit)="verificarCodigo()">
+            <span class="au-ico"><ed-icone nome="check" [tamanho]="22" /></span>
+            <header class="au-cab">
+              <h1 id="au-titulo">Confira seu e-mail</h1>
+              <p>Digite o código enviado para <b>{{ emailRecuperacao }}</b>.</p>
+            </header>
+            <div class="otp" [class.invalido]="erroCodigo">
+              @for (c of codigo; track $index; let i = $index) {
+                <input #codigoInput type="text" inputmode="numeric" autocomplete="one-time-code" [attr.aria-label]="'Dígito ' + (i + 1)"
+                       [value]="codigo[i]" (input)="digitarCodigo(i, $event)" (keydown)="apagarCodigo(i, $event)" />
+              }
+            </div>
+            @if (erroCodigo) { <small class="erro centro">{{ erroCodigo }}</small> }
+            <button class="btn-pri" type="submit" [disabled]="carregando || !codigoCompleto">
+              @if (carregando) { <ed-carregando [mini]="true" /> } @else { Verificar código }
+            </button>
+            <p class="au-troca">Não chegou? <button type="button" class="link" (click)="enviarCodigo()">Reenviar código</button></p>
+          </form>
+        }
+
+        @case ('rec-novaSenha') {
+          <form class="au-passo" (ngSubmit)="salvarSenha()">
+            <span class="au-ico"><ed-icone nome="lock" [tamanho]="22" /></span>
+            <header class="au-cab">
+              <h1 id="au-titulo">Nova senha</h1>
+              <p>Crie uma senha nova para a sua conta.</p>
+            </header>
+            <label class="campo">
+              <span>Nova senha</span>
+              <span class="campo-senha">
+                <input [type]="verSenha ? 'text' : 'password'" name="nova" [(ngModel)]="senhaNova" autocomplete="new-password" placeholder="Crie uma senha" required />
+                <button type="button" class="olho" (click)="verSenha = !verSenha">{{ verSenha ? 'Ocultar' : 'Mostrar' }}</button>
+              </span>
+            </label>
+            <ul class="regras">
+              @for (r of regras(senhaNova); track r.texto) {
+                <li [class.ok]="r.ok"><span><ed-icone nome="check" [tamanho]="11" [traco]="3" /></span>{{ r.texto }}</li>
+              }
+            </ul>
+            <label class="campo" [class.invalido]="senhaNovaConfirmacao && senhaNovaConfirmacao !== senhaNova">
+              <span>Confirmar senha</span>
+              <input [type]="verSenha ? 'text' : 'password'" name="confirmacao" [(ngModel)]="senhaNovaConfirmacao" autocomplete="new-password" placeholder="Repita a senha" required />
+              @if (senhaNovaConfirmacao && senhaNovaConfirmacao !== senhaNova) { <small class="erro">As senhas não são iguais.</small> }
+            </label>
+            @if (erroCodigo) { <small class="erro">{{ erroCodigo }}</small> }
+            <button class="btn-pri" type="submit" [disabled]="carregando || !novaSenhaOk">
+              @if (carregando) { <ed-carregando [mini]="true" /> } @else { Salvar nova senha }
+            </button>
+          </form>
+        }
+      }
+    </section>
+  </div>
+</div>

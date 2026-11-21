@@ -1,0 +1,51 @@
+<div class="pm" [class.fechando]="fechando" role="dialog" aria-modal="true" aria-labelledby="pm-titulo">
+  <div class="pm-fundo" (click)="fechar()"></div>
+
+  <section class="pm-palco">
+    <div class="pm-luzes" aria-hidden="true"><i></i><i></i><i></i></div>
+    <button class="pm-fechar" type="button" (click)="fechar()" aria-label="Fechar"><ed-icone nome="x" [tamanho]="20" /></button>
+
+    <header class="pm-cab">
+      <span class="pm-rotulo">Fechamento de {{ mes }}</span>
+      <h1 id="pm-titulo">Os melhores do mês</h1>
+      <p>{{ nomeGrupo }}</p>
+    </header>
+
+    @if (carregando) {
+      <div class="pm-carregando"><ed-carregando [tamanho]="56" [claro]="true" texto="Apurando o pódio" /></div>
+    } @else if (podio.length) {
+      <ol class="pm-podio">
+        @for (p of podio; track p.usuario; let i = $index) {
+          <li class="lugar l{{ i + 1 }}" [style.--d]="atraso(i)">
+            <div class="lugar-topo">
+              @if (i === 0) {
+                <span class="lugar-feixe" aria-hidden="true"></span>
+                <ed-icone class="lugar-coroa" nome="crown" [tamanho]="30" />
+              }
+              <span class="lugar-av">
+                <ed-avatar [valor]="p.avatar" [nome]="p.usuario" [tamanho]="72" [encher]="true" />
+              </span>
+              <b class="lugar-nome">{{ p.usuario }}</b>
+              <span class="lugar-xp">{{ formatarNumero(xp[i]) }} <small>XP</small></span>
+            </div>
+            <div class="lugar-bloco">
+              <span class="lugar-num">{{ i + 1 }}</span>
+              <ed-icone class="lugar-medalha" nome="medal" [tamanho]="18" />
+            </div>
+          </li>
+        }
+      </ol>
+
+      @if (mensagemUsuario) {
+        <p class="pm-voce" [class.destaque]="posicaoUsuario > 0 && posicaoUsuario <= 3">{{ mensagemUsuario }}</p>
+      }
+    } @else {
+      <div class="pm-vazio">
+        <span class="pm-vazio-ico"><ed-icone nome="trophy" [tamanho]="30" /></span>
+        <p>Ninguém pontuou no grupo em {{ mes }}. O pódio deste mês está em aberto.</p>
+      </div>
+    }
+
+    <button class="pm-botao" type="button" (click)="fechar()">Começar o novo mês<ed-icone nome="arrow-right" [tamanho]="18" /></button>
+  </section>
+</div>

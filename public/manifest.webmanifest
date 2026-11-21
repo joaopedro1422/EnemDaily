@@ -1,0 +1,33 @@
+{
+  "id": "/",
+  "name": "enem.daily · 4 questões por dia",
+  "short_name": "enem.daily",
+  "description": "4 questões do ENEM por dia, uma de cada área. Construa seu campus, dispute com amigos e chegue pronto na prova.",
+  "lang": "pt-BR",
+  "dir": "ltr",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "portrait",
+  "background_color": "#2836C6",
+  "theme_color": "#F3F5F9",
+  "categories": ["education", "productivity"],
+  "icons": [
+    { "src": "icons/icon-72x72.png", "sizes": "72x72", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-96x96.png", "sizes": "96x96", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-128x128.png", "sizes": "128x128", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-144x144.png", "sizes": "144x144", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-152x152.png", "sizes": "152x152", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-192x192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-384x384.png", "sizes": "384x384", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512x512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/maskable-192x192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "icons/maskable-512x512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Desafio de hoje", "short_name": "Desafio", "url": "/Home", "icons": [{ "src": "icons/icon-96x96.png", "sizes": "96x96" }] },
+    { "name": "Meu campus", "short_name": "Campus", "url": "/progresso", "icons": [{ "src": "icons/icon-96x96.png", "sizes": "96x96" }] },
+    { "name": "Amigos e duelos", "short_name": "Amigos", "url": "/amigos", "icons": [{ "src": "icons/icon-96x96.png", "sizes": "96x96" }] }
+  ]
+}

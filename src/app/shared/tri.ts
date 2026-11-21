@@ -1,0 +1,24 @@
+import { ChaveArea } from './dia';
+
+// Mediana da nota TRI por número de acertos (0 a 45), ENEM 2023, a partir dos microdados do Inep
+// (levantamento de profrafaelteixeira.com.br). Pontas sem dado suficiente foram extrapoladas.
+const TABELA: Record<ChaveArea, number[]> = {
+  linguagens: [287.2, 289.7, 294.8, 304.6, 315.2, 326.3, 340.2, 357.9, 374.8, 391.4, 406.4, 419.9, 432.9, 445.0, 456.6, 467.3, 478.0, 487.9, 497.4, 506.4, 515.1, 523.5, 531.6, 539.6, 547.6, 555.5, 563.3, 571.3, 579.3, 587.5, 595.8, 604.4, 613.3, 622.6, 632.3, 642.6, 653.5, 665.2, 677.6, 691.2, 705.6, 721.0, 737.3, 756.4, 776.0, 796.0],
+  humanas: [293.5, 296.2, 303.7, 310.7, 318.9, 328.2, 339.7, 351.8, 365.2, 378.9, 394.0, 409.3, 425.2, 440.5, 454.6, 468.0, 480.4, 491.8, 502.3, 512.2, 521.4, 530.2, 538.3, 546.4, 554.2, 561.8, 569.4, 576.8, 584.3, 591.7, 599.5, 607.3, 615.3, 623.9, 632.8, 642.3, 652.7, 663.8, 676.3, 689.4, 704.5, 722.7, 742.3, 765.9, 799.5, 830.0],
+  naturezas: [315.0, 325.5, 338.2, 374.2, 378.7, 389.3, 401.2, 416.7, 430.4, 445.6, 461.8, 479.5, 497.9, 517.3, 536.1, 553.2, 568.6, 582.3, 594.7, 606.0, 616.3, 625.8, 634.5, 642.7, 650.3, 657.9, 665.0, 672.1, 679.4, 686.2, 693.4, 700.6, 707.7, 715.5, 723.0, 731.0, 739.3, 747.5, 756.9, 766.7, 778.4, 791.5, 806.6, 824.7, 845.0, 865.0],
+  exatas: [328.2, 329.7, 333.7, 343.5, 350.3, 360.5, 371.9, 383.3, 398.6, 415.5, 435.3, 457.7, 481.9, 507.0, 532.4, 556.1, 578.5, 598.5, 616.7, 632.9, 648.0, 661.3, 673.6, 685.2, 696.3, 706.7, 717.0, 727.0, 736.6, 746.4, 756.1, 766.2, 776.5, 786.7, 797.9, 809.1, 820.6, 832.5, 845.8, 859.6, 874.7, 890.8, 908.9, 930.9, 945.2, 958.6]
+};
+
+/** Nota TRI aproximada para uma quantidade (pode ser fracionária, como uma média) de acertos de 0 a 45. */
+export function notaEstimada(area: ChaveArea, acertos: number): number {
+  const t = TABELA[area];
+  const a = Math.max(0, Math.min(45, acertos));
+  const i = Math.floor(a), f = a - i;
+  const v = i >= 45 ? t[45] : t[i] + (t[i + 1] - t[i]) * f;
+  return Math.round(v);
+}
+
+/** Quantos pontos a mais a pessoa ganharia com `extra` acertos a partir da média atual. */
+export function ganhoPorAcertos(area: ChaveArea, media: number, extra = 3): number {
+  return notaEstimada(area, Math.min(45, media + extra)) - notaEstimada(area, media);
+}

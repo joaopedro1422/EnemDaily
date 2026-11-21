@@ -1,0 +1,76 @@
+<div class="pf" [class.fechando]="fechando" role="dialog" aria-modal="true" aria-labelledby="pf-nome">
+  <div class="pf-fundo" (click)="fecharModal()"></div>
+
+  <section class="pf-folha">
+    <span class="pf-alca" aria-hidden="true"></span>
+    <button class="pf-fechar" type="button" (click)="fecharModal()" aria-label="Fechar"><ed-icone nome="x" [tamanho]="20" /></button>
+
+    <header class="pf-topo">
+      <div class="pf-av-wrap">
+        <span class="pf-av"><ed-avatar [valor]="avatar" [nome]="nome" [tamanho]="92" [encher]="true" /></span>
+        @if (proprio) {
+          <button class="pf-trocar" type="button" (click)="abrirAvatar()" aria-label="Trocar avatar"><ed-icone nome="pen-line" [tamanho]="14" /></button>
+        }
+      </div>
+      <h2 id="pf-nome">{{ nome }}</h2>
+      <span class="pf-sub">{{ proprio ? 'Seu perfil' : 'Perfil do colega' }}</span>
+      @if (!proprio && nome) { <a class="pf-completo" [routerLink]="['/u', nome]" (click)="close.emit()"><ed-icone nome="swords" [tamanho]="14" />Abrir perfil completo</a> }
+
+      <dl class="pf-stats">
+        <div><dt><ed-icone nome="zap" [tamanho]="14" />XP total</dt><dd>{{ formatarNumero(xp) }}</dd></div>
+        <div><dt><ed-icone nome="flame" [tamanho]="14" />Sequência</dt><dd>{{ dias }} <small>{{ dias === 1 ? 'dia' : 'dias' }}</small></dd></div>
+        <div><dt><ed-icone nome="school" [tamanho]="14" />Campus</dt><dd>{{ pecas }} <small>peças</small></dd></div>
+      </dl>
+    </header>
+
+    <section class="campus-sec" aria-labelledby="t-campus">
+      <div class="sec-cab">
+        <h3 id="t-campus"><ed-icone nome="school" [tamanho]="16" />Campus</h3>
+        <span><b>{{ pecas }}</b>/{{ totalCampus }} peças</span>
+      </div>
+      <div class="campus-quadro">
+        <ed-campus [progresso]="progresso" modo="auto" [avisos]="false" [interativo]="true" [aproximar]="1.45" [extras]="proprio ? (extras$ | async) : null" />
+      </div>
+      @if (proprio) {
+        <button class="btn-link" type="button" (click)="verCampus()">Explorar meu campus<ed-icone nome="arrow-right" [tamanho]="15" /></button>
+      }
+    </section>
+
+    <section class="estante-sec" aria-labelledby="t-estante">
+      <div class="sec-cab">
+        <h3 id="t-estante"><ed-icone nome="trophy" [tamanho]="16" />Estante de conquistas</h3>
+        <span><b>{{ conquistados }}</b>/{{ totalEmblemas }}</span>
+      </div>
+
+      <div class="estante">
+        <div class="trilho">
+          <div class="grade-trofeus" [style.--cols]="colunas">
+            @for (t of trofeus; track t.emblema.codigo; let k = $index) {
+              <button type="button" class="nicho" [class.ganho]="t.ganho" [class.ativo]="selecionado === t" [style.--i]="t.i"
+                      (click)="escolher(t)" [attr.aria-label]="(t.ganho ? 'Conquistado: ' : 'Bloqueado: ') + t.emblema.desc">
+                @if (t.ganho) {
+                  <span class="lampada" aria-hidden="true"></span>
+                  <span class="feixe" aria-hidden="true"></span>
+                  <span class="brilho-base" aria-hidden="true"></span>
+                }
+                <img class="trofeu" [src]="t.emblema.url" alt="" loading="lazy" />
+                @if (!t.ganho) { <ed-icone class="cadeado" nome="lock" [tamanho]="12" /> }
+                @if (selecionado === t) {
+                  <span class="balao" [class.esq]="k % colunas === 0" [class.dir]="k % colunas === colunas - 1" role="tooltip">
+                    <small [class.ok]="t.ganho">{{ t.ganho ? 'Conquistado' : 'Bloqueado' }}</small>
+                    {{ t.emblema.desc }}
+                  </span>
+                }
+              </button>
+            }
+          </div>
+        </div>
+      </div>
+
+      <p class="legenda-vazia">
+        @if (!conquistados) { {{ proprio ? 'Responda o desafio diário para acender os primeiros troféus.' : 'Nenhuma conquista ainda.' }} }
+        Toque em um troféu para ver o nome{{ colunas > 4 ? ' · arraste para o lado para ver mais' : '' }}.
+      </p>
+    </section>
+  </section>
+</div>

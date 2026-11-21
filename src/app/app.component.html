@@ -1,0 +1,16 @@
+<div class="app-component-container">
+    <app-header></app-header>
+    <app-relatorio-semanal-fab></app-relatorio-semanal-fab>
+    <app-duelo-avisos />
+    <router-outlet><router-outlet />
+@if (modalService.isOpen()) {
+<app-auth-modal></app-auth-modal>
+}
+
+
+@if (pwa.atualizacao$ | async) {
+  <div class="ed-nova-versao" role="status">
+    <span><b>Nova versão disponível</b><small>Atualize para ver as novidades.</small></span>
+    <button type="button" (click)="pwa.atualizar()">Atualizar</button>
+  </div>
+}

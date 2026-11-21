@@ -1,0 +1,129 @@
+<div class="ac">
+  <header class="ac-topo">
+    <div>
+      <a class="ac-voltar" routerLink="/admin"><ed-icone nome="chevron-right" [tamanho]="15" class="vira" />Painel</a>
+      <h1>Conteúdos</h1>
+      <p>Páginas de estudo de cada assunto. Nada vai ao ar sem você publicar.</p>
+    </div>
+  </header>
+
+  <div class="ac-grade">
+    <aside class="ac-lista">
+      <div class="ac-areas" role="tablist" aria-label="Área">
+        @for (a of areas; track a.chave) {
+          <button type="button" role="tab" [class.on]="area === a.chave" [style.--c]="a.cor" (click)="area = a.chave">
+            <ed-icone [nome]="a.icone" [tamanho]="15" />{{ a.curto }}<small>{{ contar(a.chave, 'publicado') }}/{{ contar(a.chave) }}</small>
+          </button>
+        }
+      </div>
+      <div class="ac-filtro" role="group" aria-label="Status">
+        <button type="button" [class.on]="filtroStatus === ''" (click)="filtroStatus = ''">Todos</button>
+        <button type="button" [class.on]="filtroStatus === 'sem'" (click)="filtroStatus = 'sem'">Sem conteúdo</button>
+        <button type="button" [class.on]="filtroStatus === 'rascunho'" (click)="filtroStatus = 'rascunho'">Rascunho</button>
+        <button type="button" [class.on]="filtroStatus === 'publicado'" (click)="filtroStatus = 'publicado'">Publicado</button>
+      </div>
+      <ul>
+        @for (i of daArea; track i.assuntoId) {
+          <li>
+            <button type="button" class="ac-item" [class.sel]="selecionado?.assuntoId === i.assuntoId" (click)="abrir(i)">
+              <b>{{ i.assunto }}</b>
+              <span class="st st-{{ i.status }}">{{ i.status === 'sem' ? 'Sem conteúdo' : i.status === 'rascunho' ? 'Rascunho' : 'Publicado' }}</span>
+            </button>
+          </li>
+        } @empty {
+          <li class="ac-vazio">Nenhum assunto aqui.</li>
+        }
+      </ul>
+    </aside>
+
+    <section class="ac-editor">
+      @if (!selecionado) {
+        <div class="ac-nada">
+          <ed-icone nome="book-open" [tamanho]="28" />
+          <b>Escolha um assunto</b>
+          <p>Gere um rascunho com IA, revise o texto e publique.</p>
+        </div>
+      } @else {
+        <div class="ed-cab">
+          <div class="ed-cab-txt">
+            <span class="ed-area" [style.color]="info(selecionado.area).corTexto">{{ info(selecionado.area).curto }}</span>
+            <h2>{{ selecionado.assunto }}</h2>
+            <span class="st st-{{ selecionado.status }}">{{ selecionado.status === 'sem' ? 'Sem conteúdo' : selecionado.status === 'rascunho' ? 'Rascunho' : 'Publicado' }}</span>
+            @if (pagina?.publicado) { <a class="ed-link" [href]="endereco" target="_blank" rel="noopener">{{ endereco }}</a> }
+          </div>
+          <div class="ed-acoes">
+            <button class="b b-sec" type="button" (click)="gerar()" [disabled]="!!ocupado">
+              <ed-icone nome="sparkles" [tamanho]="16" />{{ ocupado === 'gerando' ? 'Gerando...' : pagina ? 'Gerar de novo' : 'Gerar com IA' }}
+            </button>
+            <button class="b b-sec" type="button" (click)="salvar()" [disabled]="!!ocupado || !alterado">{{ ocupado === 'salvando' ? 'Salvando...' : 'Salvar' }}</button>
+            @if (pagina) {
+              <button class="b" [class.b-pri]="!pagina.publicado" [class.b-sec]="pagina.publicado" type="button" (click)="alternarPublicacao()" [disabled]="!!ocupado">
+                {{ ocupado === 'publicando' ? 'Aguarde...' : pagina.publicado ? 'Tirar do ar' : 'Publicar' }}
+              </button>
+              <button class="b b-perigo" type="button" (click)="excluir()" (blur)="confirmandoExclusao = false" [disabled]="!!ocupado">{{ confirmandoExclusao ? 'Confirmar exclusão' : 'Excluir' }}</button>
+            }
+          </div>
+        </div>
+
+        @if (ocupado === 'gerando') {
+          <div class="ed-aviso"><ed-carregando [mini]="true" />Escrevendo o conteúdo com IA. Leva de 30 segundos a 2 minutos.</div>
+        }
+        @if (mensagem) { <p class="ed-ok">{{ mensagem }}</p> }
+        @if (erro) { <p class="ed-erro">{{ erro }}</p> }
+        @if (alterado) { <p class="ed-pendente">Alterações não salvas.</p> }
+
+        @if (carregandoPagina) {
+          <div class="ac-nada"><ed-carregando [tamanho]="40" /></div>
+        } @else {
+          <div class="ed-abas" role="tablist">
+            <button type="button" role="tab" [class.on]="aba === 'editar'" (click)="aba = 'editar'">Editar</button>
+            <button type="button" role="tab" [class.on]="aba === 'previa'" (click)="aba = 'previa'">Pré-visualizar</button>
+          </div>
+
+          @if (aba === 'editar') {
+            <form class="ed-form" (ngSubmit)="salvar()">
+              <label>
+                <span>Título da página</span>
+                <input type="text" name="titulo" [(ngModel)]="campos.titulo" placeholder="Ex.: Primeira Guerra Mundial no ENEM" />
+              </label>
+              <label>
+                <span>Título no Google <small [class.passou]="tamanho(campos.seoTitulo) > 60">{{ tamanho(campos.seoTitulo) }}/60</small></span>
+                <input type="text" name="seoTitulo" [(ngModel)]="campos.seoTitulo" />
+              </label>
+              <label>
+                <span>Descrição no Google <small [class.passou]="tamanho(campos.seoDescricao) > 155">{{ tamanho(campos.seoDescricao) }}/155</small></span>
+                <textarea class="texto-normal" name="seoDescricao" rows="2" [(ngModel)]="campos.seoDescricao"></textarea>
+              </label>
+              @if (campos.seoTitulo || campos.seoDescricao) {
+                <div class="ed-google" aria-label="Como aparece no Google">
+                  <small>{{ endereco || 'enemdaily.com.br/conteudos/...' }}</small>
+                  <b>{{ campos.seoTitulo }}</b>
+                  <span>{{ campos.seoDescricao }}</span>
+                </div>
+              }
+              <label>
+                <span>Resumo <small>HTML: &lt;p&gt;, &lt;h3&gt;, &lt;b&gt;, &lt;ul&gt;&lt;li&gt;</small></span>
+                <textarea name="resumo" rows="16" [(ngModel)]="campos.resumo"></textarea>
+              </label>
+              <label>
+                <span>Como cai no ENEM</span>
+                <textarea name="comoCai" rows="10" [(ngModel)]="campos.comoCai"></textarea>
+              </label>
+              <label>
+                <span>Para não errar <small>lista &lt;ul&gt;&lt;li&gt;</small></span>
+                <textarea name="paraNaoErrar" rows="8" [(ngModel)]="campos.paraNaoErrar"></textarea>
+              </label>
+              <p class="ed-questao">
+                <ed-icone nome="clipboard-list" [tamanho]="15" />
+                @if (pagina?.questao) { Questão de treino: {{ pagina!.questao!.assunto }} (gerada em dia anterior). }
+                @else { Ainda não há questão gerada desse assunto: a seção "Teste seu conhecimento" fica oculta até existir uma. }
+              </p>
+            </form>
+          } @else if (previa) {
+            <div class="ed-previa"><app-conteudo-artigo [pagina]="previa" [previa]="true" /></div>
+          }
+        }
+      }
+    </section>
+  </div>
+</div>

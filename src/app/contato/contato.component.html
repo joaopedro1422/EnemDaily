@@ -1,0 +1,136 @@
+<div class="home">
+
+  <header class="contact-hero">
+    <div class="hero-card">
+      <div class="badge">
+        <i class="fa-regular fa-envelope"></i>
+        <span>Fale conosco</span>
+      </div>
+
+      <h1>Entre em contato conosco!</h1>
+      <p>
+        Envie uma mensagem através do nosso Email para parcerias, dúvidas, correção de bugs e etc. Caso seja um problema, descreva com detalhes o que aconteceu.
+      </p>
+    </div>
+  </header>
+
+  <main class="contact-content">
+    <section class="form-card">
+      <div class="form-header">
+        <div class="icon">
+          <i class="fa-solid fa-paper-plane"></i>
+        </div>
+        <div>
+          <h2>Enviar mensagem</h2>
+          <span class="small">Tempo médio de resposta: 8-12h</span>
+        </div>
+      </div>
+
+      <form class="form" (ngSubmit)="enviar()" #f="ngForm">
+        <div class="grid-2">
+          <div class="field">
+            <input
+              type="text"
+              name="nome"
+              [(ngModel)]="model.nome"
+              required
+              placeholder="Seu Nome "
+            />
+            
+          </div>
+
+          <div class="field">
+            <input
+              type="email"
+              name="email"
+              [(ngModel)]="model.email"
+              required
+              placeholder="Seu e-mail "
+            />
+            
+          </div>
+        </div>
+
+        <div class="field">
+          <select
+            name="assunto"
+            [(ngModel)]="model.assunto"
+            required>
+            <option value="" selected>Selecione um assunto</option>
+            <option value="suporte">Suporte</option>
+            <option value="bug">Reportar bug</option>
+            <option value="sugestao">Sugestão</option>
+            <option value="parceria">Parceria</option>
+            <option value="outros">Outros</option>
+          </select>
+        
+        </div>
+
+        <div class="field">
+          <textarea
+            name="mensagem"
+            [(ngModel)]="model.mensagem"
+            required
+            rows="6"
+            placeholder="Mensagem "
+          ></textarea>
+        
+
+       
+        </div>
+
+        <div class="actions">
+       
+
+          <button class="btn-primary" type="submit" [disabled]="f.invalid || loading">
+            <ng-container *ngIf="!loading; else loadingTpl">
+              <i class="fa-solid fa-paper-plane"></i>
+              Enviar mensagem
+            </ng-container>
+
+            <ng-template #loadingTpl>
+              <ed-carregando [mini]="true" [claro]="true" />
+              Enviando...
+            </ng-template>
+          </button>
+        </div>
+
+        <p class="status ok" *ngIf="msgOk">
+          <i class="fa-regular fa-circle-check"></i>
+          {{ msgOk }}
+        </p>
+
+        <p class="status err" *ngIf="msgErro">
+          <i class="fa-regular fa-circle-xmark"></i>
+          {{ msgErro }}
+        </p>
+      </form>
+    </section>
+
+    <aside class="info-card">
+      <h3><i class="fa-solid fa-circle-info"></i> Informações</h3>
+
+      <div class="info-item">
+        <i class="fa-regular fa-envelope"></i>
+        <div>
+          <span class="label">E-mail</span>
+          <span class="value">contato&#64;enem.daily</span>
+        </div>
+      </div>
+
+      <div class="info-item">
+        <i class="fa-regular fa-clock"></i>
+        <div>
+          <span class="label">Horário</span>
+          <span class="value">Seg–Sex, 9h–18h (BRT)</span>
+        </div>
+      </div>
+
+    
+
+   
+    </aside>
+  </main>
+</div>
+<div class="espaco"></div>
+<app-footer></app-footer>

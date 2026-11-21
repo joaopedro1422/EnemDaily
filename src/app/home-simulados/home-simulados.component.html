@@ -1,0 +1,203 @@
+@if (mostrarModal) {
+  <app-novo-simulado-modal [usuarioDemo]="!!usuario?.demo" (close)="fecharModal($event)" />
+}
+
+@if (usuario) {
+<main class="sim">
+  <header class="sim-topo" [class.compacto]="simulados.length">
+    <div class="sim-titulo">
+      <span class="sim-ico"><ed-icone nome="clipboard-list" [tamanho]="simulados.length ? 19 : 24" /></span>
+      <div>
+        <h1>Simulados</h1>
+        @if (!carregando && !simulados.length) { <p>Registre seus simulados e acompanhe a evolução até o ENEM.</p> }
+      </div>
+    </div>
+    <button class="estrela" type="button" [class.ativa]="favorito" (click)="toggleFavorito()" [attr.aria-pressed]="favorito"
+            [title]="favorito ? 'Página inicial do app' : 'Definir como página inicial'" [attr.aria-label]="favorito ? 'Remover dos favoritos' : 'Favoritar página'">
+      <ed-icone nome="star" [tamanho]="20" />
+    </button>
+  </header>
+
+  @if (carregando) {
+    <div class="carregando-pagina"><ed-carregando [tamanho]="56" texto="Carregando seus simulados" /></div>
+  } @else if (!simulados.length) {
+    <section class="vazio">
+      <div class="vazio-arte" aria-hidden="true">
+        <span></span><span></span><span></span>
+        <ed-icone nome="chart-column" [tamanho]="30" />
+      </div>
+      <h2>Seu primeiro simulado começa aqui</h2>
+      <p>Depois de fazer um simulado, registre os acertos de cada área. A partir daí você vê sua evolução, a projeção para os 180 itens e onde focar.</p>
+      <button class="btn-pri" type="button" (click)="abrirModal()"><ed-icone nome="plus" [tamanho]="18" />Registrar simulado</button>
+    </section>
+  } @else {
+
+    <section class="kpis" aria-label="Resumo">
+      <article class="kpi kpi-proj">
+        <span class="kpi-rot"><ed-icone nome="target" [tamanho]="15" />Projeção ENEM</span>
+        @if (projecao !== null) {
+          <b class="kpi-num">{{ projecao }}<small>/180</small></b>
+          <span class="kpi-sub">{{ (projecao / 180 * 100).toFixed(0) }}% de aproveitamento</span>
+          <span class="kpi-barra"><i [style.width.%]="projecao / 180 * 100"></i></span>
+          @if (notaGeral !== null) { <span class="kpi-tri" [title]="mediaRedacao !== null ? 'Média das 4 objetivas (TRI estimada) e da redação' : 'Média das 4 objetivas, sem redação'">{{ mediaRedacao !== null ? 'Nota estimada com redação' : 'Nota estimada (sem redação)' }} <b>~{{ notaGeral }} pts</b></span> }
+        } @else {
+          <b class="kpi-num vazio-num">—</b>
+          <span class="kpi-sub">Registre os dois dias para ver</span>
+        }
+      </article>
+      @for (d of dias; track d.dia) {
+        <article class="kpi" [class.d2]="d.dia === 2">
+          <span class="kpi-rot"><i class="kpi-ponto"></i>{{ d.nome }} · média</span>
+          @if (d.qtd) {
+            <b class="kpi-num">{{ d.media }}<small>/90</small></b>
+            <span class="kpi-sub">
+              Melhor {{ d.melhor }} · {{ d.qtd }} {{ d.qtd === 1 ? 'simulado' : 'simulados' }}
+              @if (d.delta !== null) { <em class="delta" [class.sobe]="d.delta > 0" [class.cai]="d.delta < 0">{{ sinal(d.delta) || '=' }}</em> }
+            </span>
+          } @else {
+            <b class="kpi-num vazio-num">—</b>
+            <span class="kpi-sub">Nenhum registro ainda</span>
+          }
+        </article>
+      }
+    </section>
+
+    <div class="grade">
+      <section class="card areas-card" aria-labelledby="t-areas">
+        <div class="card-cab"><h2 id="t-areas">Por área</h2><span class="card-dica">média de 45</span></div>
+        <ul class="areas">
+          @for (a of areas; track a.info.chave) {
+            <li [style.--c]="a.info.cor" [style.--ct]="a.info.corTexto" [class.sem]="!a.qtd">
+              <span class="area-ico"><ed-icone [nome]="a.info.icone" [tamanho]="16" /></span>
+              <div class="area-corpo">
+                <div class="area-linha">
+                  <b>{{ a.info.nome }}</b>
+                  <span class="area-val">
+                    @if (a.qtd) {
+                      {{ a.media }}<small>/45</small>
+                      @if (a.delta !== null && a.delta !== 0) { <em class="delta" [class.sobe]="a.delta > 0" [class.cai]="a.delta < 0">{{ sinal(a.delta) }}</em> }
+                    } @else { — }
+                  </span>
+                </div>
+                <span class="area-barra"><i [style.width.%]="a.pct"></i></span>
+                <span class="area-sub">
+                  @if (a.qtd) { {{ a.pct }}% · melhor {{ a.melhor }} } @else { {{ a.dia }}º dia sem registros }
+                </span>
+              </div>
+            </li>
+          }
+        </ul>
+      </section>
+
+      <section class="card grafico-card" aria-labelledby="t-evolucao">
+        <div class="card-cab">
+          <h2 id="t-evolucao">Evolução</h2>
+          <div class="seg" role="tablist" [style.--idx]="visao === 'dias' ? 0 : 1">
+            <span class="seg-marca" aria-hidden="true"></span>
+            <button type="button" role="tab" [attr.aria-selected]="visao === 'dias'" (click)="trocarVisao('dias')">Por dia</button>
+            <button type="button" role="tab" [attr.aria-selected]="visao === 'areas'" (click)="trocarVisao('areas')">Por área</button>
+          </div>
+        </div>
+        <ul class="legenda">
+          @for (l of legenda; track l.nome) {
+            <li><i [style.background]="l.cor"></i>{{ l.nome }}@if (l.valor !== null) { <b>{{ l.valor }}</b> }</li>
+          }
+        </ul>
+        <div class="grafico"><canvas #grafico aria-label="Gráfico de acertos por simulado" role="img"></canvas></div>
+        <p class="grafico-nota">Acertos por simulado, de {{ visao === 'dias' ? '90 questões por dia' : '45 questões por área' }}.</p>
+      </section>
+
+      <section class="card insights-card" aria-labelledby="t-analise" [class.aberta]="analise === 'pronta'">
+        <div class="card-cab"><h2 id="t-analise"><ed-icone nome="sparkles" [tamanho]="16" />Análise</h2>
+          @if (analise === 'pronta') { <button class="btn-txt" type="button" (click)="analise = 'fechada'">Recolher<ed-icone nome="chevron-down" [tamanho]="14" class="virado" /></button> }
+        </div>
+        @if (analise === 'fechada') {
+          <div class="gerar">
+            <p>Leia seus {{ simulados.length }} simulados e descubra tendências, pontos fortes e onde focar.</p>
+            <button class="btn-gerar" type="button" (click)="gerarAnalise()"><ed-icone nome="sparkles" [tamanho]="17" />Gerar análise</button>
+          </div>
+        } @else if (analise === 'gerando') {
+          <div class="gerando" aria-live="polite">
+            <span class="gerando-barra"><i></i></span>
+            <p>{{ etapaAnalise }}</p>
+          </div>
+        } @else {
+          <ul class="insights">
+            @for (i of insights; track i.titulo; let k = $index) {
+              <li class="insight {{ i.tom }}" [style.--k]="k">
+                <span class="insight-ico"><ed-icone [nome]="i.icone" [tamanho]="17" /></span>
+                <div><b>{{ i.titulo }}</b><p>{{ i.texto }}</p></div>
+              </li>
+            }
+          </ul>
+        }
+      </section>
+
+      <section class="card hist-card" aria-labelledby="t-hist">
+        <div class="card-cab">
+          <h2 id="t-hist">Histórico</h2>
+          <div class="chips" role="group" aria-label="Filtrar">
+            <button type="button" [attr.aria-pressed]="filtro === 'todos'" (click)="filtrar('todos')">Todos</button>
+            <button type="button" [attr.aria-pressed]="filtro === 1" (click)="filtrar(1)">1º dia</button>
+            <button type="button" [attr.aria-pressed]="filtro === 2" (click)="filtrar(2)">2º dia</button>
+          </div>
+        </div>
+
+        @for (g of historico; track g.chave) {
+          <div class="mes">
+            <h3>{{ g.rotulo }}</h3>
+            <ul class="hist">
+              @for (it of g.itens; track it.s.id) {
+                <li class="item" [class.d2]="it.s.dia === 2" [class.aberto]="abertas.has(it.s.id)">
+                  <div class="item-titulo">
+                    <b>Simulado #{{ it.s.numeracao }}</b>
+                    @if (it.s.nome) { <span>{{ it.s.nome }}</span> }
+                  </div>
+                  <div class="item-linha">
+                    <span class="item-data"><b>{{ it.dia }}</b><small>{{ it.mes }}</small></span>
+                    <div class="item-info">
+                      <span class="item-meta"><i class="item-dia">{{ it.s.dia }}º dia</i></span>
+                      <span class="item-partes">
+                        @for (p of it.partes; track p.sigla) { <span [style.--c]="p.cor" [style.--ct]="p.corTexto"><span class="parte-ico"><ed-icone [nome]="p.icone" [tamanho]="12" /></span>{{ p.sigla }} <b>{{ p.valor }}</b></span> }
+                      </span>
+                    </div>
+                    <div class="item-nota">
+                      <b>{{ it.total }}<small>/90</small></b>
+                      @if (it.s.dif) { <em class="delta" [class.sobe]="it.s.dif > 0" [class.cai]="it.s.dif < 0">{{ sinal(it.s.dif) }}</em> }
+                    </div>
+                  </div>
+                  @if (excluindo === it.s.id) {
+                    <div class="item-confirma">
+                      <span>Excluir este simulado?</span>
+                      <button type="button" class="btn-mini" (click)="excluindo = null">Cancelar</button>
+                      <button type="button" class="btn-mini perigo" (click)="excluir(it.s.id)">Excluir</button>
+                    </div>
+                  } @else {
+                    <div class="item-acoes">
+                      @if (it.s.anotacoes) {
+                        <button type="button" class="btn-txt" (click)="alternarNotas(it.s.id)" [attr.aria-expanded]="abertas.has(it.s.id)">
+                          <ed-icone nome="pen-line" [tamanho]="14" />Anotações<ed-icone nome="chevron-down" [tamanho]="14" [class.virado]="abertas.has(it.s.id)" />
+                        </button>
+                      } @else { <span></span> }
+                      <button type="button" class="btn-txt perigo" (click)="pedirExclusao(it.s.id)" aria-label="Excluir simulado"><ed-icone nome="circle-x" [tamanho]="15" />Excluir</button>
+                    </div>
+                  }
+                  @if (abertas.has(it.s.id) && it.s.anotacoes) {
+                    <p class="item-anot">{{ it.s.anotacoes }}</p>
+                  }
+                </li>
+              }
+            </ul>
+          </div>
+        } @empty {
+          <p class="hist-vazio">Nenhum simulado do {{ filtro }}º dia ainda.</p>
+        }
+      </section>
+    </div>
+  }
+  <button class="fab" type="button" [class.recolhido]="fabRecolhido" (click)="abrirModal()" aria-label="Registrar simulado">
+    <ed-icone nome="plus" [tamanho]="24" [traco]="2.5" />
+    <span class="fab-txt">Registrar simulado</span>
+  </button>
+</main>
+}

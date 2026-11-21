@@ -1,0 +1,52 @@
+<div class="bv" [class.fechando]="fechando" role="dialog" aria-modal="true" aria-labelledby="bv-fala">
+  <div class="bv-fundo"></div>
+
+  <section class="bv-caixa">
+    <header class="bv-topo">
+      <div class="bv-pontos" aria-hidden="true">
+        @for (p of passos; track $index) { <i [class.ativo]="$index === atual" [class.feito]="$index < atual"></i> }
+      </div>
+      <button class="bv-pular" type="button" (click)="pular()">Pular</button>
+    </header>
+
+    @for (k of [atual]; track k) {
+      <div class="bv-visual" [class]="'bv-visual v-' + passo.visual">
+        @switch (passo.visual) {
+          @case ('areas') {
+            <div class="vis-areas">
+              @for (a of areas; track a.chave; let i = $index) {
+                <div class="vis-area" [style.--c]="a.cor" [style.--i]="i">
+                  <span class="vis-area-ico"><ed-icone [nome]="a.icone" [tamanho]="20" /></span>
+                  <b>{{ a.nome }}</b>
+                  <small>1 questão</small>
+                  <span class="vis-check"><ed-icone nome="check" [tamanho]="12" [traco]="3" /></span>
+                </div>
+              }
+              <div class="vis-total"><b>4</b> questões por dia · até <b>70 XP</b> cada</div>
+            </div>
+          }
+          @case ('campus') {
+            <div class="vis-campus cv-palco" [innerHTML]="cenaCampus"></div>
+            <span class="vis-chip"><ed-icone nome="sparkles" [tamanho]="14" />1 acerto = 1 peça</span>
+          }
+          @case ('obras') {
+            <div class="vis-campus cv-palco" [innerHTML]="cenaObras"></div>
+            <span class="vis-chip obra"><ed-icone nome="school" [tamanho]="14" />Reitoria em obras</span>
+          }
+        }
+      </div>
+    }
+
+    <div class="balao">
+      @if (passo.titulo) { <h2 class="balao-titulo">{{ passo.titulo }}</h2> }
+      <p id="bv-fala">{{ texto }}<i class="cursor" [class.oculto]="!falando"></i></p>
+    </div>
+
+    <footer class="bv-acoes">
+      @if (atual > 0) { <button class="btn-sec" type="button" (click)="voltar()">Voltar</button> }
+      <button class="btn-pri" type="button" (click)="avancar()">
+        {{ ultimo ? 'Começar meu primeiro desafio' : 'Continuar' }}<ed-icone nome="arrow-right" [tamanho]="18" />
+      </button>
+    </footer>
+  </section>
+</div>

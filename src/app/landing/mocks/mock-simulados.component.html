@@ -1,0 +1,126 @@
+<main class="sim" aria-hidden="true">
+  <header class="sim-topo compacto">
+    <div class="sim-titulo">
+      <span class="sim-ico"><ed-icone nome="clipboard-list" [tamanho]="19" /></span>
+      <div><h1>Simulados</h1></div>
+    </div>
+    <button class="estrela" type="button" tabindex="-1"><ed-icone nome="star" [tamanho]="20" /></button>
+  </header>
+
+  <section class="kpis">
+    <article class="kpi kpi-proj">
+      <span class="kpi-rot"><ed-icone nome="target" [tamanho]="15" />Projeção ENEM</span>
+      <b class="kpi-num">{{ s.projecao }}<small>/180</small></b>
+      <span class="kpi-sub">{{ (s.projecao / 180 * 100).toFixed(0) }}% de aproveitamento</span>
+      <span class="kpi-barra"><i [style.width.%]="s.projecao / 180 * 100"></i></span>
+      <span class="kpi-tri">Nota estimada com redação <b>~{{ s.notaGeral }} pts</b></span>
+    </article>
+    @for (d of s.dias; track d.dia) {
+      <article class="kpi" [class.d2]="d.dia === 2">
+        <span class="kpi-rot"><i class="kpi-ponto"></i>{{ d.nome }} · média</span>
+        <b class="kpi-num">{{ d.media }}<small>/90</small></b>
+        <span class="kpi-sub">Melhor {{ d.melhor }} · {{ d.qtd }} simulados <em class="delta sobe">+{{ d.delta }}</em></span>
+      </article>
+    }
+  </section>
+
+  <div class="grade">
+    <section class="card areas-card">
+      <div class="card-cab"><h2>Por área</h2><span class="card-dica">média de 45</span></div>
+      <ul class="areas">
+        @for (a of s.areas; track a.info.chave) {
+          <li [style.--c]="a.info.cor" [style.--ct]="a.info.corTexto">
+            <span class="area-ico"><ed-icone [nome]="a.info.icone" [tamanho]="16" /></span>
+            <div class="area-corpo">
+              <div class="area-linha">
+                <b>{{ a.info.nome }}</b>
+                <span class="area-val">{{ a.media }}<small>/45</small><em class="delta sobe">+{{ a.delta }}</em></span>
+              </div>
+              <span class="area-barra"><i [style.width.%]="a.pct"></i></span>
+              <span class="area-sub">{{ a.pct }}% · melhor {{ a.melhor }}</span>
+            </div>
+          </li>
+        }
+      </ul>
+    </section>
+
+    <section class="card grafico-card">
+      <div class="card-cab">
+        <h2>Evolução</h2>
+        <div class="seg" role="tablist" [style.--idx]="visao === 'dias' ? 0 : 1">
+          <span class="seg-marca"></span>
+          <button type="button" role="tab" tabindex="-1" [attr.aria-selected]="visao === 'dias'" (click)="trocar('dias')">Por dia</button>
+          <button type="button" role="tab" tabindex="-1" [attr.aria-selected]="visao === 'areas'" (click)="trocar('areas')">Por área</button>
+        </div>
+      </div>
+      <ul class="legenda">
+        @for (l of legenda; track l.nome) { <li><i [style.background]="l.cor"></i>{{ l.nome }}<b>{{ l.valor }}</b></li> }
+      </ul>
+      <div class="grafico"><canvas #grafico></canvas></div>
+      <p class="grafico-nota">Acertos por simulado, de {{ visao === 'dias' ? '90 questões por dia' : '45 questões por área' }}.</p>
+    </section>
+
+    <section class="card insights-card aberta">
+      <div class="card-cab"><h2><ed-icone nome="sparkles" [tamanho]="16" />Análise</h2>
+        <button class="btn-txt" type="button" tabindex="-1">Recolher<ed-icone nome="chevron-down" [tamanho]="14" class="virado" /></button>
+      </div>
+      <ul class="insights">
+        @for (i of s.insights; track i.titulo; let k = $index) {
+          <li class="insight {{ i.tom }}" [style.--k]="k">
+            <span class="insight-ico"><ed-icone [nome]="i.icone" [tamanho]="17" /></span>
+            <div><b>{{ i.titulo }}</b><p>{{ i.texto }}</p></div>
+          </li>
+        }
+      </ul>
+    </section>
+
+    <section class="card hist-card">
+      <div class="card-cab">
+        <h2>Histórico</h2>
+        <div class="chips">
+          <button type="button" tabindex="-1" aria-pressed="true">Todos</button>
+          <button type="button" tabindex="-1" aria-pressed="false">1º dia</button>
+          <button type="button" tabindex="-1" aria-pressed="false">2º dia</button>
+        </div>
+      </div>
+      @for (g of meses; track g.rotulo) {
+        <div class="mes">
+          <h3>{{ g.rotulo }}</h3>
+          <ul class="hist">
+            @for (it of g.itens; track it.n) {
+              <li class="item" [class.d2]="it.dia === 2" [class.aberto]="!!it.anotacoes">
+                <div class="item-titulo"><b>Simulado #{{ it.n }}</b>@if (it.nome) { <span>{{ it.nome }}</span> }</div>
+                <div class="item-linha">
+                  <span class="item-data"><b>{{ dataDe(it).dia }}</b><small>{{ dataDe(it).mes }}</small></span>
+                  <div class="item-info">
+                    <span class="item-meta"><i class="item-dia">{{ it.dia }}º dia</i></span>
+                    <span class="item-partes">
+                      @for (p of partes(it); track p.sigla) { <span [style.--c]="p.cor" [style.--ct]="p.corTexto"><span class="parte-ico"><ed-icone [nome]="p.icone" [tamanho]="12" /></span>{{ p.sigla }} <b>{{ p.valor }}</b></span> }
+                    </span>
+                  </div>
+                  <div class="item-nota">
+                    <b>{{ it.total }}<small>/90</small></b>
+                    @if (it.dif) { <em class="delta sobe">+{{ it.dif }}</em> }
+                  </div>
+                </div>
+                <div class="item-acoes">
+                  @if (it.anotacoes) {
+                    <button type="button" class="btn-txt" tabindex="-1"><ed-icone nome="pen-line" [tamanho]="14" />Anotações<ed-icone nome="chevron-down" [tamanho]="14" class="virado" /></button>
+                  } @else { <span></span> }
+                  <button type="button" class="btn-txt perigo" tabindex="-1"><ed-icone nome="circle-x" [tamanho]="15" />Excluir</button>
+                </div>
+                @if (it.anotacoes) { <p class="item-anot">{{ it.anotacoes }}</p> }
+              </li>
+            }
+          </ul>
+        </div>
+      }
+    </section>
+  </div>
+  @if (fab) {
+    <button class="fab recolhido" type="button" tabindex="-1">
+      <ed-icone nome="plus" [tamanho]="24" [traco]="2.5" />
+      <span class="fab-txt">Registrar simulado</span>
+    </button>
+  }
+</main>

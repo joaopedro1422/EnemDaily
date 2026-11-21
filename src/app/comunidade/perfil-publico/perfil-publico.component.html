@@ -1,0 +1,142 @@
+<main class="pp">
+  <nav class="pp-nav">
+    <button type="button" class="pp-voltar" (click)="voltar()"><ed-icone nome="arrow-right" [tamanho]="18" />Voltar</button>
+    <a routerLink="/amigos" class="pp-link">Amigos</a>
+  </nav>
+
+  @if (!logado) {
+    <section class="pp-vazio">
+      <ed-espadas [tamanho]="130" />
+      <h1>Entre para ver o perfil de &#64;{{ arroba }}</h1>
+      <p>Com uma conta você vê o campus dos colegas, adiciona amigos e marca duelos.</p>
+      <button class="pp-pri" type="button" (click)="entrar()">Entrar ou criar conta</button>
+    </section>
+  } @else if (carregando && !perfil) {
+    <div class="pp-carregando"><ed-carregando /></div>
+  } @else if (!perfil) {
+    <section class="pp-vazio">
+      <ed-icone nome="search" [tamanho]="32" />
+      <h1>{{ erro || 'Perfil não encontrado' }}</h1>
+      <a class="pp-pri" routerLink="/amigos">Buscar outra pessoa</a>
+    </section>
+  } @else {
+    <section class="pp-capa">
+      <div class="pp-capa-fundo" aria-hidden="true"></div>
+      <div class="pp-id">
+        <span class="pp-av"><ed-avatar [valor]="perfil.avatar" [nome]="perfil.nome || perfil.usuario" [tamanho]="112" [encher]="true" /></span>
+        <div class="pp-nome">
+          <h1>{{ perfil.nome || perfil.usuario }}</h1>
+          <span>&#64;{{ perfil.usuario }}@if (perfil.perfilPrivado) { <i class="pp-privado"><ed-icone nome="lock" [tamanho]="12" />Privado</i> }</span>
+        </div>
+      </div>
+
+      <dl class="pp-stats">
+        <div><dt><ed-icone nome="zap" [tamanho]="14" />XP total</dt><dd>{{ formatarNumero(perfil.xpTotal) }}</dd></div>
+        <div><dt><ed-icone nome="flame" [tamanho]="14" />Sequência</dt><dd>{{ perfil.sequenciaAtual }} <small>{{ perfil.sequenciaAtual === 1 ? 'dia' : 'dias' }}</small></dd></div>
+        <div><dt><ed-icone nome="swords" [tamanho]="14" />Duelos</dt><dd>{{ perfil.duelosVencidos }} <small>de {{ perfil.duelosDisputados }}</small></dd></div>
+      </dl>
+
+      @if (perfil.relacao === 'EU') {
+        <p class="pp-proprio"><ed-icone nome="circle-user" [tamanho]="16" />É assim que os outros veem o seu perfil.</p>
+      } @else if (perfil.relacao === 'BLOQUEADO') {
+        <div class="pp-acoes">
+          <p class="pp-motivo"><ed-icone nome="ban" [tamanho]="16" />Você bloqueou &#64;{{ perfil.usuario }}.</p>
+          <button class="pp-sec" type="button" (click)="desbloquear()" [disabled]="ocupado">Desbloquear</button>
+        </div>
+      } @else {
+        <div class="pp-acoes">
+          <button class="pp-pri" type="button" (click)="desafiar()" [disabled]="!perfil.podeDesafiar"><ed-icone nome="swords" [tamanho]="18" />Desafiar</button>
+          @switch (perfil.relacao) {
+            @case ('AMIGOS') { <span class="pp-sec estatico"><ed-icone nome="user-check" [tamanho]="18" />Amigos</span> }
+            @case ('ENVIADA') { <button class="pp-sec" type="button" (click)="removerAmizade()" [disabled]="ocupado">Pedido enviado · cancelar</button> }
+            @case ('RECEBIDA') { <button class="pp-sec destaque" type="button" (click)="aceitar()" [disabled]="ocupado"><ed-icone nome="user-check" [tamanho]="18" />Aceitar amizade</button> }
+            @default { <button class="pp-sec" type="button" (click)="adicionar()" [disabled]="ocupado"><ed-icone nome="user-plus" [tamanho]="18" />Adicionar</button> }
+          }
+          <div class="pp-menu">
+            <button class="pp-mais" type="button" (click)="menu = !menu" aria-label="Mais opções" [attr.aria-expanded]="menu"><ed-icone nome="ellipsis" [tamanho]="20" /></button>
+            @if (menu) {
+              <div class="pp-menu-lista" role="menu">
+                @if (perfil.relacao === 'AMIGOS') { <button role="menuitem" type="button" (click)="removerAmizade()"><ed-icone nome="user-minus" [tamanho]="16" />Desfazer amizade</button> }
+                <button role="menuitem" type="button" class="perigo" (click)="confirmarBloqueio = true; menu = false"><ed-icone nome="ban" [tamanho]="16" />Bloquear &#64;{{ perfil.usuario }}</button>
+              </div>
+            }
+          </div>
+        </div>
+        @if (!perfil.podeDesafiar && perfil.motivoSemDuelo) { <p class="pp-motivo"><ed-icone nome="lock" [tamanho]="14" />{{ perfil.motivoSemDuelo }}</p> }
+        @if (confirmarBloqueio) {
+          <div class="pp-confirma" role="alertdialog" aria-label="Confirmar bloqueio">
+            <p><b>Bloquear &#64;{{ perfil.usuario }}?</b> Vocês deixam de ser amigos, os duelos futuros são cancelados e essa pessoa não encontra mais você na busca.</p>
+            <div class="pp-acoes"><button class="pp-sec" type="button" (click)="confirmarBloqueio = false">Cancelar</button><button class="pp-perigo" type="button" (click)="bloquear()" [disabled]="ocupado">Bloquear</button></div>
+          </div>
+        }
+      }
+      @if (erro) { <p class="pp-erro" role="alert">{{ erro }}</p> }
+    </section>
+
+    @if (perfil.relacao !== 'EU' && perfil.relacao !== 'BLOQUEADO') {
+      <section class="pp-confronto">
+        <header><h2><ed-icone nome="swords" [tamanho]="16" />Vocês dois</h2>@if (temPlacar) { <span>{{ perfil.placar.vitorias + perfil.placar.derrotas + perfil.placar.empates }} duelos</span> }</header>
+        @if (temPlacar) {
+          <div class="pc-placar">
+            <div><small>Você</small><b>{{ perfil.placar.vitorias }}</b></div>
+            <span>×</span>
+            <div><small>&#64;{{ perfil.usuario }}</small><b>{{ perfil.placar.derrotas }}</b></div>
+          </div>
+          @if (perfil.placar.empates) { <p class="pc-emp">{{ perfil.placar.empates }} {{ perfil.placar.empates === 1 ? 'empate' : 'empates' }}</p> }
+        } @else if (!perfil.dueloAtivo) {
+          <p class="pc-nada">Vocês ainda não duelaram. Que tal começar?</p>
+        }
+        @if (perfil.dueloAtivo; as d) {
+          <div class="pc-ativo">
+            @switch (d.status) {
+              @case ('AO_VIVO') {
+                <div class="pc-ativo-cab"><i class="ao-vivo"></i><b>Duelo acontecendo hoje</b></div>
+                <div class="pc-vivo"><span>Você <b>{{ d.meuXp }}</b></span><span><b>{{ d.xpOponente }}</b> &#64;{{ perfil.usuario }}</span></div>
+                <div class="pc-barra" [style.--p]="porcentagem(d.meuXp, d.xpOponente) + '%'"><i></i></div>
+              }
+              @case ('AGENDADO') {
+                <div class="pc-ativo-cab"><ed-icone nome="calendar" [tamanho]="16" /><b>Duelo marcado para {{ nomeDoDia(d.dia) }}</b></div>
+                <button class="pp-link-btn" type="button" (click)="cancelarDuelo()" [disabled]="ocupado">Desmarcar</button>
+              }
+              @default {
+                @if (d.souDesafiante) {
+                  <div class="pc-ativo-cab"><ed-icone nome="clock" [tamanho]="16" /><b>Convite enviado para {{ nomeDoDia(d.dia) }}</b></div>
+                  <button class="pp-link-btn" type="button" (click)="cancelarDuelo()" [disabled]="ocupado">Cancelar convite</button>
+                } @else {
+                  <div class="pc-ativo-cab"><ed-icone nome="swords" [tamanho]="16" /><b>&#64;{{ perfil.usuario }} te desafiou para {{ nomeDoDia(d.dia) }}</b></div>
+                  <div class="pp-acoes"><button class="pp-sec" type="button" (click)="recusarDuelo()" [disabled]="ocupado">Recusar</button><button class="pp-pri" type="button" (click)="aceitarDuelo()" [disabled]="ocupado">Aceitar</button></div>
+                }
+              }
+            }
+          </div>
+        }
+      </section>
+    }
+
+    <section class="pp-campus">
+      <header>
+        <h2><ed-icone nome="school" [tamanho]="16" />Campus de &#64;{{ perfil.usuario }}</h2>
+        @if (progresso) { <span>{{ pecas }}/{{ totalCampus }} peças</span> }
+      </header>
+      @if (progresso) {
+        <div class="pp-palco"><ed-campus [progresso]="progresso" modo="auto" [avisos]="false" [interativo]="true" [aproximar]="1.2" /></div>
+        <ul class="pp-areas">
+          @for (a of areas; track a.chave) {
+            <li [style.--c]="a.cor"><span class="pa-ico"><ed-icone [nome]="a.icone" [tamanho]="16" /></span><span><b>{{ a.acertos }}</b><small>{{ a.nome }}</small></span></li>
+          }
+        </ul>
+        <p class="pp-emblemas"><ed-icone nome="trophy" [tamanho]="15" />{{ emblemas }} de {{ totalEmblemas }} conquistas · {{ perfil.diasAtivos }} dias ativos</p>
+      } @else {
+        <div class="pp-trancado">
+          <ed-icone nome="eye-off" [tamanho]="28" />
+          <b>Perfil privado</b>
+          <p>&#64;{{ perfil.usuario }} mostra o campus só para amigos.@if (perfil.relacao === 'NENHUMA') { Envie um pedido de amizade para ver. }</p>
+        </div>
+      }
+    </section>
+  }
+</main>
+
+@if (desafiando) {
+  <app-duelo-convite [alvo]="desafiando" (fechar)="desafiando = null" (enviado)="aoEnviar()" />
+}

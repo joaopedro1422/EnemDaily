@@ -1,0 +1,360 @@
+<app-banner-inicial *ngIf="mostrarModal" (close)="fecharBanner()"></app-banner-inicial>
+<app-onboarding-balloon *ngIf="mostrarOnboarding" (retorno)="processarRetorno($event)"></app-onboarding-balloon>
+
+@if (!usuarioLogado) {
+  @defer (on immediate) {
+    <app-landing />
+  } @placeholder {
+    <div class="carregando-landing"><ed-carregando [tamanho]="52" /></div>
+  }
+} @else {
+  <main class="painel">
+    <header class="saudacao">
+      @if (contagem; as c) {
+        <span class="saudacao-contagem" [class.hoje]="c.hoje || c.entreDias" role="timer" [attr.aria-label]="textoContagem" [title]="dataEnem + (c.edicao.confirmada ? '' : ' · data prevista')">
+          <ed-icone nome="calendar-check" [tamanho]="15" />
+          @if (c.hoje) { <b>Hoje é dia de ENEM</b> · {{ c.hoje === 'dia1' ? '1º dia' : '2º dia' }}, boa prova! }
+          @else if (c.entreDias) { <b>Semana de ENEM</b> · falta o 2º dia }
+          @else { <b>{{ diasMostrados }} {{ c.dias === 1 ? 'dia' : 'dias' }}</b> para o ENEM {{ c.edicao.ano }} }
+        </span>
+      } @else {
+        <span class="saudacao-data">{{ dataExtenso }}</span>
+      }
+      <h1>{{ saudacao }}, {{ primeiroNome }}.</h1>
+    </header>
+
+    @if (sessaoEmOutroAparelho) {
+      <div class="aviso" role="status">
+        <ed-icone nome="smartphone" [tamanho]="20" />
+        <p><b>Sua conta foi aberta em outro aparelho.</b> Entre de novo para continuar daqui.</p>
+        <button type="button" (click)="entrarDeNovo()">Entrar</button>
+      </div>
+    }
+
+    <div class="grade">
+      <div class="coluna-principal">
+
+        <section class="desafio" aria-labelledby="titulo-desafio">
+          <div class="desafio-capa" [class.completo]="diaCompleto">
+            <div class="capa-texto">
+              <span class="capa-rotulo">Desafio de hoje</span>
+              <h2 id="titulo-desafio">{{ tituloDesafio }}</h2>
+              @if (semQuestoesHoje || diaCompleto) {
+                <p>{{ subtituloDesafio }}</p>
+              }
+              <div class="capa-relogio">
+                <span>{{ diaCompleto ? 'Novas questões em' : 'Renova em' }}</span>
+                <b>{{ tempoRestante }}</b>
+              </div>
+              @if (feitasHoje > 0 && usuarioLogado.xpHoje > 0) {
+                <span class="capa-xp">Você já fez <b>{{ formatarNumero(usuarioLogado.xpHoje) }} XP</b> hoje</span>
+              }
+            </div>
+            <div class="capa-lado">
+              <ed-simbolo-dia class="capa-simbolo" [cores]="coresDia" corAnel="rgba(255,255,255,.95)" />
+              @if (diaCompleto) {
+                <button class="capa-compartilhar" type="button" (click)="abrirResumoDia()" aria-label="Ver e compartilhar o resumo do dia">
+                  <ed-icone nome="share" [tamanho]="15" />
+                </button>
+              }
+            </div>
+            @if (proximaArea; as proxima) {
+              <button class="btn-capa" type="button" (click)="abrirConfirmacao(proxima.info.chave)">
+                <ed-icone class="btn-capa-area" [nome]="proxima.info.icone" [tamanho]="16" [style.color]="proxima.info.corTexto" />
+                Responder {{ proxima.info.nome }}
+                <ed-icone nome="arrow-right" [tamanho]="18" />
+              </button>
+            }
+          </div>
+
+          <ol class="cartao-resposta">
+            @for (linha of linhasDia; track linha.info.chave) {
+              <li>
+                <button class="linha" type="button"
+                        [class.feita]="linha.estado !== 'pendente'"
+                        [class.bloqueada]="linha.estado === 'pendente' && !linha.disponivel"
+                        [disabled]="linha.estado === 'pendente' && !linha.disponivel"
+                        [style.--a]="linha.info.cor" [style.--at]="linha.info.corTexto"
+                        (click)="abrirConfirmacao(linha.info.chave)">
+                  <span class="area-ico"><ed-icone [nome]="linha.info.icone" [tamanho]="18" /></span>
+                  <span class="linha-texto">
+                    <b>{{ linha.info.nome }}</b>
+                    @if (linha.assunto) {
+                      <span>{{ linha.assunto }}</span>
+                    } @else if (!assuntosCarregados) {
+                      <span class="carregando-linha"><ed-carregando [mini]="true" />Carregando</span>
+                    } @else if (!linha.disponivel) {
+                      <span>Questão em preparação</span>
+                    } @else {
+                      <span>Questão do dia</span>
+                    }
+                  </span>
+                  @switch (linha.estado) {
+                    @case ('acertou') {
+                      <span class="selo selo-ok"><ed-icone nome="check" [tamanho]="15" [traco]="2.5" />Acertou</span>
+                    }
+                    @case ('errou') {
+                      <span class="selo selo-erro"><ed-icone nome="x" [tamanho]="15" [traco]="2.5" />Errou</span>
+                    }
+                    @default {
+                      @if (linha.disponivel) {
+                        <span class="linha-acao">Responder<ed-icone nome="chevron-right" [tamanho]="18" /></span>
+                      } @else {
+                        <span class="linha-espera"><ed-icone nome="hourglass" [tamanho]="16" /></span>
+                      }
+                    }
+                  }
+                </button>
+              </li>
+            }
+          </ol>
+
+          <div class="desafio-rodape">
+            <span class="respondentes">
+              <ed-icone nome="users" [tamanho]="16" />
+              @if (respondentesHoje > 0) {
+                <span><b>{{ formatarNumero(respondentesHoje) }}</b> respostas hoje</span>
+              } @else {
+                <span>Seja o primeiro a responder hoje</span>
+              }
+            </span>
+            <button type="button" class="btn-ajuda" (click)="mostrarComoFunciona = true" aria-label="Como funciona" title="Como funciona">
+              <ed-icone nome="circle-help" [tamanho]="20" />
+            </button>
+          </div>
+        </section>
+
+
+
+        <ed-duelo-hoje />
+
+        <section class="bloco bloco-areas" aria-labelledby="titulo-areas">
+          <div class="bloco-cab">
+            <h2 id="titulo-areas">Desempenho por área</h2>
+            <a routerLink="/estatisticas">Ver detalhes<ed-icone nome="chevron-right" [tamanho]="16" /></a>
+          </div>
+          @if (respondidas === 0) {
+            <p class="vazio-texto">Responda sua primeira questão para ver como você vai em cada área.</p>
+          } @else {
+          <ul class="areas">
+            @for (d of desempenho; track d.info.chave) {
+              <li>
+                <button class="area" type="button" (click)="irParaEstatisticasArea(d.info.chave)" [style.--a]="d.info.cor" [style.--at]="d.info.corTexto">
+                  <span class="area-ico"><ed-icone [nome]="d.info.icone" [tamanho]="18" /></span>
+                  <span class="area-nome">
+                    <b>{{ d.info.nome }}</b>
+                    <span>{{ d.acertos }} de {{ d.respondidas }} · {{ formatarNumero(d.xp) }} XP</span>
+                  </span>
+                  <span class="area-barra" role="img" [attr.aria-label]="d.porcentagem + '% de acerto'"><i [style.width.%]="d.porcentagem"></i></span>
+                  <span class="area-pct">{{ d.porcentagem }}%</span>
+                </button>
+              </li>
+            }
+          </ul>
+          }
+        </section>
+
+        @if (respondidas > 0) {
+        <section class="numeros" aria-label="Seus números no desafio">
+          <div class="numero">
+            <span class="numero-rotulo">Taxa de acerto</span>
+            <b>{{ taxaAcerto }}%</b>
+            <span class="numero-detalhe">{{ acertos }} de {{ respondidas }} questões</span>
+          </div>
+          <div class="numero">
+            <span class="numero-rotulo">Acertos seguidos</span>
+            <b>{{ usuarioLogado.streak }}</b>
+            <span class="numero-detalhe">na sequência atual</span>
+          </div>
+          <div class="numero">
+            <span class="numero-rotulo">Tempo médio</span>
+            <b>{{ tempoMedio }}</b>
+            <span class="numero-detalhe">por questão</span>
+          </div>
+          <div class="numero">
+            <span class="numero-rotulo">Dias ativos</span>
+            <b>{{ usuarioLogado.qntDiasAtivos }}</b>
+            <span class="numero-detalhe">com resposta</span>
+          </div>
+        </section>
+        }
+
+        <section class="bloco bloco-evolucao" aria-labelledby="titulo-evolucao">
+          <div class="bloco-cab">
+            <div>
+              <h2 id="titulo-evolucao">Sua evolução</h2>
+              <span class="bloco-sub">XP acumulado em {{ anoAtual }} · <b>{{ formatarNumero(xpAno) }} XP</b></span>
+            </div>
+          </div>
+          <ul class="legenda">
+            <li class="total" style="--a: var(--ed-caneta)"><i></i>Total</li>
+            @for (d of desempenho; track d.info.chave) {
+              <li [style.--a]="d.info.cor"><i></i>{{ d.info.nome }}</li>
+            }
+          </ul>
+          @if (xpAno > 0) {
+            <div class="grafico">
+              <canvas #graficoXp aria-label="Gráfico do XP acumulado ao longo do ano, total e por área" role="img"></canvas>
+            </div>
+          } @else {
+            <p class="vazio-texto">Sua curva de evolução no ano aparece aqui assim que você acertar a primeira questão.</p>
+          }
+        </section>
+      </div>
+
+      <aside class="coluna-lateral">
+        <section class="bloco sequencia" aria-labelledby="titulo-sequencia">
+          <div class="sequencia-topo">
+            <span class="sequencia-ico" [class.risco]="sequenciaDias > 0 && feitasHoje === 0" [class.acesa]="feitasHoje > 0"><ed-icone nome="flame" [tamanho]="20" /></span>
+            <div>
+              <h2 id="titulo-sequencia">{{ sequenciaDias }} {{ sequenciaDias === 1 ? 'dia seguido' : 'dias seguidos' }}</h2>
+              <p>{{ textoSequencia }}</p>
+            </div>
+          </div>
+          <ol class="semana" aria-label="Dias com resposta nesta semana">
+            @for (dia of semana; track $index) {
+              <li [class.feito]="dia.feito" [class.hoje]="dia.hoje"><i></i>{{ dia.rotulo }}</li>
+            }
+          </ol>
+          <div class="bonus">
+            <div class="bonus-trilha"><i [style.width.%]="progressoBonus"></i></div>
+            <ol class="bonus-marcos">
+              @for (b of bonusMarcos; track b.dias) {
+                <li [class.ganho]="sequenciaDias >= b.dias" [style.left.%]="(b.dias / 20) * 100">
+                  <b>+{{ b.valor }}%</b><span>{{ b.dias }} dias</span>
+                </li>
+              }
+            </ol>
+          </div>
+        </section>
+
+        <section class="bloco campus" aria-labelledby="titulo-campus">
+          <div class="campus-palco">
+            <ed-campus [progresso]="progressoCampus" [memoria]="'campus-' + usuarioLogado.id" modo="auto" [extras]="extras$ | async" [sons]="false" />
+            <button class="campus-abrir" type="button" (click)="abrirCampus()" aria-label="Explorar o campus">
+              <ed-icone nome="arrow-right" [tamanho]="16" />
+            </button>
+          </div>
+          <div class="campus-info">
+            <div class="campus-linha">
+              <h2 id="titulo-campus"><ed-icone nome="school" [tamanho]="18" />Seu campus</h2>
+              <span>{{ totalPecas }} de {{ totalCampus }} peças</span>
+            </div>
+            <button class="btn-secundario" type="button" (click)="abrirCampus()">Explorar campus</button>
+          </div>
+        </section>
+
+        <section class="bloco bloco-grupos" aria-labelledby="titulo-grupos">
+          <div class="bloco-cab">
+            <h2 id="titulo-grupos">Seus grupos</h2>
+            <a routerLink="/homeGrupos">Ver todos<ed-icone nome="chevron-right" [tamanho]="16" /></a>
+          </div>
+          @if (usuarioLogado.grupos && usuarioLogado.grupos.length) {
+            <ul class="grupos">
+              @for (g of usuarioLogado.grupos.slice(0, 3); track g.id) {
+                <li>
+                  <a class="grupo" [routerLink]="['/grupo', g.id]">
+                    @if (g.img) {
+                      <img class="grupo-img" [src]="g.img" alt="" />
+                    } @else {
+                      <span class="grupo-img grupo-iniciais">{{ iniciais(g.nome) }}</span>
+                    }
+                    <span class="grupo-nome"><b>{{ g.nome }}</b><span>{{ g.membros }} {{ g.membros === 1 ? 'membro' : 'membros' }}</span></span>
+                    <span class="grupo-posicao" [class.primeiro]="g.posicao === 1"><b>{{ g.posicao }}º</b><span>lugar</span></span>
+                  </a>
+                </li>
+              }
+            </ul>
+          } @else {
+            <div class="vazio">
+              <p>Compita com a turma da escola, do cursinho ou com amigos. Cada grupo tem ranking geral e do mês.</p>
+              <a class="btn-secundario" routerLink="/homeGrupos">Encontrar um grupo</a>
+            </div>
+          }
+        </section>
+
+        <section class="bloco estudos" aria-labelledby="titulo-estudos">
+          <div class="bloco-cab">
+            <div>
+              <h2 id="titulo-estudos">Seus estudos</h2>
+              <span class="bloco-sub">Simulados e redações que você fez fora do app</span>
+            </div>
+          </div>
+          <a class="estudo" routerLink="/simulados">
+            <span class="estudo-ico"><ed-icone nome="clipboard-list" [tamanho]="19" /></span>
+            <span class="estudo-texto">
+              <b>Simulados</b>
+              @if (ultimoSimulado) {
+                <span>Último: {{ ultimoSimulado.linguagens + ultimoSimulado.humanas + ultimoSimulado.naturezas + ultimoSimulado.exatas }} de 90 · {{ dataCurta(ultimoSimulado.data) }}</span>
+              } @else if (estudosCarregados) {
+                <span>Registre o primeiro e acompanhe sua evolução</span>
+              } @else {
+                <span class="carregando-linha"><ed-carregando [mini]="true" />Carregando</span>
+              }
+            </span>
+            @if (totalSimulados) { <span class="estudo-total">{{ totalSimulados }}</span> }
+            <ed-icone nome="chevron-right" [tamanho]="18" />
+          </a>
+          <a class="estudo" routerLink="/redacoes">
+            <span class="estudo-ico"><ed-icone nome="pen-line" [tamanho]="19" /></span>
+            <span class="estudo-texto">
+              <b>Redações</b>
+              @if (totalRedacoes) {
+                <span>Média {{ mediaRedacoes }} em {{ totalRedacoes }} {{ totalRedacoes === 1 ? 'redação' : 'redações' }}</span>
+              } @else {
+                <span>Registre notas e competências</span>
+              }
+            </span>
+            @if (totalRedacoes) { <span class="estudo-total">{{ totalRedacoes }}</span> }
+            <ed-icone nome="chevron-right" [tamanho]="18" />
+          </a>
+        </section>
+      </aside>
+    </div>
+
+    <footer class="rodape">
+      <span class="wm">enem<i class="pt"></i>daily</span>
+      <nav aria-label="Links institucionais">
+        <a routerLink="/contato">Contato</a>
+        <a routerLink="/privacidade">Privacidade</a>
+      </nav>
+      <span>© {{ anoAtual }} enem.daily</span>
+    </footer>
+
+    @if (mostrarComoFunciona) {
+      <div class="folha-veu" (click)="mostrarComoFunciona = false"></div>
+      <section class="folha" role="dialog" aria-modal="true" aria-labelledby="ajuda-titulo">
+        <span class="folha-alca" aria-hidden="true"></span>
+        <div class="folha-cab">
+          <ed-simbolo-dia class="ajuda-simbolo" [animar]="false" />
+          <div>
+            <span class="folha-rotulo ajuda-rotulo">Desafio de hoje</span>
+            <h2 id="ajuda-titulo">Como funciona</h2>
+          </div>
+        </div>
+        <ul class="folha-regras">
+          <li><ed-icone nome="target" [tamanho]="18" /><span><b>Quatro questões por dia.</b> Uma de cada área do ENEM, no mesmo estilo da prova. São as mesmas para todo mundo.</span></li>
+          <li><ed-icone nome="clock" [tamanho]="18" /><span><b>3:30 para cada uma.</b> O tempo começa quando a questão abre e não pausa.</span></li>
+          <li><ed-icone nome="trophy" [tamanho]="18" /><span><b>Quanto mais rápido você acerta, mais XP ganha.</b> São até 70 XP por questão, para quem acerta nos primeiros 40 segundos.</span></li>
+          <li><ed-icone nome="flame" [tamanho]="18" /><span><b>Sequência vale bônus.</b> Responda todo dia: +10% de XP a partir de 4 dias, +15% a partir de 8 e +20% a partir de 20.</span></li>
+          <li><ed-icone nome="book-open" [tamanho]="18" /><span><b>Sempre com explicação.</b> Depois de responder, você vê a resolução e um link para revisar o assunto.</span></li>
+          <li><ed-icone nome="school" [tamanho]="18" /><span><b>O XP faz seu campus crescer</b> e conta no ranking dos seus grupos.</span></li>
+        </ul>
+        <div class="folha-acoes">
+          <button class="btn-comecar" type="button" (click)="mostrarComoFunciona = false">Entendi</button>
+        </div>
+      </section>
+    }
+
+  </main>
+  @if (mostrarBoasVindas && usuarioLogado) {
+    <app-boas-vindas [nome]="usuarioLogado.nome" [progresso]="progressoCampus" (fechar)="fecharBoasVindas($event)" />
+  }
+  @if (mostrarResumo && usuarioLogado) {
+    <app-resumo-semanal (fechar)="fecharResumo()" />
+  }
+}
+
+@if (resumoDia) {
+  <ed-resumo-dia [resultados]="resumoDia.resultados" [sequencia]="resumoDia.sequencia" [xp]="resumoDia.xp" (fechar)="resumoDia = null" />
+}

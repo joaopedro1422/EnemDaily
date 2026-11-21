@@ -1,0 +1,81 @@
+.le-hero { position: relative; max-width: var(--ed-largura); margin: 0 auto; padding: 18px 16px 24px; display: grid; gap: 28px; }
+.le-hero::before { content: ''; position: absolute; inset: -80px -40vw 0; z-index: -1; background-image: radial-gradient(circle, color-mix(in srgb, var(--ed-caneta) 14%, transparent) 0 1.6px, transparent 2px); background-size: 22px 22px; -webkit-mask-image: radial-gradient(55% 60% at 75% 40%, #000, transparent); mask-image: radial-gradient(55% 60% at 75% 40%, #000, transparent); }
+.le-hero-texto { display: grid; gap: 16px; align-content: start; animation: ld-sobe 600ms var(--ed-curva) both; }
+.le-voltar { justify-self: start; display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 700; color: var(--ed-tinta-3); text-decoration: none; }
+.le-voltar ed-icone { transform: rotate(180deg); }
+.le-voltar:hover { color: var(--ed-caneta-texto); }
+.le-hero h1 { font-size: clamp(36px, 8.4vw, 60px); font-weight: 800; letter-spacing: -.045em; line-height: 1.02; text-wrap: balance; }
+.le-palma { position: relative; display: inline-block; color: var(--ed-caneta); font-family: var(--ed-fonte-leitura); font-style: italic; font-weight: 600; letter-spacing: -.02em; }
+.le-palma::after { content: ''; position: absolute; left: -1%; right: -2%; bottom: -4px; height: 14px; z-index: -1; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 16' preserveAspectRatio='none'%3E%3Cpath d='M3 11 C 60 4, 120 3, 180 6 S 270 12, 297 5' fill='none' stroke='%23FFD66B' stroke-width='6' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat center / 100% 100%; animation: ld-risco 900ms cubic-bezier(.6, 0, .2, 1) 500ms both; }
+.le-hero .ld-ctas .ld-btn { flex: 1 1 200px; }
+
+.le-hero-cels { position: relative; height: 560px; display: flex; justify-content: center; align-items: flex-start; }
+.le-cel-frente { position: relative; z-index: 2; animation: ld-sobe 800ms var(--ed-curva) 150ms both; }
+.le-cel-tras { position: absolute; top: 46px; left: calc(50% - 250px); transform: rotate(-7deg); opacity: .96; animation: le-tras 900ms var(--ed-curva) 300ms both; }
+@keyframes le-tras { from { transform: rotate(0deg) translateX(60px); opacity: 0; } }
+@media (max-width: 560px) {
+  .le-hero-cels { height: 520px; }
+  .le-cel-tras { display: none; }
+}
+
+.le-passos { max-width: var(--ed-largura); margin: 0 auto; padding: 8px 16px 8px; }
+.le-passos ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.le-passos li { display: flex; gap: 14px; align-items: flex-start; padding: 16px; border-radius: 20px; background: var(--ed-folha); border: 1px solid var(--ed-pauta); }
+.le-passos li > span { flex: none; width: 34px; height: 34px; border-radius: 11px; display: grid; place-items: center; background: var(--ed-caneta); color: #FFFFFF; font-weight: 800; }
+.le-passos b { display: block; font-size: 16px; font-weight: 800; letter-spacing: -.01em; }
+.le-passos p { margin-top: 3px; font-size: 14px; line-height: 1.45; color: var(--ed-tinta-3); }
+
+.le-modulo { grid-template-columns: minmax(0, 1fr); align-items: center; }
+.le-texto { display: grid; gap: 12px; align-content: start; }
+.le-tag { justify-self: start; display: inline-flex; align-items: center; gap: 7px; padding: 7px 12px; border-radius: 999px; background: var(--ed-caneta-suave); color: var(--ed-caneta-texto); font-size: 13.5px; font-weight: 800; }
+.le-texto h2 { font-size: clamp(28px, 6vw, 40px); font-weight: 800; letter-spacing: -.04em; line-height: 1.06; text-wrap: balance; }
+.le-desc { font-size: 16.5px; line-height: 1.55; color: var(--ed-tinta-2); }
+.le-recursos { list-style: none; margin: 6px 0 0; padding: 0; display: grid; gap: 6px; }
+.le-recursos button { width: 100%; display: flex; gap: 12px; align-items: flex-start; padding: 12px 14px; border-radius: 16px; border: 1.5px solid transparent; background: transparent; font-family: var(--ed-fonte); text-align: left; color: var(--ed-tinta); cursor: pointer; transition: background var(--ed-t-rapido), border-color var(--ed-t-rapido); }
+.le-recursos button:hover { background: var(--ed-folha); }
+.le-recursos button.ativo { background: var(--ed-folha); border-color: var(--ed-caneta); box-shadow: 0 10px 24px -18px rgba(40, 54, 198, .7); }
+.le-recursos button:focus-visible { outline: 2px solid var(--ed-caneta); outline-offset: 2px; }
+.le-rec-ico { flex: none; width: 36px; height: 36px; border-radius: 11px; display: grid; place-items: center; background: var(--ed-fundo-2); color: var(--ed-tinta-2); transition: background var(--ed-t-rapido), color var(--ed-t-rapido); }
+.le-recursos button.ativo .le-rec-ico { background: var(--ed-caneta); color: #FFFFFF; }
+.le-recursos b { display: block; font-size: 15.5px; font-weight: 800; }
+.le-recursos small { display: block; margin-top: 3px; font-size: 14px; line-height: 1.45; color: var(--ed-tinta-3); }
+.le-cel { display: flex; justify-content: center; }
+
+.le-dica { align-items: center; }
+.le-dica-cel { display: flex; justify-content: center; }
+
+.le-notas { position: relative; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; align-items: end; height: 330px; padding: 104px 18px 18px; border-radius: 28px; background: var(--ed-folha); border: 1px solid var(--ed-pauta); }
+.le-nota { height: 100%; display: grid; grid-template-rows: 1fr auto auto; justify-items: center; gap: 6px; }
+.le-barra { width: 100%; max-width: 64px; height: 100%; display: flex; align-items: flex-end; border-radius: 14px; background: var(--ed-fundo-2); overflow: hidden; }
+.le-barra i { display: block; width: 100%; height: var(--h); border-radius: 14px; background: var(--c); transform-origin: bottom; animation: le-sobe 900ms var(--ed-curva) both; animation-delay: calc(var(--i) * 90ms + 200ms); }
+@keyframes le-sobe { from { transform: scaleY(0); } }
+.le-nota b { font-size: 18px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.le-nota small { font-size: 12px; font-weight: 800; letter-spacing: .08em; color: var(--ed-tinta-3); }
+.le-media { position: absolute; top: 16px; right: 16px; display: grid; justify-items: end; padding: 12px 14px; border-radius: 18px; color: #FFFFFF; background: radial-gradient(110% 140% at 100% 0%, #3A49E0 0%, #2836C6 45%, #18206E 100%); box-shadow: 0 18px 36px -24px rgba(24, 32, 110, .9); }
+.le-media small { font-size: 11.5px; font-weight: 700; color: rgba(255, 255, 255, .78); }
+.le-media b { font-size: 30px; font-weight: 800; letter-spacing: -.03em; line-height: 1.05; }
+.le-media span { font-size: 11.5px; color: rgba(255, 255, 255, .7); }
+.le-aviso { display: flex; align-items: flex-start; gap: 8px; font-size: 13.5px; line-height: 1.45; color: var(--ed-tinta-3); }
+.le-aviso ed-icone { flex: none; margin-top: 1px; }
+
+.le-perguntas { display: grid; gap: 8px; max-width: 760px; }
+.le-perguntas details { padding: 4px 18px; border-radius: 18px; background: var(--ed-folha); border: 1px solid var(--ed-pauta); }
+.le-perguntas summary { list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 0; font-size: 16px; font-weight: 800; cursor: pointer; }
+.le-perguntas summary::-webkit-details-marker { display: none; }
+.le-perguntas summary::after { content: '+'; flex: none; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: var(--ed-fundo-2); font-weight: 700; color: var(--ed-tinta-2); transition: transform var(--ed-t-medio) var(--ed-curva); }
+.le-perguntas details[open] summary::after { transform: rotate(45deg); }
+.le-perguntas p { padding: 0 0 16px; font-size: 15px; line-height: 1.55; color: var(--ed-tinta-2); }
+
+@media (min-width: 640px) {
+  .le-hero { padding: 28px 24px 24px; }
+  .le-passos { padding-inline: 24px; }
+  .le-passos ol { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (min-width: 960px) {
+  .le-hero { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: 40px; padding: 48px 24px 40px; }
+  .le-hero-cels { height: 640px; }
+  .le-modulo { grid-template-columns: minmax(0, 1fr) auto; gap: 56px; }
+  .le-modulo.invertido { grid-template-columns: auto minmax(0, 1fr); }
+  .le-modulo.invertido .le-texto { order: 2; }
+  .le-dica { grid-template-columns: auto minmax(0, 1fr); gap: 56px; }
+}

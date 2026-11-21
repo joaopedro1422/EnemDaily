@@ -1,0 +1,66 @@
+<div class="ns" [class.fechando]="fechando" role="dialog" aria-modal="true" aria-labelledby="ns-titulo">
+  <div class="ns-fundo" (click)="fechar()"></div>
+
+  <form class="ns-folha" (ngSubmit)="salvar()">
+    <span class="ns-alca" aria-hidden="true"></span>
+    <header class="ns-cab">
+      <div>
+        <h2 id="ns-titulo">Registrar simulado</h2>
+        <p>Anote os acertos de cada área do dia que você fez.</p>
+      </div>
+      <button class="ns-fechar" type="button" (click)="fechar()" aria-label="Fechar"><ed-icone nome="x" [tamanho]="20" /></button>
+    </header>
+
+    <div class="ns-dias" role="radiogroup" aria-label="Dia da prova" [style.--idx]="dia === '1' ? 0 : 1">
+      <span class="ns-dias-marca" aria-hidden="true"></span>
+      <button type="button" role="radio" [attr.aria-checked]="dia === '1'" (click)="dia = '1'; erro = ''">
+        <b>1º dia</b><small>Linguagens e Humanas</small>
+      </button>
+      <button type="button" role="radio" [attr.aria-checked]="dia === '2'" (click)="dia = '2'; erro = ''">
+        <b>2º dia</b><small>Naturezas e Matemática</small>
+      </button>
+    </div>
+
+    <div class="ns-pontos">
+      @for (a of areasDoDia; track a.chave) {
+        <div class="ponto" [style.--c]="a.cor" [style.--ct]="a.corTexto">
+          <span class="ponto-cab"><span class="ponto-ico"><ed-icone [nome]="a.icone" [tamanho]="16" /></span>{{ a.nome }}</span>
+          <div class="ponto-ctrl">
+            <button type="button" (click)="ajustar(a.chave, -1)" [attr.aria-label]="'Menos um acerto em ' + a.nome">−</button>
+            <input type="number" inputmode="numeric" min="0" max="45" [name]="a.chave" [(ngModel)]="acertos[a.chave]" (blur)="normalizar(a.chave)" placeholder="0" [attr.aria-label]="'Acertos em ' + a.nome" />
+            <button type="button" (click)="ajustar(a.chave, 1)" [attr.aria-label]="'Mais um acerto em ' + a.nome">+</button>
+          </div>
+          <span class="ponto-barra"><i [style.width.%]="((acertos[a.chave] ?? 0) / 45) * 100"></i></span>
+          <small>de 45 questões</small>
+        </div>
+      }
+    </div>
+
+    <div class="ns-total">
+      <span>Total do dia</span>
+      <b>{{ total }}<small>/90</small></b>
+    </div>
+
+    <div class="ns-linha">
+      <label class="campo">
+        <span>Data</span>
+        <input type="date" name="data" [(ngModel)]="data" required />
+      </label>
+      <label class="campo">
+        <span>Nome <i>(opcional)</i></span>
+        <input type="text" name="nome" [(ngModel)]="nome" maxlength="40" placeholder="Ex.: SAS 3" />
+      </label>
+    </div>
+
+    <label class="campo">
+      <span>Anotações <i>(opcional)</i></span>
+      <textarea name="anotacoes" [(ngModel)]="anotacoes" rows="3" maxlength="500" placeholder="O que errou, o que revisar, como foi o tempo…"></textarea>
+    </label>
+
+    @if (erro) { <p class="ns-erro">{{ erro }}</p> }
+
+    <button class="ns-salvar" type="submit" [disabled]="enviando">
+      @if (enviando) { <ed-carregando [mini]="true" [claro]="true" />Salvando } @else { <ed-icone nome="check" [tamanho]="18" />Salvar simulado }
+    </button>
+  </form>
+</div>

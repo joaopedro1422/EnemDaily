@@ -1,0 +1,74 @@
+.streak-card {
+
+ /* background: linear-gradient(145deg, #ffffff, #fafafc);*/
+background-color: transparent;
+  border-radius: 10px;
+  padding: 16px;
+    padding-top: 0;
+    font-family: 'poppins';
+  color: #0d0142;
+  width: 100%;
+ 
+}
+
+.streak-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 600;
+  opacity: 0.9;
+}
+
+.count {
+  font-size: 14px;
+  font-weight: bold;
+  color: #0f0344;
+}
+
+.streak-days {
+  display: flex;
+  justify-content: space-between;
+  margin: 12px 0;
+}
+
+.day {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #22227910;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  color: #aaa;
+  transition: all 0.3s ease;
+}
+
+.day.done {
+ background: #7b4ae2;
+  color: #fff;
+  box-shadow: 0 0 8px rgba(38, 10, 139, 0.459);
+}
+
+.day.today {
+  border: 2px solid #7b4ae2;
+  animation: pulse 1.5s infinite;
+  color: #7b4ae2;
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(65, 0, 243, 0.6); }
+  70% { box-shadow: 0 0 0 10px rgba(255, 204, 0, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 204, 0, 0); }
+}
+
+.streak-subtitle {
+  font-size: 12px;
+  text-align: center;
+  opacity: 0.8;
+}

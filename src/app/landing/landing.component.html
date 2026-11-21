@@ -1,0 +1,184 @@
+<main class="ld">
+
+  <!-- 1. topo: a promessa e o desafio de hoje funcionando -->
+  <section class="ld-hero">
+    <div class="ld-hero-texto">
+      <h1>Nunca foi tão <span class="ld-sub-h1">divertido</span> estudar para o ENEM!</h1>
+      <p class="ld-lead">Complete o desafio de hoje em poucos minutos, ganhe XP, evolua o seu campus universitário e dispute entre amigos.</p>
+    </div>
+
+    <section class="desafio ld-desafio" aria-labelledby="ld-titulo-desafio">
+      <div class="desafio-capa">
+        <div class="capa-texto">
+          <span class="capa-rotulo">Desafio de hoje</span>
+          <h2 id="ld-titulo-desafio">4 questões te esperando</h2>
+          <div class="capa-relogio"><span>Renova em</span><b>{{ tempoRestante }}</b></div>
+        </div>
+        <ed-simbolo-dia class="capa-simbolo" [cores]="[null, null, null, null]" corAnel="rgba(255,255,255,.95)" />
+        <button class="btn-capa" type="button" (click)="responder('linguagens')">
+          <ed-icone class="btn-capa-area" nome="book-open" [tamanho]="16" style="color: var(--ed-lc-texto)" />
+          Responder Linguagens
+          <ed-icone nome="arrow-right" [tamanho]="18" />
+        </button>
+      </div>
+      <ol class="cartao-resposta">
+        @for (l of linhas; track l.info.chave) {
+          <li>
+            <button class="linha" type="button" [style.--a]="l.info.cor" [style.--at]="l.info.corTexto" (click)="responder(l.info.chave)">
+              <span class="area-ico"><ed-icone [nome]="l.info.icone" [tamanho]="18" /></span>
+              <span class="linha-texto">
+                <b>{{ l.info.nome }}</b>
+                @if (l.assunto) { <span>{{ l.assunto }}</span> }
+                @else if (carregados < 4) { <span class="carregando-linha"><ed-carregando [mini]="true" />Carregando</span> }
+                @else { <span>Questão do dia</span> }
+              </span>
+              <span class="linha-acao">Responder<ed-icone nome="chevron-right" [tamanho]="18" /></span>
+            </button>
+          </li>
+        }
+      </ol>
+      <div class="desafio-rodape">
+        <span class="respondentes">
+          <ed-icone nome="users" [tamanho]="16" />
+          @if (respondentes > 0) { <span><b>{{ formatarNumero(respondentes) }}</b> respostas hoje</span> } @else { <span>Seja o primeiro a responder hoje</span> }
+        </span>
+        <button type="button" class="ld-link" (click)="irPara('como-funciona')">Como funciona</button>
+      </div>
+    </section>
+  </section>
+
+  <!-- 2. como funciona -->
+  <section class="ld-sec" id="como-funciona" aria-labelledby="t-como">
+    <header class="ld-cab">
+      <span class="ld-sobre">Como funciona</span>
+      <h2 id="t-como">Um hábito pequeno que vira nota no ENEM</h2>
+      <p>Em vez de maratonas que você abandona na segunda semana, quatro questões por dia, todo dia, até a prova.</p>
+    </header>
+
+    <div class="ld-bento">
+      <article class="ld-bloco ld-dia">
+        <div class="ld-bloco-arte ld-arte-dia" aria-hidden="true">
+          <ed-simbolo-dia [cores]="['var(--ed-lc)', 'var(--ed-ch)', 'var(--ed-cn)', null]" corAnel="var(--ed-caneta)" />
+          <ul>
+            <li [style.--c]="'var(--ed-lc)'"><i></i>Linguagens<b>+64 XP</b></li>
+            <li [style.--c]="'var(--ed-ch)'"><i></i>Humanas<b>+70 XP</b></li>
+            <li [style.--c]="'var(--ed-cn)'"><i></i>Naturezas<b>+52 XP</b></li>
+            <li class="falta"><i></i>Matemática<b>agora</b></li>
+          </ul>
+        </div>
+        <h3>Um desafio por dia</h3>
+        <p>Toda meia-noite saem quatro questões novas, uma de cada área. Quanto mais rápido você acerta, mais XP ganha, e dias seguidos dão bônus de até 20%.</p>
+      </article>
+
+      <article class="ld-bloco ld-ia">
+        <div class="ld-bloco-arte ld-arte-ia" aria-hidden="true">
+          <div class="ld-acervo">
+            <span class="ld-folha f3"></span><span class="ld-folha f2"></span>
+            <span class="ld-folha f1"><small>INEP</small><b>+3.000</b><small>questões oficiais</small></span>
+          </div>
+          <span class="ld-seta"><ed-icone nome="sparkles" [tamanho]="18" /></span>
+          <div class="ld-q">
+            <span class="ld-q-tag"><ed-icone nome="landmark" [tamanho]="13" />Questão inédita</span>
+            <span class="ld-q-linha l1"></span><span class="ld-q-linha l2"></span><span class="ld-q-linha l3"></span>
+            <span class="ld-q-alts"><i></i><i class="certa"></i><i></i><i></i></span>
+          </div>
+        </div>
+        <h3>Questões inéditas, criadas por IA</h3>
+        <p>Nossa inteligência artificial cria questões novas todos os dias com base em mais de 3.000 questões oficiais disponibilizadas pelo INEP, no mesmo estilo e nível do ENEM. Toda questão vem com explicação e link para estudar.</p>
+      </article>
+
+      <article class="ld-bloco ld-amigos">
+        <div class="ld-bloco-arte ld-arte-amigos" aria-hidden="true">
+          <div class="ld-vs">
+            <span class="ld-vs-av"><ed-avatar valor="ed1|caneta|orbita|bronze|engenharia||" nome="Rafael Costa" [tamanho]="52" [encher]="true" /></span>
+            <ed-espadas [tamanho]="86" />
+            <span class="ld-vs-av"><ed-avatar valor="ed1|ameixa|arcos|prata|medicina||" nome="Marina Lopes" [tamanho]="52" [encher]="true" /></span>
+          </div>
+          <div class="ld-placar"><b>186</b><span>×</span><b>171</b></div>
+        </div>
+        <h3>Mais forte com os amigos</h3>
+        <p>Monte grupos com ranking semanal e mensal, veja o campus dos colegas e marque duelos: no dia combinado, vence quem fizer mais XP no desafio.</p>
+      </article>
+    </div>
+    <div class="ld-como-cta">
+      <button class="ld-btn ld-btn-pri" type="button" (click)="criarConta()">Criar conta grátis<ed-icone nome="arrow-right" [tamanho]="18" /></button>
+    </div>
+  </section>
+
+  <!-- 3. campus -->
+  <section class="ld-campus" aria-labelledby="t-campus">
+    <div class="ld-campus-texto">
+      <span class="ld-sobre">Seu campus</span>
+      <h2 id="t-campus">A cada acerto, o seu campus evolui rumo a uma grande universidade!</h2>
+      <p>O seu progresso nos estudos de forma visível. Os acertos de cada área evoluem regiões diferentes do campus.</p>
+      <ul class="ld-etapas" aria-hidden="true">
+        @for (e of etapasCampus; track e.rotulo; let i = $index) { <li [class.ativa]="i === etapa" [class.feita]="i < etapa">{{ e.rotulo }}</li> }
+      </ul>
+    </div>
+    <div class="ld-campus-palco">
+      <ed-campus [progresso]="campusAgora.progresso" [extras]="campusAgora.extras" modo="dia" [avisos]="false" [intervalo]="18" [passeio]="false" />
+    </div>
+  </section>
+
+  <!-- 4. gestão de estudos -->
+  <section class="ld-sec ld-estudos" aria-labelledby="t-estudos">
+    <header class="ld-cab">
+      <span class="ld-sobre">Gestão de estudos</span>
+      <h2 id="t-estudos">Seus simulados e redações num lugar só</h2>
+      <p>Registre os acertos de cada simulado e a nota de cada redação. O enem.daily mostra sua evolução, estima sua nota e aponta onde vale mais a pena estudar.</p>
+    </header>
+
+    <div class="ld-modulos">
+      <article class="ld-modulo">
+        <div class="ld-modulo-cel"><ld-celular [escala]=".62" xp="6.953"><ld-mock-simulados [fab]="false" /></ld-celular></div>
+        <div class="ld-modulo-texto">
+          <span class="ld-modulo-ico"><ed-icone nome="clipboard-list" [tamanho]="20" /></span>
+          <h3>Simulados</h3>
+          <ul>
+            <li><ed-icone nome="target" [tamanho]="16" />Projeção para os 180 itens e nota estimada pela TRI</li>
+            <li><ed-icone nome="chart-column" [tamanho]="16" />Evolução por dia de prova e por área</li>
+            <li><ed-icone nome="sparkles" [tamanho]="16" />Análise que mostra tendências e onde focar</li>
+          </ul>
+        </div>
+      </article>
+      <article class="ld-modulo">
+        <div class="ld-modulo-cel"><ld-celular [escala]=".62" xp="6.953"><ld-mock-redacoes [fab]="false" /></ld-celular></div>
+        <div class="ld-modulo-texto">
+          <span class="ld-modulo-ico"><ed-icone nome="pen-line" [tamanho]="20" /></span>
+          <h3>Redações</h3>
+          <ul>
+            <li><ed-icone nome="target" [tamanho]="16" />Nota média e projeção até 1000</li>
+            <li><ed-icone nome="activity" [tamanho]="16" />As 5 competências, uma a uma</li>
+            <li><ed-icone nome="book-open" [tamanho]="16" />O que estudar em cada competência</li>
+          </ul>
+        </div>
+      </article>
+    </div>
+    <a class="ld-btn ld-btn-sec ld-saiba" routerLink="/estudos">Saiba mais sobre a gestão de estudos<ed-icone nome="arrow-right" [tamanho]="18" /></a>
+  </section>
+
+  <!-- 5. chamada final -->
+  <section class="ld-final" aria-labelledby="t-final">
+    <ed-simbolo-dia class="ld-final-simbolo" [cores]="['#FFFFFF', '#FFFFFF', '#FFFFFF', '#FFD66B']" corAnel="#FFFFFF" />
+    <h2 id="t-final">@if (diasEnem !== null) { Faltam {{ diasEnem }} dias para o ENEM. } @else { O ENEM está chegando. }<br>Comece hoje.</h2>
+    <p>Quatro questões, cinco minutos. Amanhã tem mais.</p>
+    <div class="ld-ctas">
+      <button class="ld-btn ld-btn-branco" type="button" (click)="responder()">Experimentar uma questão<ed-icone nome="arrow-right" [tamanho]="18" /></button>
+      <button class="ld-btn ld-btn-vazado" type="button" (click)="criarConta()">Criar conta grátis</button>
+    </div>
+  </section>
+
+  <footer class="ld-rodape">
+    <span class="ld-rodape-marca"><ed-simbolo-dia [animar]="false" /><span class="wm">enem<i class="pt"></i>daily</span></span>
+    <nav aria-label="Links institucionais">
+      <a routerLink="/estudos">Gestão de estudos</a>
+      <a routerLink="/contato">Contato</a>
+      <a routerLink="/privacidade">Privacidade</a>
+    </nav>
+    <small>© {{ ano }} enem.daily · Feito para quem vai fazer o ENEM.</small>
+  </footer>
+</main>
+
+@if (exemplo) {
+  <ld-questao-exemplo [area]="exemplo" (fechar)="exemplo = null" />
+}

@@ -1,0 +1,363 @@
+.section{
+    background-color: rgba(0, 0, 0, 0);
+    width: 100%;
+    margin-bottom: 20px;
+    
+
+}
+@media (max-width: 768px) {
+  .home{
+    padding: 10px;
+}
+}
+
+.title-time{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0px;
+    flex-direction: column;
+}
+
+.title-time h2{
+    font-family: 'poppins';
+    font-weight: bold;
+    font-size: 18px;
+}
+.title-time span{
+    font-size: 18px;
+}
+.card-info{
+    background-color: white;
+    border-radius: 8px;
+    padding: 13px;
+    box-shadow: 0 0 9px rgba(0, 0, 0, 0.144);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.card-info p{
+    font-size: 11px;
+}
+.card-info i{
+    font-size: 5px;
+    margin-top: 5px;
+}
+.container-paragrafo{
+    display: flex;
+    gap: 5px;
+}
+.container-paragrafo p{
+    font-family: 'poppins';
+}
+.card-area{
+    border-radius: 8px;
+   
+    padding: 25px ;
+    padding-bottom: 12px !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: white;
+    font-family: 'poppins';
+    font-weight: bold;
+    gap: 6px;
+}
+.card-area img{
+    height: 98px;
+}
+.exatas{
+    background: linear-gradient(to right, #bb9600, #c29b00 , #caa305, #bb9600 );
+    box-shadow: 0 0 9px rgba(119, 101, 0, 0.603);
+}
+.humanas{
+ background: linear-gradient(to right, #2f86e4, #2f86e4, #1f9fbe, #2f86e4 );
+ box-shadow: 0 0 9px rgba(0, 30, 114, 0.5);
+}
+.naturezas{
+ background: linear-gradient(to right, #68972a, #68972a, #72a72c, #68972a);
+   box-shadow: 0 0 9px rgba(12, 100, 0, 0.603);
+}
+.linguagens{
+ background: linear-gradient(to right, #ca8402, #ca8702, #bd820d, #ca8702);
+   box-shadow: 0 0 9px rgba(124, 50, 0, 0.603);
+   margin-top: 5px;
+}
+.concluido {
+  position: relative;
+  box-shadow: none !important;
+}
+
+.concluido::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.267); /* controla o “escuro” */
+  border-radius: inherit;
+  pointer-events: none;
+}
+.btnArea{
+    border-radius: 99px;
+    padding: 9px 0px;
+    border: none;
+    width: 100%;
+    color: white;
+    font-weight: bold;
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    justify-content: center;
+    font-family:'poppins';
+}
+
+.container-cards{
+    display: grid;
+       grid-template-columns: repeat(auto-fit, minmax(160px, 2fr));
+    gap: 20px;
+}
+
+/* Ajustes para Tablet */
+@media (min-width: 768px) and (max-width: 1000px) {
+  .card-area img{
+    height: 160px !important;
+  }
+  .card-area h3{
+    font-size: 29px !important;
+  }
+  .container-paragrafo p {
+    font-size: 14px;
+  }
+  .title-time h2{
+    font-size: 22px;
+  }
+  .title-time span{
+    font-size: 21px;
+  }
+}
+.live-counter-badge {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.85); /* Fundo branco com transparência */
+  backdrop-filter: blur(8px); /* Efeito de vidro sutil */
+  -webkit-backdrop-filter: blur(8px);
+  padding: 10px 18px;
+  border-radius: 50px; /* Formato de pílula */
+  border: 1px solid rgba(45, 52, 148, 0.15); /* Borda fina no seu azul marinho */
+  box-shadow: 0 6px 15px rgba(45, 52, 148, 0.06); /* Sombra suave e colorida */
+  gap: 14px;
+  margin: 15px 0;
+  transition: all 0.3s ease;
+}
+
+/* Efeito de destaque no hover (opcional, se for clicável) */
+.live-counter-badge:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(45, 52, 148, 0.1);
+  border-color: rgba(45, 52, 148, 0.3);
+}
+
+/* --- Container do Ícone com Pulso --- */
+.icon-pulse-container {
+  position: relative;
+  width: 20px;
+  height: 20px;
+  background: #fffbf0; /* Fundo azul clarinho para o ícone */
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.status-icon {
+  height: 18px; /* Ligeiramente maior que os 16px para destaque */
+  z-index: 2; /* Fica acima do anel de pulso */
+}
+
+/* O anel que pulsa atrás do ícone */
+.pulse-ring {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: rgba(242, 214, 92, 0.3); /* Cor de destaque (seu azul vibrante) */
+  animation: pulse-animation 2s infinite ease-out;
+  z-index: 1;
+}
+
+/* --- Área do Texto --- */
+.counter-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.counter-text h4 {
+  color: #1A237E; /* Seu Navy Blue profissional */
+  font-size: 0.95rem;
+  font-weight: 800;
+  margin: 0;
+  line-height: 1.2;
+}
+
+/* Destaque para o número */
+.counter-text h4 span {
+  color: #2D3494; /* Azul vibrante para o número saltar */
+  font-size: 1.1rem;
+}
+
+.counter-text p {
+  color: #64748b; /* Cinza para texto secundário */
+  font-size: 0.75rem;
+  margin: 2px 0 0 0;
+  font-weight: 500;
+}
+
+/* --- Definição da Animação de Pulso --- */
+@keyframes pulse-animation {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.8); /* O anel expande bastante */
+    opacity: 0; /* E some no final */
+  }
+}
+.container-respostas-hoje{
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 15px;
+}
+.container-respostas-hoje h3{
+  font-size: 14px;
+  color: gray;
+}
+.reward-popup {
+  border-radius: 20px;
+}
+
+.emblem-reward-container {
+  text-align: center;
+  color: white;
+  font-family: 'Poppins', sans-serif;
+  position: relative;
+}
+
+/* TÍTULO */
+.reward-title {
+  font-size: 1.4rem;
+  color: #ffd700;
+  margin-bottom: 20px;
+  letter-spacing: 1px;
+}
+
+/* CARD 3D */
+.card-scene {
+  perspective: 1000px;
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+.card {
+  width: 140px;
+  height: 180px;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 1s cubic-bezier(0.4, 2, 0.6, 1);
+}
+
+.card.flip {
+  transform: rotateY(180deg) scale(1.1);
+}
+
+/* FACES */
+.card-face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 16px;
+  backface-visibility: hidden;
+  box-shadow: 0 0 25px rgba(255, 215, 0, 0.6);
+}
+.card-front img{
+  max-width: 80px;
+  max-height: 80px;
+}
+
+/* FRENTE */
+.card-front {
+  background: linear-gradient(145deg, #1e2a78, #3f51b5);
+  transform: rotateY(180deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.emblem-img {
+  max-width: 80px;
+  max-height: 80px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 10px gold);
+}
+
+/* VERSO */
+.card-back {
+  background: linear-gradient(145deg, #111, #333);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mystery {
+  font-size: 3rem;
+  color: #aaa;
+}
+
+/* INFO */
+.reward-info {
+  margin-top: 20px;
+}
+
+.reward-name {
+  font-size: 1.2rem;
+  color: #ffd700;
+}
+
+.reward-desc {
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+/* BOTÃO */
+.reward-btn {
+  background: linear-gradient(135deg, #ffd700, #ff9800) !important;
+  color: black !important;
+  font-weight: bold;
+  border-radius: 10px !important;
+}
+
+/* PARTÍCULAS */
+.particles {
+  position: absolute;
+  font-size: 20px;
+  color: gold;
+  animation: float 2s infinite ease-in-out;
+}
+
+.p1 { top: 20%; left: 15%; }
+.p2 { top: 30%; right: 15%; }
+.p3 { bottom: 20%; left: 50%; }
+
+@keyframes float {
+  0% { transform: translateY(0px) scale(1); opacity: 0.7; }
+  50% { transform: translateY(-15px) scale(1.2); opacity: 1; }
+  100% { transform: translateY(0px) scale(1); opacity: 0.7; }
+}

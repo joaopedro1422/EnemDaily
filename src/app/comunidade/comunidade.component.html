@@ -1,0 +1,259 @@
+<main class="cm">
+  <header class="cm-cab">
+    <div>
+      <span class="cm-sobre"><ed-icone nome="users" [tamanho]="15" />Amigos</span>
+      <h1>Estude junto, dispute de verdade</h1>
+      <p>Encontre colegas e marque duelos no desafio diário.</p>
+    </div>
+    @if (logado) {
+      <button class="cm-config" type="button" (click)="abrirPrivacidade()" aria-label="Privacidade"><ed-icone nome="settings-2" [tamanho]="20" /></button>
+    }
+  </header>
+
+  @if (!logado) {
+    <section class="cm-vazio grande">
+      <ed-espadas [tamanho]="140" />
+      <h2>Entre para encontrar seus colegas</h2>
+      <p>Com uma conta você adiciona amigos, vê o campus deles e marca duelos.</p>
+      <button class="btn-pri" type="button" (click)="entrar()">Entrar ou criar conta</button>
+    </section>
+  } @else {
+    <label class="cm-busca" [class.ativa]="termo.length > 0">
+      <ed-icone nome="search" [tamanho]="20" />
+      <span class="cm-arroba" aria-hidden="true">&#64;</span>
+      <input type="search" [ngModel]="termo" (ngModelChange)="digitar($event)" placeholder="Buscar pelo usuário ou nome" autocomplete="off" autocapitalize="none" spellcheck="false" aria-label="Buscar pessoas" />
+      @if (buscando) { <ed-carregando [mini]="true" /> }
+      @else if (termo) { <button type="button" class="cm-limpar" (click)="limparBusca()" aria-label="Limpar busca"><ed-icone nome="x" [tamanho]="16" /></button> }
+    </label>
+
+    @if (erro) { <p class="cm-erro" role="alert">{{ erro }}</p> }
+
+    @if (resultados !== null) {
+      <section class="cm-sec" aria-live="polite">
+        <h2 class="cm-titulo">Resultados <span>{{ resultados.length }}</span></h2>
+        @if (!resultados.length) {
+          <div class="cm-vazio"><ed-icone nome="search" [tamanho]="26" /><p>Ninguém encontrado com "{{ termo }}". Confira o &#64; com o seu colega.</p></div>
+        } @else {
+          <ul class="pessoas">
+            @for (u of resultados; track u.id) {
+              <li class="pessoa">
+                <button type="button" class="pessoa-info" (click)="abrir(u)">
+                  <ed-avatar [valor]="u.avatar" [nome]="u.nome || u.usuario" [tamanho]="48" />
+                  <span><b>{{ u.nome || u.usuario }}</b><small>&#64;{{ u.usuario }} · {{ formatarNumero(u.xpTotal) }} XP@if (u.perfilPrivado) { · <ed-icone nome="lock" [tamanho]="11" /> }</small></span>
+                </button>
+                <div class="pessoa-acoes">
+                  @switch (u.relacao) {
+                    @case ('EU') { <span class="chip">Você</span> }
+                    @case ('AMIGOS') { <span class="chip ok"><ed-icone nome="user-check" [tamanho]="14" />Amigos</span> }
+                    @case ('ENVIADA') { <span class="chip">Pedido enviado</span> }
+                    @case ('RECEBIDA') { <button class="btn-mini pri" type="button" (click)="adicionar(u)" [disabled]="ocupando('add' + u.id)">Aceitar</button> }
+                    @case ('BLOQUEADO') { <span class="chip">Bloqueado</span> }
+                    @default { <button class="btn-mini" type="button" (click)="adicionar(u)" [disabled]="ocupando('add' + u.id)"><ed-icone nome="user-plus" [tamanho]="15" />Adicionar</button> }
+                  }
+                  @if (u.relacao !== 'EU' && u.relacao !== 'BLOQUEADO') {
+                    <button class="btn-ico" type="button" (click)="desafiar(u)" [attr.aria-label]="'Desafiar @' + u.usuario"><ed-icone nome="swords" [tamanho]="18" /></button>
+                  }
+                </div>
+              </li>
+            }
+          </ul>
+        }
+      </section>
+    } @else {
+      <nav class="cm-abas" role="tablist" aria-label="Seções de Amigos">
+        <button role="tab" type="button" [class.ativa]="aba === 'amigos'" [attr.aria-selected]="aba === 'amigos'" (click)="trocarAba('amigos')"><ed-icone nome="users" [tamanho]="16" />Meus amigos</button>
+        <button role="tab" type="button" [class.ativa]="aba === 'solicitacoes'" [attr.aria-selected]="aba === 'solicitacoes'" (click)="trocarAba('solicitacoes')"><ed-icone nome="bell" [tamanho]="16" />Solicitações @if (qtdSolicitacoes) { <i class="bolha">{{ qtdSolicitacoes }}</i> }</button>
+        <button role="tab" type="button" [class.ativa]="aba === 'duelos'" [attr.aria-selected]="aba === 'duelos'" (click)="trocarAba('duelos')"><ed-icone nome="swords" [tamanho]="16" />Duelos</button>
+      </nav>
+
+      @switch (aba) {
+        @case ('amigos') {
+          @if (amigos === null) { <div class="cm-carregando"><ed-carregando /></div> }
+          @else if (!amigos.length) {
+            <div class="cm-vazio grande">
+              <ed-icone nome="user-plus" [tamanho]="30" />
+              <h2>Seus amigos aparecem aqui</h2>
+              <p>Busque o &#64; de um colega lá em cima e envie um pedido de amizade. Depois é só desafiar.</p>
+            </div>
+          } @else {
+            <ul class="pessoas">
+              @for (u of amigos; track u.id) {
+                <li class="pessoa">
+                  <button type="button" class="pessoa-info" (click)="abrir(u)">
+                    <ed-avatar [valor]="u.avatar" [nome]="u.nome || u.usuario" [tamanho]="48" />
+                    <span><b>{{ u.nome || u.usuario }}</b><small>&#64;{{ u.usuario }} · <ed-icone nome="flame" [tamanho]="11" />{{ u.sequencia }} {{ u.sequencia === 1 ? 'dia' : 'dias' }}</small></span>
+                  </button>
+                  <div class="pessoa-acoes">
+                    <button class="btn-mini pri" type="button" (click)="desafiar(u)"><ed-icone nome="swords" [tamanho]="15" />Desafiar</button>
+                  </div>
+                </li>
+              }
+            </ul>
+          }
+        }
+
+        @case ('solicitacoes') {
+          @if (solicitacoes === null) { <div class="cm-carregando"><ed-carregando /></div> }
+          @else {
+            @if (!solicitacoes.duelosRecebidos.length && !solicitacoes.amizadesRecebidas.length && !solicitacoes.amizadesEnviadas.length && !solicitacoes.duelosEnviados.length) {
+              <div class="cm-vazio grande"><ed-icone nome="bell" [tamanho]="30" /><h2>Nada por aqui</h2><p>Convites de duelo e pedidos de amizade aparecem nesta aba.</p></div>
+            }
+            @if (solicitacoes.duelosRecebidos.length) {
+              <section class="cm-sec">
+                <h2 class="cm-titulo">Convites de duelo <span>{{ solicitacoes.duelosRecebidos.length }}</span></h2>
+                @for (d of solicitacoes.duelosRecebidos; track d.id) {
+                  <article class="convite">
+                    <ed-avatar [valor]="d.oponente.avatar" [nome]="d.oponente.nome || d.oponente.usuario" [tamanho]="46" />
+                    <div class="convite-txt"><b>&#64;{{ d.oponente.usuario }} te desafiou</b><small><ed-icone nome="calendar" [tamanho]="12" />Duelo {{ nomeDoDia(d.dia) }}</small></div>
+                    <div class="convite-acoes">
+                      <button class="btn-mini" type="button" (click)="recusarDuelo(d)" [disabled]="ocupando('du' + d.id)">Recusar</button>
+                      <button class="btn-mini pri" type="button" (click)="aceitarDuelo(d)" [disabled]="ocupando('du' + d.id)"><ed-icone nome="swords" [tamanho]="15" />Aceitar</button>
+                    </div>
+                  </article>
+                }
+              </section>
+            }
+            @if (solicitacoes.amizadesRecebidas.length) {
+              <section class="cm-sec">
+                <h2 class="cm-titulo">Pedidos de amizade <span>{{ solicitacoes.amizadesRecebidas.length }}</span></h2>
+                @for (s of solicitacoes.amizadesRecebidas; track s.id) {
+                  <article class="convite">
+                    <button type="button" class="pessoa-info" (click)="abrir(s.usuario)">
+                      <ed-avatar [valor]="s.usuario.avatar" [nome]="s.usuario.nome || s.usuario.usuario" [tamanho]="46" />
+                      <span class="convite-txt"><b>{{ s.usuario.nome || s.usuario.usuario }}</b><small>&#64;{{ s.usuario.usuario }} quer ser seu amigo</small></span>
+                    </button>
+                    <div class="convite-acoes">
+                      <button class="btn-mini" type="button" (click)="removerAmizade(s.id)" [disabled]="ocupando('am' + s.id)">Recusar</button>
+                      <button class="btn-mini pri" type="button" (click)="aceitarAmizade(s.id)" [disabled]="ocupando('am' + s.id)">Aceitar</button>
+                    </div>
+                  </article>
+                }
+              </section>
+            }
+            @if (solicitacoes.duelosEnviados.length || solicitacoes.amizadesEnviadas.length) {
+              <section class="cm-sec">
+                <h2 class="cm-titulo">Enviados por você</h2>
+                @for (d of solicitacoes.duelosEnviados; track d.id) {
+                  <article class="convite leve">
+                    <ed-avatar [valor]="d.oponente.avatar" [nome]="d.oponente.nome || d.oponente.usuario" [tamanho]="40" />
+                    <div class="convite-txt"><b>Duelo com &#64;{{ d.oponente.usuario }}</b><small>{{ nomeDoDia(d.dia) }} · aguardando resposta</small></div>
+                    <button class="btn-mini" type="button" (click)="cancelarDuelo(d)" [disabled]="ocupando('du' + d.id)">Cancelar</button>
+                  </article>
+                }
+                @for (s of solicitacoes.amizadesEnviadas; track s.id) {
+                  <article class="convite leve">
+                    <ed-avatar [valor]="s.usuario.avatar" [nome]="s.usuario.nome || s.usuario.usuario" [tamanho]="40" />
+                    <div class="convite-txt"><b>Amizade com &#64;{{ s.usuario.usuario }}</b><small>aguardando resposta</small></div>
+                    <button class="btn-mini" type="button" (click)="removerAmizade(s.id)" [disabled]="ocupando('am' + s.id)">Cancelar</button>
+                  </article>
+                }
+              </section>
+            }
+          }
+        }
+
+        @case ('duelos') {
+          @if (duelos === null) { <div class="cm-carregando"><ed-carregando /></div> }
+          @else {
+            <section class="placar-geral">
+              <ed-espadas [tamanho]="86" [animar]="false" />
+              <div class="pg-num"><b>{{ duelos.geral.vitorias }}</b><small>vitórias</small></div>
+              <div class="pg-num"><b>{{ duelos.geral.derrotas }}</b><small>derrotas</small></div>
+              <div class="pg-num"><b>{{ duelos.geral.empates }}</b><small>empates</small></div>
+            </section>
+
+            @if (aoVivo.length) {
+              <section class="cm-sec">
+                <h2 class="cm-titulo"><i class="ao-vivo"></i>Acontecendo hoje</h2>
+                @for (d of aoVivo; track d.id) {
+                  <article class="vivo">
+                    <div class="vivo-lados">
+                      <div><small>Você</small><b>{{ d.meuXp }}</b><span>{{ d.minhasRespostas }}/4 questões</span></div>
+                      <span class="vivo-x">×</span>
+                      <div class="dir"><small>&#64;{{ d.oponente.usuario }}</small><b>{{ d.xpOponente }}</b><span>{{ d.respostasOponente }}/4 questões</span></div>
+                    </div>
+                    <div class="vivo-barra" [style.--p]="porcentagem(d.meuXp, d.xpOponente) + '%'"><i></i></div>
+                    <a class="btn-mini pri" routerLink="/Home">{{ d.minhasRespostas >= 4 ? 'Você já terminou' : 'Responder agora' }}</a>
+                  </article>
+                }
+              </section>
+            }
+
+            @if (futuros.length) {
+              <section class="cm-sec">
+                <h2 class="cm-titulo">Agendados <span>{{ futuros.length }}</span></h2>
+                @for (d of futuros; track d.id) {
+                  <article class="convite leve">
+                    <ed-avatar [valor]="d.oponente.avatar" [nome]="d.oponente.nome || d.oponente.usuario" [tamanho]="40" />
+                    <div class="convite-txt"><b>Você × &#64;{{ d.oponente.usuario }}</b><small><ed-icone nome="calendar" [tamanho]="12" />{{ nomeDoDia(d.dia) }}</small></div>
+                    <button class="btn-mini" type="button" (click)="cancelarDuelo(d)" [disabled]="ocupando('du' + d.id)">Desmarcar</button>
+                  </article>
+                }
+              </section>
+            }
+
+            @if (duelos.enviados.length) {
+              <section class="cm-sec">
+                <h2 class="cm-titulo">Aguardando resposta</h2>
+                @for (d of duelos.enviados; track d.id) {
+                  <article class="convite leve">
+                    <ed-avatar [valor]="d.oponente.avatar" [nome]="d.oponente.nome || d.oponente.usuario" [tamanho]="40" />
+                    <div class="convite-txt"><b>&#64;{{ d.oponente.usuario }}</b><small>{{ nomeDoDia(d.dia) }}</small></div>
+                    <button class="btn-mini" type="button" (click)="cancelarDuelo(d)" [disabled]="ocupando('du' + d.id)">Cancelar</button>
+                  </article>
+                }
+              </section>
+            }
+
+            <section class="cm-sec">
+              <h2 class="cm-titulo"><ed-icone nome="history" [tamanho]="16" />Histórico</h2>
+              @if (!duelos.historico.length) {
+                <div class="cm-vazio"><p>Seus duelos terminados aparecem aqui, com o placar de cada um.</p></div>
+              } @else {
+                <ul class="historico">
+                  @for (d of duelos.historico; track d.id) {
+                    <li>
+                      <span class="res" [class.v]="d.resultado === 'VITORIA'" [class.d]="d.resultado === 'DERROTA'">{{ d.resultado === 'VITORIA' ? 'V' : d.resultado === 'DERROTA' ? 'D' : 'E' }}</span>
+                      <button type="button" class="pessoa-info" (click)="abrir(d.oponente)">
+                        <ed-avatar [valor]="d.oponente.avatar" [nome]="d.oponente.nome || d.oponente.usuario" [tamanho]="34" />
+                        <span><b>&#64;{{ d.oponente.usuario }}</b><small>{{ nomeDoDia(d.dia) }}</small></span>
+                      </button>
+                      <span class="hist-placar">{{ d.meuXp }} <i>×</i> {{ d.xpOponente }}</span>
+                    </li>
+                  }
+                </ul>
+              }
+            </section>
+          }
+        }
+      }
+    }
+  }
+</main>
+
+@if (desafiando) {
+  <app-duelo-convite [alvo]="desafiando" (fechar)="desafiando = null" (enviado)="aoEnviarDuelo()" />
+}
+
+@if (mostrarPrivacidade) {
+  <div class="pv" role="dialog" aria-modal="true" aria-labelledby="pv-titulo">
+    <div class="pv-fundo" (click)="mostrarPrivacidade = false"></div>
+    <section class="pv-folha">
+      <header class="pv-cab">
+        <h2 id="pv-titulo">Privacidade</h2>
+        <button class="btn-ico" type="button" (click)="mostrarPrivacidade = false" aria-label="Fechar"><ed-icone nome="x" [tamanho]="18" /></button>
+      </header>
+      @if (!privacidade) { <ed-carregando /> } @else {
+        <label class="pv-op">
+          <span><b>Perfil privado</b><small>Você continua aparecendo na busca, mas só amigos veem seu campus e suas conquistas.</small></span>
+          <input type="checkbox" role="switch" [checked]="privacidade.perfilPrivado" (change)="salvarPrivacidade('perfilPrivado', $any($event.target).checked)" />
+        </label>
+        <label class="pv-op">
+          <span><b>Só amigos podem me desafiar</b><small>Quem não é seu amigo não consegue te convidar para duelos.</small></span>
+          <input type="checkbox" role="switch" [checked]="privacidade.duelosSoAmigos" (change)="salvarPrivacidade('duelosSoAmigos', $any($event.target).checked)" />
+        </label>
+        <p class="pv-nota">Para bloquear alguém, abra o perfil da pessoa e use o menu ⋯.</p>
+      }
+    </section>
+  </div>
+}
