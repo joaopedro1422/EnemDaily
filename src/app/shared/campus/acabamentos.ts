@@ -1,12 +1,6 @@
 import { Paleta, Predio, iso, f1, shade, mix, box, faceX, faceY, linha3, arvore, poste, canteiro, sebe } from './motor';
 import { Peca, Trilha } from './pecas';
 
-/**
- * Depois que a região termina a construção base, cada acerto liberta um nível de ACABAMENTO:
- * floreiras, toldos, frisos coloridos, luzes, brasões, sebes, árvores, bandeiras e pinturas,
- * que depois voltam em versões mais caprichadas (nível 2 e 3). Nada de peça nova solta: tudo
- * acontece em todos os prédios da região de uma vez.
- */
 
 type Area = Exclude<Trilha, 'geral'>;
 
@@ -26,7 +20,6 @@ const LOTE: Record<Area, [number, number, number, number]> = {
 
 type Efeito = 'floreiras' | 'toldos' | 'friso' | 'luzes' | 'vasos' | 'brasao' | 'sebe' | 'postes' | 'arvores' | 'bandeiras' | 'pintura';
 
-/** A ordem dos níveis: cada um é um efeito e o grau dele (1 simples, 2 caprichado, 3 de luxo). */
 export const NIVEIS_ACABAMENTO: [Efeito, number][] = [
   ['floreiras', 1], ['sebe', 1], ['toldos', 1], ['friso', 1], ['arvores', 1], ['vasos', 1], ['luzes', 1], ['postes', 1], ['brasao', 1], ['bandeiras', 1], ['pintura', 1],
   ['floreiras', 2], ['friso', 2], ['toldos', 2], ['arvores', 2], ['luzes', 2], ['vasos', 2], ['sebe', 2], ['pintura', 2], ['bandeiras', 2], ['brasao', 2], ['postes', 2],
@@ -132,7 +125,6 @@ function efeitoNaRegiao(e: Efeito, g: number, t: Area, P: Paleta, cor: string): 
   }
 }
 
-/** As peças de acabamento da região até o nível dado (cumulativo; o grau mais alto de cada efeito vale). */
 export function pecasDeAcabamento(t: Trilha, nivel: number, nivelAntes: number | null, P: Paleta): { pecas: Peca[]; novas: Set<Peca> } {
   const novas = new Set<Peca>();
   if (t === 'geral' || nivel <= 0) return { pecas: [], novas };

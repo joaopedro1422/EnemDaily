@@ -41,7 +41,7 @@ export const MOCK_SIMULADOS: Simulado[] = [
     humanas: 42,
     naturezas: 0,
     exatas: 0,
-    acertosTotais: 80, // 38 + 42
+    acertosTotais: 80,
     nome: 'Bernoulli',
     anotacoes: "11 acertos em biologia; revisar quimica orgânica",
     showNotes: false
@@ -56,7 +56,7 @@ export const MOCK_SIMULADOS: Simulado[] = [
     humanas: 0,
     naturezas: 35,
     exatas: 40,
-    acertosTotais: 75, // 35 + 40
+    acertosTotais: 75,
     nome: 'Poliedro',
     anotacoes: "11 acertos em biologia; revisar quimica orgânica",
     showNotes: false
@@ -71,7 +71,7 @@ export const MOCK_SIMULADOS: Simulado[] = [
     humanas: 37,
     naturezas: 0,
     exatas: 0,
-    acertosTotais: 77, // 40 + 37
+    acertosTotais: 77,
     nome: 'SAS 01',
     anotacoes: "11 acertos em biologia; revisar quimica orgânica",
     showNotes: false
@@ -86,7 +86,7 @@ export const MOCK_SIMULADOS: Simulado[] = [
     humanas: 0,
     naturezas: 37,
     exatas: 41,
-    acertosTotais: 78, // 37 + 41
+    acertosTotais: 78,
     nome: 'SAS 02',
     anotacoes: "11 acertos em biologia; revisar quimica orgânica",
     showNotes: false
@@ -101,7 +101,7 @@ export const MOCK_SIMULADOS: Simulado[] = [
     humanas: 45,
     naturezas: 0,
     exatas: 0,
-    acertosTotais: 85, // 40 + 45
+    acertosTotais: 85,
     nome: 'Final',
     anotacoes: "11 acertos em biologia; revisar quimica orgânica",
     showNotes: false
@@ -116,7 +116,7 @@ export const MOCK_SIMULADOS: Simulado[] = [
     humanas: 0,
     naturezas: 39,
     exatas: 42,
-    acertosTotais: 81, // 40 + 45
+    acertosTotais: 81,
     nome: 'Final',
     anotacoes: "11 acertos em biologia; revisar quimica orgânica",
     showNotes: false

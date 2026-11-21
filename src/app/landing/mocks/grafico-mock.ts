@@ -3,7 +3,6 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 Chart.register(...registerables);
 
-/** Mesmo gráfico de linhas das telas reais (Simulados e Redações), alimentado com dados de exemplo. */
 export function graficoDeLinhas(canvas: HTMLCanvasElement, opcoes: {
   rotulos: string[];
   series: { nome: string; cor: string; dados: (number | null)[]; area?: boolean }[];

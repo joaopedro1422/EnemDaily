@@ -1,7 +1,6 @@
 import { AREAS } from '../../shared/dia';
 import { COMPETENCIAS } from '../../home-redacoes/competencias';
 
-/** Dados de exemplo das landings: uma estudante com 6 simulados e 5 redações entre agosto e novembro. */
 
 const area = (chave: string) => AREAS.find(a => a.chave === chave)!;
 
@@ -24,7 +23,6 @@ export const SIM = {
     { icone: 'flame', tom: 'bom', titulo: '2º dia: 2 melhoras seguidas', texto: 'Seus últimos 3 simulados do 2º dia foram melhorando um atrás do outro.' },
     { icone: 'target', tom: 'alerta', titulo: 'Foco em Matemática', texto: 'É a sua menor média: 23 de 45. Priorizar essa área tende a render mais pontos na projeção.' }
   ],
-  // ordem cronológica (#1 a #6); 1º dia = LC + CH, 2º dia = CN + MT
   lista: [
     { n: 1, dia: 1, data: '10 ago', lc: 28, ch: 30, total: 58, dif: 0, nome: '' },
     { n: 2, dia: 2, data: '17 ago', cn: 22, mt: 19, total: 41, dif: 0, nome: '' },

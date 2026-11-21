@@ -22,7 +22,7 @@ import { Questao } from '../../models/questao';
             </tbody>
           </table>
         </div>
-        @if (t.nota) { <p class="tb-nota" [innerHTML]="t.nota"></p> }
+        @if (notaVisivel(t.nota)) { <p class="tb-nota" [innerHTML]="t.nota"></p> }
       </figure>
     }
     @if (questao.fonte) { <p class="tb-fonte" [innerHTML]="questao.fonte"></p> }
@@ -45,4 +45,8 @@ import { Questao } from '../../models/questao';
 })
 export class TextoBaseComponent {
   @Input({ required: true }) questao!: Questao;
+
+  notaVisivel(nota?: string | null): boolean {
+    return !!nota && !/dados\s+(hipot[eé]tic|fict[ií]ci)/i.test(nota);
+  }
 }

@@ -17,19 +17,17 @@ export class SomService {
 
   alternar(ligado = !this.ligado) {
     this.estado.next(ligado);
-    try { localStorage.setItem(CHAVE, ligado ? '1' : '0'); } catch { /* sem armazenamento */ }
+    try { localStorage.setItem(CHAVE, ligado ? '1' : '0'); } catch {}
   }
 
-  /** Para sons em arquivo (tambores, XP): só toca com os sons ligados. */
   tocarAudio(audio: HTMLAudioElement, inicio = 0) {
     if (!this.ligado) return;
     try {
       audio.currentTime = inicio;
       audio.play().catch(() => {});
-    } catch { /* navegador sem suporte */ }
+    } catch {}
   }
 
-  /** Risco curto de caneta marcando a bolha. */
   caneta() {
     this.tocar((c, t, saida) => {
       for (let i = 0; i < 3; i++) {
@@ -43,7 +41,6 @@ export class SomService {
     });
   }
 
-  /** Encaixe de uma peça nova no campus. */
   pop() {
     this.tocar((c, t, saida) => {
       const o = c.createOscillator();
@@ -59,14 +56,12 @@ export class SomService {
     });
   }
 
-  /** Terreno novo liberado: acorde curto e brilhante. */
   terreno() {
     this.tocar((c, t, saida) => {
       [659.25, 830.61, 987.77, 1318.5].forEach((hz, i) => this.nota(c, t + i * 0.07, hz, 0.55, 0.35, 'triangle', saida));
     });
   }
 
-  /** Uma nota por bolinha do resumo do dia; acerto brilha, erro sai abafado. */
   bolinha(indice: number, acertou: boolean) {
     this.tocar((c, t, saida) => {
       const hz = ESCALA[Math.max(0, Math.min(indice, ESCALA.length - 1))];
@@ -79,7 +74,6 @@ export class SomService {
     });
   }
 
-  /** Bônus de sequência: chama subindo. */
   fogo() {
     this.tocar((c, t, saida) => {
       const f = c.createBiquadFilter();
@@ -91,7 +85,6 @@ export class SomService {
     });
   }
 
-  /** Convite de duelo: espadas se cruzando. */
   espadas() {
     this.tocar((c, t, saida) => {
       const f = c.createBiquadFilter();
@@ -112,7 +105,7 @@ export class SomService {
     const c = this.contexto();
     if (!c || !this.mestre) return;
     if (c.state === 'suspended') c.resume().catch(() => {});
-    try { desenhar(c, c.currentTime + 0.01, this.mestre); } catch { /* ignora falhas de áudio */ }
+    try { desenhar(c, c.currentTime + 0.01, this.mestre); } catch {}
   }
 
   private contexto(): AudioContext | null {

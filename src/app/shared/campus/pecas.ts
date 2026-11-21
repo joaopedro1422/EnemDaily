@@ -137,7 +137,6 @@ function paineisSolares(b: Predio, n: number, P: Paleta): string {
   return o;
 }
 
-// Placa de madeira presa entre os postes do portal: fica no mesmo plano do portal e o texto acompanha a inclinação da vista.
 function placaNoPortal(xc: number, Y: number, P: Paleta): string {
   const z0 = .7, z1 = 1.24, meio = 1.5;
   const c = iso(xc, Y, (z0 + z1) / 2);
@@ -146,10 +145,8 @@ function placaNoPortal(xc: number, Y: number, P: Paleta): string {
     `<text transform="translate(${f1(c[0])} ${f1(c[1])}) skewY(30)" y="2.6" text-anchor="middle" font-family="Schibsted Grotesk, Arial, sans-serif" font-size="7.4" font-weight="800" fill="${shade(P.madeira, .38)}" letter-spacing=".2">Universidade</text>`;
 }
 
-/** Peças da Universidade que aparecem no começo: terreno, lote da reitoria, reitoria em obras, caminhos de terra, fonte e portão. */
 export const BASE_GERAL = 6;
 
-// Dia ativo em que cada peça da Reitoria aparece; as demais seguem a ordem natural da trilha.
 const DIAS_FIXOS: [number, string][] = [
   [0, 'Terreno da Universidade'], [0, 'Terreno da reitoria'], [0, 'Reitoria · em obras'], [0, 'Primeiros caminhos'], [0, 'Fonte simples'], [0, 'Portão simples'],
   [3, 'Reitoria · 1º andar'], [7, 'Reitoria · entrada'], [16, 'Reitoria · 2º andar'], [17, 'Reitoria · 3º andar'],
@@ -183,7 +180,6 @@ function reitoriaEmObras(b: Predio, P: Paleta): string {
 }
 
 function pessoas(P: Paleta, lista: [number, number, Trilha | 'caneta', number?, [number, number, number, number?]?][]): string {
-  // quem está em grupo sempre caminha: se o trajeto não foi definido, ganha uma volta curta automática
   return lista.map(([x, y, c, v, anda], i) => {
     const k = (Math.round(x * 7 + y * 3) + i) % 4;
     const auto: [number, number, number, number] = [k % 2 ? 1.6 : 0, k % 2 ? 0 : 1.6, 5 + (k % 3), (x + y) % 4];
@@ -201,7 +197,6 @@ function arvoreMata(x: number, y: number, P: Paleta, s: number, v: number): stri
   return o + `<circle cx="${f1(c[0] - r * .38)}" cy="${f1(c[1] - r * .48)}" r="${f1(r * .34)}" fill="${P.arvoreLuz}" opacity=".85"/>`;
 }
 
-// pontos com sorteio fixo para plantar a mata, deixando livre a trilha que corta o lote em y≈13
 function pontosMata(x0: number, x1: number, y0: number, y1: number, passo: number, semente: number): [number, number, number][] {
   const h = (i: number) => { const t = Math.sin(i * 12.9898 + semente * 78.233) * 43758.5453; return t - Math.floor(t); };
   const out: [number, number, number][] = [];
@@ -284,9 +279,6 @@ function tabela(x: number, y: number, P: Paleta): string {
   return box(x - .04, y - .04, 0, .08, .08, 1.5, P.ferro) + faceX(x + .06, y - .38, y + .38, 1.3, 1.85, P.branco, ` stroke="${P.ferro}" stroke-width=".6"`);
 }
 
-// ---------------------------------------------------------------------------------------------
-// Melhorias gerais (sobem a cada dia ativo)
-// ---------------------------------------------------------------------------------------------
 function trilhaGeral(): Peca[] {
   const { lista, add } = criarTrilha('geral');
   const RC: Predio = { x: 10.7, y: 6.3, w: 4.6, d: 3, z0: .25, h: 1.3 };
@@ -421,9 +413,6 @@ function trilhaGeral(): Peca[] {
   return comDiasFixos(lista);
 }
 
-// ---------------------------------------------------------------------------------------------
-// Linguagens: fundo do campus
-// ---------------------------------------------------------------------------------------------
 function trilhaLinguagens(): Peca[] {
   const { lista, add } = criarTrilha('linguagens');
   const BI: Predio = { x: 5.5, y: 5.6, w: 3.0, d: 2.6, z0: .25, h: 1.6 };
@@ -506,9 +495,6 @@ function trilhaLinguagens(): Peca[] {
   return lista;
 }
 
-// ---------------------------------------------------------------------------------------------
-// Humanas: lado esquerdo
-// ---------------------------------------------------------------------------------------------
 function trilhaHumanas(): Peca[] {
   const { lista, add } = criarTrilha('humanas');
   const MU: Predio = { x: 5.6, y: 16.6, w: 3.2, d: 2.8, z0: .4, h: 1.8 };
@@ -596,9 +582,6 @@ function trilhaHumanas(): Peca[] {
   return lista;
 }
 
-// ---------------------------------------------------------------------------------------------
-// Naturezas: frente do campus
-// ---------------------------------------------------------------------------------------------
 function trilhaNaturezas(): Peca[] {
   const { lista, add } = criarTrilha('naturezas');
   const GH = { x: 16.6, y: 16.8, w: 3.0, d: 2.0 };
@@ -695,9 +678,6 @@ function trilhaNaturezas(): Peca[] {
   return lista;
 }
 
-// ---------------------------------------------------------------------------------------------
-// Matemática: lado direito
-// ---------------------------------------------------------------------------------------------
 function trilhaExatas(): Peca[] {
   const { lista, add } = criarTrilha('exatas');
   const EX: Predio = { x: 21.2, y: 5.2, w: 2.5, d: 3.3, z0: .25, h: 1.3 };
@@ -773,7 +753,6 @@ function trilhaExatas(): Peca[] {
   add('Portão do labirinto', 24.1, 3.4, P => box(23.8, 3.25, 0, .14, .25, 1.0, P.mt) + box(24.26, 3.25, 0, .14, .25, 1.0, P.mt) + box(23.76, 3.23, 1.0, .68, .3, .12, P.mt), { anim: 'cresce' });
   add('Telescópio solar', 16.35, 4.7, P => { const g = iso(16.35, 4.7, 0), t = iso(16.35, 4.7, .6); return `<path d="M${f1(g[0] - 3)},${f1(g[1])} L${f1(t[0])},${f1(t[1])} L${f1(g[0] + 3)},${f1(g[1])}" stroke="${P.ferro}" stroke-width="1.2" fill="none"/><rect x="${f1(t[0] - 2.2)}" y="${f1(t[1] - 11)}" width="4.4" height="12" rx="1.6" fill="${P.branco}" stroke="${P.mt}" stroke-width="1" transform="rotate(35 ${f1(t[0])} ${f1(t[1])})"/>`; }, {});
   add('Monumento ao infinito', 25.5, 6.6, P => { const c = iso(25.5, 6.6, 1.3); return box(25.1, 6.2, 0, .8, .8, .5, P.concreto) + `<path d="M${f1(c[0])},${f1(c[1])} c-6,-8 -16,-8 -16,0 c0,8 10,8 16,0 c6,-8 16,-8 16,0 c0,8 -10,8 -16,0 z" fill="none" stroke="${P.mt}" stroke-width="3.2"/>`; }, { anim: 'cresce' });
-  // prédios do fundo (coordenadas antes do deslocamento para perto da trilha)
   const IM: Predio = { x: 16.4, y: -2.2, w: 4.2, d: 2.1, z0: .25, h: 1.3 };
   const CC: Predio = { x: 21.0, y: -2.2, w: 3.4, d: 2.0, z0: .25, h: 1.25 };
   add('Instituto de Matemática · fundação', 18.5, -1.15, P => fundacao(IM, P), { chave: k(IM), anim: 'cresce' });
@@ -798,7 +777,6 @@ function trilhaExatas(): Peca[] {
   return lista;
 }
 
-/** Portão de madeira do começo; fica sempre na borda da frente do campus. */
 export function portaoSimples(y: number, P: Paleta): string {
   const c = iso(13, y + .05, .95);
   return box(12.2, y, 0, .12, .12, 1.05, P.tronco) + box(13.68, y, 0, .12, .12, 1.05, P.tronco) + linha3([[12.26, y + .06, 1.0], [13.74, y + .06, 1.0]], P.tronco, 2) +
@@ -806,8 +784,6 @@ export function portaoSimples(y: number, P: Paleta): string {
     `<circle cx="${f1(c[0])}" cy="${f1(c[1])}" r="2.4" fill="${P.lc}"/>`;
 }
 
-// Cada área entrega o prédio principal logo no começo: 1º acerto = terreno + fundação,
-// 2º = o prédio em obras, 3º = o primeiro andar de verdade (que substitui a obra). Depois segue a trilha normal.
 function obraDePredio(b: Predio, P: Paleta, cor: string): string {
   const z = b.z0, X = b.x + b.w, Y = b.y + b.d, tijolo = P.noite ? '#7A5A4A' : '#C98B6B';
   let o = box(b.x, b.y, z, b.w, .14, .95, tijolo) + box(b.x, b.y, z, .14, b.d, .7, tijolo);
@@ -822,9 +798,7 @@ function obraDePredio(b: Predio, P: Paleta, cor: string): string {
   return o + `<path d="M${f1(c[0])},${f1(c[1])} L${f1(g[0] - 4.5)},${f1(g[1])} L${f1(g[0] + 4.5)},${f1(g[1])} Z" fill="#F28C28"/><path d="M${f1(c[0] - 2.2)},${f1(c[1] + 5)} L${f1(c[0] + 2.2)},${f1(c[1] + 5)}" stroke="#FFFFFF" stroke-width="1.5"/>`;
 }
 
-/** Matemática fica 2,4 mais perto da trilha da frente: todas as peças descem juntas no eixo y. */
 export const DY_EXATAS = 2.4;
-/** Linguagens também desce 2,4 para encostar no caminho oeste. */
 export const DY_LETRAS = 2.4;
 function deslocarY(lista: Peca[], dy: number): Peca[] {
   const a = iso(0, 0, 0), b = iso(0, dy, 0), t = `translate(${f1(b[0] - a[0])} ${f1(b[1] - a[1])})`;

@@ -1,4 +1,3 @@
-/* Carregando: o símbolo "O dia em 4" se pinta bolinha por bolinha e tomba para recomeçar */
 .ed-carregando { --tam: 48px; --anel: var(--ed-caneta, #2836C6); --c1: var(--ed-lc, #C7455A); --c2: var(--ed-ch, #12A5E1); --c3: var(--ed-cn, #36B37D); --c4: var(--ed-mt, #D08C21); --ciclo: 2.6s;
   display: inline-grid; justify-items: center; gap: 12px; color: var(--ed-tinta-3, #626A80); font: 600 14px var(--ed-fonte, 'Schibsted Grotesk', Arial, sans-serif); }
 .ed-carregando svg { width: var(--tam); height: var(--tam); display: block; overflow: visible; }
@@ -30,6 +29,5 @@
   .ed-carregando .p { animation-duration: 5s; }
 }
 
-/* tela de abertura, antes do app carregar */
 .ed-abertura { position: fixed; inset: 0; display: grid; place-items: center; background: var(--ed-papel, #F3F5F9); }
 .ed-abertura .ed-carregando { --tam: 64px; }

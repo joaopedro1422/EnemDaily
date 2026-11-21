@@ -13,10 +13,6 @@ import { ResolucaoComponent } from '../../shared/questao/resolucao.component';
 
 type Fase = 'carregando' | 'prova' | 'corrigindo' | 'resultado' | 'vazia';
 
-/**
- * Questão de exemplo para quem ainda não tem conta: a mesma folha de prova e a mesma resolução do desafio,
- * com uma questão de um dia anterior. A resposta fica só na tela: nada é enviado nem salvo.
- */
 @Component({
   selector: 'ld-questao-exemplo',
   standalone: true,
@@ -34,7 +30,6 @@ export class QuestaoExemploComponent implements OnInit, OnDestroy {
   private sanitizer = inject(DomSanitizer);
   obra: { svg: SafeHtml; nome: string; regiao: string; cor: string; total: number; noite: boolean; construindo: boolean; svgObra: SafeHtml } | null = null;
 
-  /** Mock fixo por área: um campus avançado (~300 peças, com área de lazer) ganhando um andar de prédio. */
   private montarObra() {
     const dias = 90;
     const t = this.area;

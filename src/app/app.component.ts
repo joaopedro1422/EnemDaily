@@ -22,7 +22,6 @@ export class AppComponent {
   public pwa = inject(PwaService);
 
   constructor() {
-    // a abertura fica até a primeira tela estar pronta; no app instalado ela completa a animação
     inject(Router).events.pipe(filter(e => e instanceof NavigationEnd), take(1)).subscribe(() => {
       const w = window as any, limite = Date.now() + 4000;
       const esperar = () => {

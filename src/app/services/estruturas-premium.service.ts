@@ -13,7 +13,6 @@ export interface ContagemEstudos { acertos: number; simulados: number; redacoes:
 export const acertosTotais = (u: Usuario | null | undefined) =>
   (u?.linguagens?.acertos ?? 0) + (u?.humanas?.acertos ?? 0) + (u?.naturezas?.acertos ?? 0) + (u?.exatas?.acertos ?? 0);
 
-/** Junta o que libera os marcos do campus: total de acertos, simulados e redações registrados. */
 @Injectable({ providedIn: 'root' })
 export class EstruturasPremiumService {
   private estado = new BehaviorSubject<ContagemEstudos>({ acertos: 0, simulados: 0, redacoes: 0, maiorSequencia: 0, diasAtivos: 0, xp: 0, carregado: false });

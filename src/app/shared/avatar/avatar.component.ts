@@ -11,15 +11,11 @@ import { ConfigAvatar, gravarAvatar, lerAvatar, svgDoAvatar } from './avatar';
   styles: [`:host{display:inline-flex;flex:none;line-height:0}:host(.encher){width:100%;height:100%}.ed-av{display:block;border-radius:50%}.ed-av ::ng-deep svg{width:100%;height:100%;display:block}`]
 })
 export class AvatarComponent implements OnChanges {
-  /** Valor salvo no backend (ed1|...) ou um avatar antigo. */
   @Input() valor: string | null | undefined = '';
-  /** Configuração direta, usada nas prévias do editor. */
   @Input() config: ConfigAvatar | null = null;
   @Input() nome = '';
   @Input() tamanho = 40;
-  /** O selo do curso só aparece a partir deste tamanho. */
   @Input() seloDesde = 64;
-  /** Ocupa 100% do contêiner (o tamanho só decide se o selo aparece). */
   @Input() encher = false;
 
   svg: SafeHtml = '';

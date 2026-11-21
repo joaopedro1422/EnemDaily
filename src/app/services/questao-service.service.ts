@@ -26,7 +26,6 @@ export class QuestaoServiceService {
     return this.http.get<Revisao>(`${this.apiUrlQuestoes}/${area}/revisao`, { headers });
   }
 
-  /** Questão de exemplo para visitantes (de um dia anterior). Pública e sem registro de resposta. */
   getQuestaoExemplo(area: string): Observable<Questao | null> {
     return this.http.get<Questao | null>(`${this.apiUrlQuestoes}/exemplo/${area}`);
   }

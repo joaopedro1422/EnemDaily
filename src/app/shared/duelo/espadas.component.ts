@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 
-/** Duas espadas que entram pelos lados, se cruzam com faísca e ficam flutuando. */
 @Component({
   selector: 'ed-espadas',
   standalone: true,

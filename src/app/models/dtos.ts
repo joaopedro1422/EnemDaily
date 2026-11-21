@@ -16,7 +16,6 @@ export interface RegisterRequest {
 
 export interface RespostaRequest {
   area: string;
-  /** Índice da alternativa marcada; null quando o tempo acabou. */
   alternativa: number | null;
   tempoGasto: number;
 }

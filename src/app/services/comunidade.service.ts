@@ -17,7 +17,6 @@ export class ComunidadeService {
 
   get notificacoes(): Notificacoes | null { return this.notif.value; }
 
-  /** Mensagem amigável vinda do backend (regras de duelo e amizade). */
   erro(e: unknown, padrao = 'Não foi possível concluir agora. Tente de novo.'): string {
     const r = e as HttpErrorResponse;
     return (r?.error && typeof r.error === 'object' && r.error.mensagem) || padrao;
@@ -27,7 +26,6 @@ export class ComunidadeService {
   private pendente = false;
   private ultimaBusca = 0;
 
-  /** Busca as notificações sem repetir pedidos: ignora chamadas em sequência (menos de 5 s) e junta as que chegam durante uma busca. */
   atualizarNotificacoes(forcar = false): void {
     if (!localStorage.getItem('tokenUser')) return;
     if (this.emVoo) { this.pendente = this.pendente || forcar; return; }
@@ -49,7 +47,6 @@ export class ComunidadeService {
 
   limparNotificacoes() { this.notif.next(null); }
 
-  // ---------- pessoas
   buscar(q: string): Observable<UsuarioComunidade[]> {
     return this.http.get<UsuarioComunidade[]>(`${this.api}/comunidade/buscar`, { headers: this.headers, params: { q } });
   }
@@ -63,7 +60,6 @@ export class ComunidadeService {
     return this.http.get<Solicitacoes>(`${this.api}/comunidade/solicitacoes`, { headers: this.headers });
   }
 
-  // ---------- amizade
   solicitarAmizade(usuario: string): Observable<{ relacao: Relacao }> {
     return this.http.post<{ relacao: Relacao }>(`${this.api}/comunidade/amizades/${encodeURIComponent(usuario)}`, {}, { headers: this.headers })
       .pipe(tap(() => this.atualizarNotificacoes(true)));
@@ -87,7 +83,6 @@ export class ComunidadeService {
     return this.http.put<Privacidade>(`${this.api}/comunidade/privacidade`, p, { headers: this.headers });
   }
 
-  // ---------- duelos
   duelos(): Observable<Duelos> {
     return this.http.get<Duelos>(`${this.api}/duelos`, { headers: this.headers });
   }
@@ -111,7 +106,6 @@ export class ComunidadeService {
   }
 }
 
-/** "hoje", "amanhã" ou "quinta, 21 de nov." a partir de uma data ISO (yyyy-mm-dd). */
 export function nomeDoDia(iso: string, curto = false): string {
   const [a, m, d] = iso.split('-').map(Number);
   const dia = new Date(a, m - 1, d), hoje = new Date();

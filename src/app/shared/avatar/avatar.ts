@@ -1,10 +1,5 @@
 import { AVATARES_MOCK } from '../../models/mockAvatares';
 
-/**
- * Avatar do enem.daily: monograma (iniciais) sobre cor e motivo, com moldura de conquista,
- * selo do curso dos sonhos e foto opcional (no Firebase Storage). No backend fica só a referência,
- * num texto curto: ed1|tinta|motivo|moldura|selo|caminhoDaFoto|tokenDaFoto
- */
 
 export const BUCKET = 'enemdaily.firebasestorage.app';
 
@@ -64,7 +59,6 @@ export interface ConfigAvatar { tinta: string; motivo: Motivo; moldura: Moldura;
 
 function hash(s: string): number { let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return Math.abs(h); }
 
-/** Configuração padrão para quem ainda não escolheu: cor sorteada de forma fixa a partir do nome. */
 export function avatarPadrao(nome: string): ConfigAvatar {
   const t = Object.keys(TINTAS);
   return { tinta: t[hash(nome || '?') % t.length], motivo: 'liso', moldura: 'nenhuma', selo: '', fotoCaminho: '', fotoToken: '' };
@@ -92,7 +86,6 @@ export function urlDaFoto(c: ConfigAvatar): string | null {
   return `https://firebasestorage.googleapis.com/v0/b/${BUCKET}/o/${encodeURIComponent(c.fotoCaminho)}?alt=media${c.fotoToken ? '&token=' + c.fotoToken : ''}`;
 }
 
-/** Quem tinha comprado um avatar antigo com XP ganha um motivo especial no lugar. */
 export function motivoHerdado(valor: string | null | undefined): Motivo | null {
   const antigo = AVATARES_MOCK.find(a => a.url === valor);
   return antigo && (antigo.custo ?? 0) > 0 ? 'arcos' : null;
@@ -110,7 +103,6 @@ function tom(h: string, f: number) { const [r, g, b] = rgb(h); return f >= 1 ? h
 
 let uid = 0;
 
-/** SVG completo do avatar. Com foto, a foto ocupa o círculo e moldura e selo ficam por cima. */
 export function svgDoAvatar(c: ConfigAvatar, nome: string, comSelo = true): string {
   const id = 'av' + (uid++).toString(36), base = TINTAS[c.tinta]?.cor ?? TINTAS['caneta'].cor, txt = iniciais(nome), foto = urlDaFoto(c);
   const claro = tom(base, 1.09), escuro = tom(base, .88);
@@ -163,7 +155,6 @@ export function svgDoAvatar(c: ConfigAvatar, nome: string, comSelo = true): stri
   return `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Avatar de ${txt}"><defs>${defs.join('')}</defs><g clip-path="url(#${id}c)">${conteudo}</g>${aro}${selo}</svg>`;
 }
 
-/** Desbloqueios: XP para motivos, sequência e acertos para molduras. */
 export function motivoLiberado(m: Motivo, xp: number, herdado: Motivo | null): boolean {
   const info = MOTIVOS.find(x => x.chave === m)!;
   return info.xp <= xp || herdado === m;

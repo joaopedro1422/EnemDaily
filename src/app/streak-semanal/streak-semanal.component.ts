@@ -19,7 +19,6 @@ export class StreakSemanalComponent implements OnChanges{
     if (!this.semana) return;
 
     const hoje = new Date().getDay(); 
-    // 0 = domingo, 1 = segunda, ...
 
     
   }

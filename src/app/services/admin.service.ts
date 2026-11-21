@@ -41,7 +41,7 @@ export class AdminService {
     try { return localStorage.getItem('edAdminChave') ?? ''; } catch { return ''; }
   }
   set chave(v: string) {
-    try { v ? localStorage.setItem('edAdminChave', v) : localStorage.removeItem('edAdminChave'); } catch { /* sem armazenamento */ }
+    try { v ? localStorage.setItem('edAdminChave', v) : localStorage.removeItem('edAdminChave'); } catch {}
   }
 
   private get headers(): HttpHeaders {

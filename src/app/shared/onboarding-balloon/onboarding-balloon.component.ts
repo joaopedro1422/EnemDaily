@@ -24,7 +24,7 @@ export class OnboardingBalloonComponent implements OnInit{
   displayedText = '';
   charIndex = 0;
 
-  typingSpeed = 35; // ms por letra
+  typingSpeed = 35;
   typingTimeout: any;
 
   ngOnInit(): void {
@@ -60,7 +60,6 @@ export class OnboardingBalloonComponent implements OnInit{
   }
 
   next(): void {
-    // Se ainda estiver digitando, completa instantaneamente
     if (this.charIndex < this.fullText.length) {
       this.clearTyping();
       this.displayedText = this.fullText;

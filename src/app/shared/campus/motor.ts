@@ -229,7 +229,6 @@ export function pessoa(x: number, y: number, P: Paleta, cor: string, v = 0, anda
   const pele = P.pele[v % P.pele.length], cabelo = P.cabelo[(v + 1) % P.cabelo.length];
   const corpo = `<ellipse cx="0" cy="0" rx="3.6" ry="1.6" fill="${P.sombra}"/><rect x="-1.9" y="-4.4" width="3.8" height="4.6" rx="1.2" fill="${P.calca}"/><rect x="-2.7" y="-11.2" width="5.4" height="7.8" rx="2.5" fill="${cor}"/><circle cx="0" cy="-13.7" r="2.6" fill="${pele}"/><path d="M-2.7,-13.5 a2.7,2.7 0 0 1 5.4,0 l-.6,-.5 q-2.1,-.9 -4.2,0 z" fill="${cabelo}"/>`;
   if (anda) {
-    // percurso em volta (ida por um lado, volta pelo outro), em vez de só ir e voltar na mesma reta
     const [dx, dy, dur, atraso = 0] = anda;
     const lado = (v % 2 ? -1 : 1) * Math.min(1.3, Math.max(.8, Math.hypot(dx, dy) * .5));
     const px = Math.abs(dx) >= Math.abs(dy) ? 0 : lado, py = Math.abs(dx) >= Math.abs(dy) ? lado : 0;
@@ -274,7 +273,6 @@ export function canteiro(x: number, y: number, w: number, d: number, P: Paleta, 
   return o;
 }
 
-// Placas ficam no plano do terreno (face Y), como a placa do portal: o texto acompanha o ângulo do mapa.
 export function textoNoPlano(x: number, y: number, z: number, texto: string, cor: string, tam: number): string {
   const c = iso(x, y, z);
   return `<text transform="translate(${f1(c[0])} ${f1(c[1])}) skewY(30)" y="${f1(tam * .36)}" text-anchor="middle" font-family="Schibsted Grotesk, Arial, sans-serif" font-size="${tam}" font-weight="800" fill="${cor}" letter-spacing="-.1">${texto}</text>`;

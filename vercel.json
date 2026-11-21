@@ -3,5 +3,11 @@
   "outputDirectory": "dist/enem-daily/browser",
   "rewrites": [
     { "source": "/((?!.*\\.).*)", "destination": "/index.html" }
+  ],
+  "headers": [
+    {
+      "source": "/(ngsw-worker.js|ngsw.json|index.html)",
+      "headers": [{ "key": "Cache-Control", "value": "no-cache" }]
+    }
   ]
 }

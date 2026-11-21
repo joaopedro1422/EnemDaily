@@ -21,7 +21,6 @@ animation: enemFade 1.4s cubic-bezier(0.22, 1, 0.36, 1);
   backdrop-filter: blur(2px);
   z-index: 1000;
 }
-/* BALÃO */
 .balloon {
   background: linear-gradient(180deg, #fbfcff, #dae2ff);
   border: 1px solid rgba(99, 102, 241, 0.35);
@@ -32,7 +31,6 @@ animation: enemFade 1.4s cubic-bezier(0.22, 1, 0.36, 1);
   box-shadow: 0 20px 60px rgba(0,0,0,0.6);
 }
 
-/* TEXTO */
 .text {
   font-size: 14px;
   line-height: 1.5;
@@ -40,14 +38,12 @@ animation: enemFade 1.4s cubic-bezier(0.22, 1, 0.36, 1);
   white-space: pre-line;
 }
 
-/* CURSOR */
 .cursor {
   display: inline-block;
   margin-left: 2px;
   animation: blink 1s step-start infinite;
 }
 
-/* BOTÃO */
 .next-btn {
   margin-top: 14px;
   width: 100%;
@@ -64,7 +60,6 @@ animation: enemFade 1.4s cubic-bezier(0.22, 1, 0.36, 1);
   border: 2px solid #5663da;
   color: #4f5cd1
 }
-/* SETA */
 .arrow {
   margin: 0 auto;
   width: 0;
@@ -76,7 +71,6 @@ animation: enemFade 1.4s cubic-bezier(0.22, 1, 0.36, 1);
   border-left: 14px solid #e4e9fc;
 }
 
-/* CURSOR BLINK */
 @keyframes blink {
   50% { opacity: 0 }
 }

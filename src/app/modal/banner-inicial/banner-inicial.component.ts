@@ -15,7 +15,7 @@ export class BannerInicialComponent {
     this.isClosing = true;
 
     setTimeout(() => {
-      this.close.emit(); // avisa a Home para remover
-    }, 500); // TEMPO DA ANIMAÇÃO
+      this.close.emit();
+    }, 500);
   }
 }

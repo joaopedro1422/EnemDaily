@@ -1,19 +1,7 @@
-/**
- * A arte (HTML/CSS) vira PNG no navegador com o html-to-image (import dinâmico: só carrega ao baixar ou compartilhar).
- * As fontes do Google entram embutidas na imagem (sem elas a imagem sai com a fonte padrão do aparelho): os @font-face
- * vêm do CSS da página e os arquivos .woff2 viram data URLs (só os subconjuntos latinos das famílias que a arte usa).
- * As fotos já chegam em data URL (PostsService.imagem), então nada depende de CORS na hora de desenhar.
- *
- * O CSS das fontes muda de lugar conforme o build: no `npm start` é o <link> do index.html; no build de produção o
- * Angular troca o link por um <style> com o CSS já baixado e SEM os comentários que marcam o subconjunto (latin,
- * latin-ext...). Por isso os blocos são lidos dos dois lugares e o subconjunto é reconhecido pelo unicode-range.
- * Família que não aparecer em nenhum dos dois é buscada direto no Google Fonts.
- */
 
 const cssBaixado = new Map<string, Promise<string>>();
 const arquivosDeFonte = new Map<string, Promise<string>>();
 
-/** "'Playfair Display', serif" -> "Playfair Display" */
 export function nomeDaFamilia(fonteCss: string): string {
   return fonteCss.split(',')[0].replace(/['"]/g, '').trim();
 }
@@ -41,14 +29,12 @@ function arquivoComoDataUrl(url: string): Promise<string> {
             leitor.readAsDataURL(blob);
           }),
       );
-    // falhou: tenta de novo na próxima exportação
     pedido.catch(() => arquivosDeFonte.delete(url));
     arquivosDeFonte.set(url, pedido);
   }
   return arquivosDeFonte.get(url)!;
 }
 
-/** Todo o CSS de fontes do Google que a página tem: os <link> (desenvolvimento) e os <style> inline (produção). */
 async function cssDaPagina(): Promise<string> {
   const links = [...document.querySelectorAll<HTMLLinkElement>('link[href*="fonts.googleapis.com/css"]')].map((link) => link.href);
   const inline = [...document.querySelectorAll('style')]
@@ -61,7 +47,6 @@ function familiaDoBloco(bloco: string): string | undefined {
   return /font-family:\s*['"]?([^;'"]+)/.exec(bloco)?.[1]?.trim();
 }
 
-/** latin (U+0000-00FF...) e latin-ext (U+0100-02BA...); bloco sem unicode-range = o arquivo inteiro. */
 function ehLatino(bloco: string): boolean {
   const faixa = /unicode-range:\s*([^;}]+)/.exec(bloco)?.[1];
   return !faixa || /U\+0000-00FF/i.test(faixa) || /^\s*U\+0100-/i.test(faixa);
@@ -73,14 +58,12 @@ function blocosLatinos(css: string, familias: string[]): string[] {
     .filter((bloco) => familias.includes(familiaDoBloco(bloco) ?? '') && ehLatino(bloco));
 }
 
-/** A família direto do Google Fonts (com os pesos usados nas artes; a que só tem um peso vem sem eles). */
 async function cssDoGoogle(familia: string): Promise<string> {
   const nome = encodeURIComponent(familia).replace(/%20/g, '+');
   const comPesos = await baixarCss(`https://fonts.googleapis.com/css2?family=${nome}:wght@400;500;600;700&display=swap`);
   return comPesos || baixarCss(`https://fonts.googleapis.com/css2?family=${nome}&display=swap`);
 }
 
-/** O @font-face (com os arquivos embutidos) das famílias usadas na arte. */
 async function cssDasFontes(familias: string[]): Promise<string> {
   const blocos = blocosLatinos(await cssDaPagina(), familias);
   const faltando = familias.filter((familia) => !blocos.some((bloco) => familiaDoBloco(bloco) === familia));
@@ -98,7 +81,6 @@ async function cssDasFontes(familias: string[]): Promise<string> {
   return embutidos.join('\n');
 }
 
-/** A arte em PNG, no tamanho real (1080 px de largura). */
 export async function gerarPng(elemento: HTMLElement, largura: number, altura: number, familias: string[]): Promise<Blob> {
   const [{ toSvg }, fontEmbedCSS] = await Promise.all([import('html-to-image'), cssDasFontes(familias)]);
   await document.fonts.ready;
@@ -107,10 +89,8 @@ export async function gerarPng(elemento: HTMLElement, largura: number, altura: n
     height: altura,
     pixelRatio: 1,
     fontEmbedCSS,
-    // a prévia está reduzida por transform: a imagem sai sem ela, no tamanho real
     style: { transform: 'none', left: '0', top: '0' },
   };
-  // a arte vira um SVG (com as fontes e fotos embutidas) e o SVG é desenhado num canvas do tamanho real
   const imagem = await carregarImagem(await toSvg(elemento, opcoes));
   const canvas = document.createElement('canvas');
   canvas.width = largura;
@@ -119,8 +99,6 @@ export async function gerarPng(elemento: HTMLElement, largura: number, altura: n
   if (!contexto) {
     throw new Error('Não foi possível gerar a imagem.');
   }
-  // o Safari (iPhone) carrega as fontes de dentro do SVG depois do "load": a mesma imagem é desenhada algumas vezes,
-  // com intervalo, e a última sai com as fontes (desenhar uma vez só pode sair com a fonte padrão do aparelho)
   for (let vez = 0; vez < DESENHOS; vez++) {
     contexto.clearRect(0, 0, largura, altura);
     contexto.drawImage(imagem, 0, 0, largura, altura);
@@ -163,7 +141,6 @@ export function baixarArquivo(blob: Blob, nome: string): void {
   setTimeout(() => URL.revokeObjectURL(url), 2000);
 }
 
-/** No celular, abre o compartilhamento do sistema (Instagram, WhatsApp...) com a imagem. false = não suportado. */
 export async function compartilharArquivo(blob: Blob, nome: string, texto: string): Promise<boolean> {
   const arquivo = new File([blob], nome, { type: 'image/png' });
   if (!navigator.canShare?.({ files: [arquivo] })) {
@@ -172,7 +149,6 @@ export async function compartilharArquivo(blob: Blob, nome: string, texto: strin
   try {
     await navigator.share({ files: [arquivo], text: texto });
   } catch (erro) {
-    // o usuário fechou o compartilhamento: não é erro
     if ((erro as DOMException)?.name !== 'AbortError') throw erro;
   }
   return true;

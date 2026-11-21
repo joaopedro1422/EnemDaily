@@ -1,8 +1,3 @@
-// Gera HTML pronto para o Google das páginas de conteúdo, mais sitemap.xml e robots.txt.
-// Roda depois do `ng build` (veja o script build:vercel). Variáveis:
-//   API_URL  endereço do backend (ex.: https://api.enemdaily.com.br)
-//   SITE_URL endereço público do site (ex.: https://enemdaily.com.br)
-// Se a API não responder, o build continua sem as páginas estáticas (o app funciona normalmente).
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { join } from 'node:path';
 

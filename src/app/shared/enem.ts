@@ -1,4 +1,3 @@
-// Datas do ENEM. Quando o Inep publicar o edital, atualize a data e marque `confirmada: true`.
 export interface EdicaoEnem { ano: number; dia1: string; dia2: string; confirmada: boolean; }
 
 export const EDICOES_ENEM: EdicaoEnem[] = [

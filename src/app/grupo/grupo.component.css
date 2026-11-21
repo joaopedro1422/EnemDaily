@@ -18,7 +18,6 @@
 .btn-link ed-icone { transition: transform var(--ed-t-rapido); }
 .btn-link ed-icone.virado { transform: rotate(180deg); }
 
-/* carregando */
 .sk { border-radius: 20px; background: var(--ed-folha); border: 1px solid var(--ed-pauta); animation: piscar 1.2s ease-in-out infinite; }
 .sk-hero { height: 220px; background: color-mix(in srgb, var(--ed-caneta) 70%, var(--noite)); border: 0; }
 .sk-card { height: 120px; }
@@ -28,7 +27,6 @@
 .nao-achou h1 { font-size: 22px; color: var(--ed-tinta); }
 .nao-achou .btn-pri { margin-top: 10px; }
 
-/* hero */
 .hero { position: relative; padding: 12px 14px 16px; border-radius: 22px; background: var(--ed-folha); border: 1px solid var(--ed-pauta); animation: ed-surgir 400ms var(--ed-curva) both; }
 .hero-barra { display: flex; justify-content: space-between; align-items: center; }
 .hero-acoes { display: flex; gap: 6px; }
@@ -54,7 +52,6 @@
 .ativ { order: 4; }
 .rodape { order: 5; }
 
-/* destaques */
 .dest { display: grid; gap: 10px; }
 .dest-cab { display: flex; align-items: center; justify-content: space-between; padding: 0 2px; }
 .dest-cab h2, .ativ-cab h2, .rank-cab h2 { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--ed-tinta-3); }
@@ -102,7 +99,6 @@
 .slide-vazio b { font-size: 18px; font-weight: 800; }
 .slide-vazio p { margin-top: 4px; font-size: 14px; color: rgba(255, 255, 255, .75); line-height: 1.45; }
 
-/* ranking */
 .rank { padding: 4px 0 0; display: grid; gap: 14px; align-content: start; }
 .rank-cab { display: grid; gap: 12px; }
 .abas { position: relative; display: grid; grid-template-columns: repeat(3, 1fr); padding: 4px; border-radius: 14px; background: var(--ed-fundo-2); }
@@ -142,7 +138,6 @@
 .nota { display: flex; align-items: flex-start; gap: 6px; padding-top: 4px; font-size: 12.5px; color: var(--ed-tinta-3); line-height: 1.4; }
 .nota ed-icone { margin-top: 1px; flex-shrink: 0; }
 
-/* atividade */
 .ativ { padding: 16px; border-radius: 22px; background: var(--ed-folha); border: 1px solid var(--ed-pauta); display: grid; gap: 10px; }
 .ativ-cab { display: flex; justify-content: space-between; align-items: center; }
 .ao-vivo { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: var(--ed-ok); }
@@ -157,7 +152,6 @@
 .ativ-lista time { font-size: 12.5px; color: var(--ed-tinta-3); white-space: nowrap; }
 .ativ-vazio { font-size: 14px; color: var(--ed-tinta-3); line-height: 1.45; }
 
-/* rodape */
 .rodape { display: grid; gap: 14px; padding: 4px 2px 0; }
 .rodape-areas { display: grid; gap: 8px; }
 .rodape-areas > span { font-size: 12px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--ed-tinta-3); }
@@ -167,14 +161,12 @@
 .btn-sair { display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 14px; border: 0; border-radius: 12px; background: transparent; color: var(--ed-erro); font: 700 14.5px var(--ed-fonte); cursor: pointer; }
 .btn-sair:hover { background: var(--ed-erro-suave); }
 
-/* selo podio */
 .selo-podio { position: fixed; z-index: 45; right: 16px; bottom: calc(18px + env(safe-area-inset-bottom)); display: inline-flex; align-items: center; gap: 10px; height: 52px; max-width: 260px; padding: 0 18px 0 6px; border: 0; border-radius: 999px; background: var(--noite); color: #FFFFFF; font: 800 14px var(--ed-fonte); cursor: pointer; box-shadow: 0 16px 32px -14px rgba(18, 26, 51, .7); overflow: hidden; animation: cair 500ms cubic-bezier(.2, 1.4, .5, 1) both; transition: max-width 500ms var(--ed-curva), padding 500ms var(--ed-curva); }
 .selo-ico { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; flex-shrink: 0; background: linear-gradient(140deg, #F2C94C, #C9971A); color: #3B2A00; }
 .selo-txt { white-space: nowrap; text-transform: capitalize; transition: opacity 300ms; }
 .selo-podio.recolhido { max-width: 52px; padding: 0 6px; }
 .selo-podio.recolhido .selo-txt { opacity: 0; }
 
-/* convite */
 .convite { min-height: calc(100svh - 64px); display: grid; place-items: center; padding: 20px 16px 40px; transition: opacity 500ms, transform 600ms var(--ed-curva); }
 .convite.saindo { opacity: 0; transform: scale(.96) translateY(-12px); }
 .convite-card { position: relative; isolation: isolate; overflow: hidden; width: 100%; max-width: 420px; display: grid; justify-items: center; gap: 12px; padding: 32px 22px 26px; border-radius: 28px; text-align: center; color: #FFFFFF; background: radial-gradient(120% 120% at 50% 0%, #3A49E0 0%, #2836C6 40%, #141B5A 100%); box-shadow: 0 30px 60px -30px rgba(24, 32, 110, .9); animation: ed-surgir 520ms var(--ed-curva) both; }
@@ -196,7 +188,6 @@
 @keyframes girar { to { transform: rotate(360deg); } }
 .convite-erro { font-size: 14px; font-weight: 700; color: #FFD3CF; }
 
-/* sair */
 .veu { position: fixed; inset: 0; z-index: 60; background: rgba(18, 26, 51, .45); animation: ed-surgir 200ms ease both; }
 .folha-sair { position: fixed; z-index: 61; left: 0; right: 0; bottom: 0; max-width: 480px; margin: 0 auto; padding: 22px 20px calc(20px + env(safe-area-inset-bottom)); background: var(--ed-folha); border-radius: 22px 22px 0 0; display: grid; gap: 8px; animation: subir-folha 280ms var(--ed-curva) both; }
 .folha-sair h2 { font-size: 20px; font-weight: 800; letter-spacing: -.02em; }

@@ -3,10 +3,6 @@ import { IconeComponent } from '../../shared/icone/icone.component';
 import { SimboloDiaComponent } from '../../shared/simbolo-dia/simbolo-dia.component';
 import { AvatarComponent } from '../../shared/avatar/avatar.component';
 
-/**
- * Celular com a barra do app (menu, marca, XP e avatar) e a tela rolável. A tela tem 360px de largura, como um
- * celular comum, e o aparelho inteiro é reduzido por escala. Com `paradas`, a tela rola sozinha enquanto aparece.
- */
 @Component({
   selector: 'ld-celular',
   standalone: true,
@@ -59,9 +55,7 @@ import { AvatarComponent } from '../../shared/avatar/avatar.component';
 export class CelularComponent implements AfterViewInit, OnDestroy {
   @Input() escala = 1;
   @Input() xp = '6.953';
-  /** Seletor (dentro da tela) onde ela começa. */
   @Input() rolar = '';
-  /** Seletores que a tela percorre sozinha, em loop, enquanto o celular está visível. */
   @Input() paradas: string[] = [];
   @ViewChild('rolagem', { static: true }) rolagem!: ElementRef<HTMLDivElement>;
 
@@ -97,7 +91,6 @@ export class CelularComponent implements AfterViewInit, OnDestroy {
     }, espera);
   }
 
-  /** Rola a tela até um elemento (usado pelas listas clicáveis ao lado do celular); para o passeio automático. */
   irPara(seletor: string) {
     this.tocou = true;
     this.rolagem.nativeElement.scrollTo({ top: this.posicao(seletor), behavior: 'smooth' });

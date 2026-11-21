@@ -3,7 +3,6 @@
 .ld h1, .ld h2, .ld h3 { margin: 0; }
 .ld p { margin: 0; }
 
-/* ---------- botões ---------- */
 .ld-ctas { display: flex; flex-wrap: wrap; gap: 10px; }
 .ld-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 54px; padding: 0 22px; border-radius: 15px; border: 0; font: 800 16px var(--ed-fonte); letter-spacing: -.01em; text-decoration: none; cursor: pointer; transition: background var(--ed-t-rapido), transform var(--ed-t-rapido), box-shadow var(--ed-t-rapido), border-color var(--ed-t-rapido); }
 .ld-btn:active { transform: scale(.98); }
@@ -23,7 +22,6 @@
 .ld-link:hover { text-decoration: underline; text-underline-offset: 3px; }
 .ld-erro { margin-top: 10px !important; padding: 10px 12px; border-radius: 12px; background: var(--ed-erro-suave); color: var(--ed-erro); font-size: 14px; font-weight: 600; }
 
-/* ---------- topo ---------- */
 .ld-hero { position: relative; max-width: var(--ed-largura); margin: 0 auto; padding: 18px 16px 40px; display: grid; gap: 28px; }
 .ld-hero::before { content: ''; position: absolute; inset: -80px -40vw 0; z-index: -1; background-image: radial-gradient(circle, color-mix(in srgb, var(--ed-caneta) 14%, transparent) 0 1.6px, transparent 2px); background-size: 22px 22px; -webkit-mask-image: radial-gradient(60% 60% at 70% 30%, #000, transparent); mask-image: radial-gradient(60% 60% at 70% 30%, #000, transparent); }
 .ld-hero-texto { display: grid; gap: 16px; align-content: start; animation: ld-sobe 600ms var(--ed-curva) both; }
@@ -44,7 +42,6 @@
 .ld-como-cta { display: flex; justify-content: center; margin-top: 28px; }
 .ld-como-cta .ld-btn { width: 100%; max-width: 340px; }
 
-/* cartão do desafio: mesmo HTML e CSS do painel */
 .desafio { background: var(--ed-folha); border: 1px solid var(--ed-pauta); border-radius: var(--ed-r-folha); overflow: hidden; }
 .ld-desafio { box-shadow: 0 30px 60px -36px rgba(24, 32, 110, .55), 0 2px 6px rgba(18, 26, 51, .05); animation: ld-sobe 700ms var(--ed-curva) 120ms both; }
 .desafio-capa { position: relative; isolation: isolate; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: center; padding: 22px 20px 24px; background: var(--ed-capa); color: #FFFFFF; }
@@ -75,7 +72,6 @@
 .desafio-rodape span { display: inline-flex; align-items: center; gap: 6px; }
 .desafio-rodape b { font-weight: 700; color: var(--ed-tinta-2); font-variant-numeric: tabular-nums; }
 
-/* ---------- seções ---------- */
 .ld-sec { max-width: var(--ed-largura); margin: 0 auto; padding: 56px 16px; display: grid; gap: 28px; }
 .ld-cab { display: grid; gap: 10px; max-width: 640px; }
 .ld-sobre { font-size: 12.5px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--ed-caneta-texto); }
@@ -124,7 +120,6 @@
 .ld-placar b { font-size: 30px; font-weight: 800; letter-spacing: -.03em; }
 .ld-placar span { opacity: .55; font-weight: 700; }
 
-/* ---------- campus ---------- */
 .ld-campus { position: relative; isolation: isolate; max-width: var(--ed-largura); margin: 0 auto; padding: 56px 16px; display: grid; gap: 24px; }
 .ld-campus-texto { display: grid; gap: 12px; align-content: center; }
 .ld-etapas { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
@@ -134,7 +129,6 @@
 .ld-campus-palco { position: relative; height: 340px; border-radius: 28px; overflow: hidden; background: linear-gradient(#CFE6FF, #EEF6FF); border: 1px solid var(--ed-pauta); }
 .ld-campus-palco ed-campus { position: absolute; inset: 0; }
 
-/* ---------- gestão de estudos ---------- */
 .ld-estudos { padding-top: 64px; }
 .ld-modulos { display: grid; gap: 16px; }
 .ld-modulo { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 18px; align-items: center; padding: 18px; border-radius: 28px; background: var(--ed-folha); border: 1px solid var(--ed-pauta); overflow: hidden; }
@@ -153,7 +147,6 @@
   .ld-saiba { width: 100%; }
 }
 
-/* ---------- final ---------- */
 .ld-final { position: relative; isolation: isolate; overflow: hidden; margin: 40px 16px 0; padding: 48px 22px; border-radius: 32px; display: grid; justify-items: center; gap: 14px; text-align: center; color: #FFFFFF; background: radial-gradient(120% 120% at 50% 0%, #3442D8 0%, #1C2590 55%, #0F1550 100%); }
 .ld-final::before { content: ''; position: absolute; inset: 0; z-index: -1; background-image: radial-gradient(rgba(255, 255, 255, .14) 1.2px, transparent 1.3px); background-size: 20px 20px; -webkit-mask-image: radial-gradient(circle at 50% 30%, #000, transparent 75%); mask-image: radial-gradient(circle at 50% 30%, #000, transparent 75%); }
 .ld-final-simbolo { width: 64px; height: 64px; }
@@ -171,7 +164,6 @@
 .ld-rodape a:hover { color: var(--ed-caneta-texto); }
 .ld-rodape small { font-size: 12.5px; }
 
-/* ---------- telas maiores ---------- */
 @media (min-width: 640px) {
   .ld-hero { padding: 28px 24px 56px; }
   .ld-sec, .ld-campus { padding: 72px 24px; }

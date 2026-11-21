@@ -62,7 +62,6 @@ constructor(private authService: AuthServiceService){}
   const animate = (now: number) => {
     const progress = Math.min((now - start) / duration, 1);
 
-    // easing moderno (easeOutCubic)
     const eased = 1 - Math.pow(1 - progress, 3);
 
     callback(Math.round(eased * target));

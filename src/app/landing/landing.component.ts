@@ -21,7 +21,6 @@ import { ExtrasCampus } from '../shared/campus/especiais';
 
 interface LinhaHero { info: InfoArea; assunto: string | null; }
 
-/** Página de entrada para quem não está logado: o desafio de hoje logo no topo, e o resto do produto abaixo. */
 @Component({
   selector: 'app-landing',
   standalone: true,
@@ -44,7 +43,6 @@ export class LandingComponent implements OnInit, OnDestroy {
   tempoRestante = '';
   exemplo: ChaveArea | null = null;
 
-  /** O campus da seção "cada acerto vira uma peça" cresce sozinho: cerca de 3 acertos por dia, todos os dias. */
   readonly etapasCampus: { rotulo: string; progresso: Progresso; extras: ExtrasCampus }[] = [
     this.etapa_('1º dia', [1, 1, 0, 1], 1),
     this.etapa_('4º dia', [3, 3, 3, 3], 4),
@@ -86,7 +84,6 @@ export class LandingComponent implements OnInit, OnDestroy {
     this.tempoRestante = `${p(Math.floor(s / 3600))}:${p(Math.floor((s % 3600) / 60))}:${p(s % 60)}`;
   }
 
-  /** Abre uma questão de exemplo (de um dia anterior) na área escolhida. Nada é registrado. */
   responder(area: ChaveArea = 'linguagens') {
     this.exemplo = area;
   }

@@ -1,4 +1,3 @@
-/* Gerado a partir de src/app/home-simulados/home-simulados.component.css (layout de celular). Se a tela real mudar, gere de novo. */
 :host { display: block; --d1: var(--ed-caneta); --d2: var(--ed-mt); }
 .sim { max-width: var(--ed-largura); margin: 0 auto; padding: 14px 16px 56px; display: grid; gap: 16px; color: var(--ed-tinta); font-family: var(--ed-fonte); }
 
@@ -37,7 +36,6 @@
 .vazio p { max-width: 46ch; font-size: 15px; line-height: 1.5; color: var(--ed-tinta-2); }
 .vazio .btn-pri { flex: none; margin-top: 8px; }
 
-/* kpis */
 .kpis { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
 .kpi { display: grid; gap: 4px; align-content: start; padding: 14px; border-radius: 18px; background: var(--ed-folha); border: 1px solid var(--ed-pauta); animation: ed-surgir 420ms var(--ed-curva) both; --p: var(--d1); }
 .kpi.d2 { --p: var(--d2); animation-delay: 80ms; }
@@ -60,7 +58,6 @@
 .delta.sobe { background: var(--ed-ok-suave); color: var(--ed-ok); }
 .delta.cai { background: var(--ed-erro-suave); color: var(--ed-erro); }
 
-/* cards */
 .grade { display: grid; gap: 16px; }
 .card { box-shadow: none; padding: 16px; border-radius: 22px; background: var(--ed-folha); border: 1px solid var(--ed-pauta); display: grid; gap: 12px; align-content: start; min-width: 0; animation: ed-surgir 460ms var(--ed-curva) 120ms both; }
 .card-cab { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
@@ -175,7 +172,6 @@ ed-icone.virado { transform: rotate(180deg); }
 .kpi-tri { justify-self: start; margin-top: 8px; display: inline-flex; align-items: baseline; gap: 6px; padding: 4px 10px; border-radius: 999px; background: rgba(255, 255, 255, .14); font-size: 12.5px; font-weight: 600; color: rgba(255, 255, 255, .85); }
 .kpi-tri b { font-size: 14px; font-weight: 800; color: #FFFFFF; }
 
-/* ajustes do mock: tudo dentro da tela do celular, sem botões flutuando fora dela */
 :host { display: block; }
 .fab { position: absolute; animation: none; }
 .dt { position: absolute; }

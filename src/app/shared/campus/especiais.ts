@@ -5,7 +5,6 @@ import {
 import { Peca, TRILHAS } from './pecas';
 import { miniaturaPraca } from './alimentacao';
 
-/** Dados de fora das trilhas que liberam marcos: total de acertos, simulados e redações registrados. */
 export interface ExtrasCampus { acertos?: number; simulados?: number; redacoes?: number; maiorSequencia?: number; diasAtivos?: number; xp?: number; }
 
 export type ChaveMarco = 'praca' | 'reitoria' | 'fonte' | 'portal' | 'campo' | 'quadras' | 'piscina' | 'hospital' | 'alimentacao';
@@ -52,7 +51,6 @@ const OURO_ESC = '#B5871A';
 const MARMORE = '#F3F0E8';
 const AREAS = (P: Paleta) => [P.lc, P.ch, P.cn, P.mt];
 
-// ---------------------------------------------------------------- upgrades de visual
 
 const RC: Predio = { x: 10.7, y: 6.3, w: 4.6, d: 3, z0: .25, h: 1.3 };
 
@@ -99,8 +97,6 @@ function aroOuro(P: Paleta): string {
   return o;
 }
 
-/** Portal Monumental (4.000 XP): pilares de mármore com anéis de ouro, faixas nas cores das áreas, lanternas,
- *  viga azul com letreiro e lâmpadas e uma pequena praça de pedra na frente. */
 export function portalMonumental(Y: number): (P: Paleta) => string {
   return P => {
     const marmore = P.noite ? '#B9B4A6' : MARMORE, ouro = P.noite ? shade(OURO, .85) : OURO;
@@ -168,7 +164,6 @@ const VARIANTES: Record<string, Variante> = {
   'Bandeira da Universidade': { marco: 'portal', troca: () => '' }
 };
 
-/** Desenho da peça já com o visual premium, se o marco dela estiver atingido. */
 export function desenhoComMarcos(p: Peca, marcos: Set<ChaveMarco>): ((P: Paleta) => string) | null {
   const v = p.trilha === 'geral' ? VARIANTES[p.nome] : undefined;
   if (!v || !marcos.has(v.marco)) return null;
@@ -179,7 +174,6 @@ export function marcoDaPeca(p: Peca): ChaveMarco | null {
   return p.trilha === 'geral' ? VARIANTES[p.nome]?.marco ?? null : null;
 }
 
-// ---------------------------------------------------------------- área de lazer (terreno novo)
 
 const RIO = 1.4;
 
@@ -316,7 +310,6 @@ function arquibancadaEBosque(dm: ReturnType<typeof dimensoes>, P: Paleta, parte:
 
 export interface Distrito { svg: string; x0: number; x1: number; y0: number; y1: number; }
 
-/** Área de lazer do outro lado do rio, com a mesma altura do terreno principal. Abre com o campo (2 simulados). */
 export function desenharDistrito(xCampus: number, y0: number, y1: number, marcos: Set<ChaveMarco>, P: Paleta, novos: Set<ChaveMarco> = new Set(), atraso = 0, yPonte?: number): Distrito | null {
   if (!marcos.has('campo')) return null;
   const dm = dimensoes(xCampus, y0, y1);
@@ -342,7 +335,6 @@ export function desenharDistrito(xCampus: number, y0: number, y1: number, marcos
   return { svg, x0: xCampus, x1: dm.x1, y0: y0 - .4, y1: y1 + .4 };
 }
 
-// ---------------------------------------------------------------- hospital universitário (o desafio final)
 
 const LARG_HOSP = 6.5;
 const VERMELHO = '#E5484D';
@@ -390,7 +382,6 @@ function ambulancia(x: number, y: number, P: Paleta): string {
 
 export interface Hospital { svg: string; x0: number; }
 
-/** Hospital à esquerda do campus, depois de um rio, com a mesma altura do terreno principal. */
 export function desenharHospital(xCampus: number, y0: number, y1: number, P: Paleta, novo = false, atraso = 0): Hospital {
   const xh1 = xCampus - RIO, xh0 = xh1 - LARG_HOSP;
   const agua = topo(xh1 + .1, y0 - .4, xCampus - .1, y1 + .4, -.25, P.agua) +
@@ -415,7 +406,6 @@ export function miniaturaHospital(P: Paleta): string {
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${f1(c[0] - w / 2)} ${f1(c[1] - h / 2)} ${f1(w)} ${f1(h)}" preserveAspectRatio="xMidYMid meet" role="img">${chao}${predioHospital(b, P)}</svg>`;
 }
 
-// ---------------------------------------------------------------- miniaturas para os cards
 
 const PECAS_DO_MARCO: Record<'praca' | 'reitoria' | 'fonte' | 'portal', string[]> = {
   praca: ['Praça · piso', 'Primeiros caminhos', 'Canteiros da praça'],

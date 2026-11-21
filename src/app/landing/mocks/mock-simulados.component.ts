@@ -5,7 +5,6 @@ import { AREAS } from '../../shared/dia';
 import { SIM } from './dados';
 import { graficoDeLinhas } from './grafico-mock';
 
-/** Cópia estática da tela de Simulados (mesmo HTML e CSS), com dados de exemplo. */
 @Component({
   selector: 'ld-mock-simulados',
   standalone: true,

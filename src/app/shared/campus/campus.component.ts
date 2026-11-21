@@ -65,9 +65,7 @@ export class CampusComponent implements OnChanges, OnInit, OnDestroy {
   @Input() foco: Trilha | null = null;
   @Input() aproximar = 1;
   @Input() extras: ExtrasCampus | null = null;
-  /** Intervalo (ms) entre as peças novas que aparecem; menor = crescimento mais rápido. */
   @Input() intervalo = 520;
-  /** Leva a câmera até terrenos novos (desligado em vitrines, como a landing). */
   @Input() passeio = true;
   @Output() novas = new EventEmitter<Peca[]>();
   @ViewChild('cena', { static: true }) cenaRef!: ElementRef<HTMLDivElement>;
@@ -202,7 +200,6 @@ export class CampusComponent implements OnChanges, OnInit, OnDestroy {
     this.timers.push(setTimeout(() => this.zone.run(() => { this.aviso = null; this.cdr.markForCheck(); }), fim + 900));
   }
 
-  /** Leva a câmera até cada terreno novo ou upgrade quando a animação dele começa e depois volta para o campus inteiro. */
   private mostrarDestaques(destaques: Destaque[]) {
     destaques.forEach(d => this.timers.push(setTimeout(() => this.animarCamera(caixaEm(d.x, d.y, d.terreno ? 11 : 7.5, .62), 1000), Math.max(0, d.atraso - 900))));
     const fim = Math.max(...destaques.map(d => d.atraso + (d.terreno ? 2600 : 1600)));

@@ -21,7 +21,6 @@ export class ConteudoService {
     return this.http.get<PaginaConteudo>(`${APIURL}/conteudos/${area}/${slug}`);
   }
 
-  /** Página publicada do assunto de uma questão (para o "Estudar este assunto" da resolução). */
   doAssunto(areaQuestao: string, assunto: string): Observable<ResumoConteudo | null> {
     const area = chaveConteudoDaQuestao(areaQuestao);
     return this.publicados().pipe(map(l => l.find(c => c.area === area && c.assunto.toLowerCase() === (assunto ?? '').toLowerCase()) ?? null));

@@ -166,7 +166,6 @@ export class DesafioComponent implements OnInit, OnDestroy {
     });
   }
 
-  /** Questão já respondida hoje: abre direto no resultado, com a alternativa marcada e a resolução. */
   private abrirRevisao() {
     this.revisao = true;
     this.questaoService.getRevisao(this.area).subscribe({
@@ -341,7 +340,6 @@ export class DesafioComponent implements OnInit, OnDestroy {
     this.aguardandoServidor = false;
     const depois = progressoDoUsuario(res);
     const novas: Peca[] = [...novasPecas(this.progressoAntes, depois)];
-    // acabamentos da região e negócios da praça também contam como "o campus cresceu"
     const n0 = nivelAcabamento(this.area, this.progressoAntes), n1 = nivelAcabamento(this.area, depois);
     const centro: Record<string, [number, number]> = { linguagens: [6, 6], humanas: [6, 20], naturezas: [20, 20], exatas: [20, 6] };
     if (n1 > n0) {
@@ -399,7 +397,6 @@ export class DesafioComponent implements OnInit, OnDestroy {
       atrasoInicial: 700,
       intervalo: 500
     };
-    // se a resposta abriu um terreno novo (ex.: praça de alimentação), a câmera vai até ele
     const lote = renderizarCampus(depois, paletaDe(noite), opcoes).destaques.find(d => d.terreno);
     const cena = renderizarCampus(depois, paletaDe(noite), { ...opcoes, camera: lote ? caixaEm(lote.x, lote.y, 10, .62) : caixaEm(principal.ax, principal.ay, 6.5, .62) });
     const r = regiao(principal.trilha);

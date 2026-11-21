@@ -9,7 +9,6 @@ import { MockRedacoesComponent } from '../mocks/mock-redacoes.component';
 
 interface Recurso { icone: string; titulo: string; texto: string; alvo: string; }
 
-/** Landing da gestão de estudos (simulados e redações), com as telas reais em celulares. */
 @Component({
   selector: 'app-landing-estudos',
   standalone: true,

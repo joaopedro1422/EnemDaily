@@ -122,7 +122,7 @@ export class ResumoDiaComponent implements OnInit, OnDestroy {
         await navigator.clipboard?.writeText(texto).catch(() => {});
         this.copiado = true;
       }
-    } catch { /* compartilhamento cancelado */ }
+    } catch {}
     this.gerando = false;
   }
 

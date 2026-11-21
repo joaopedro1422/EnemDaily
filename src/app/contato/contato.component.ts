@@ -27,8 +27,6 @@ enviar() {
   this.msgErro = '';
   this.loading = true;
 
-  // aqui você chama seu backend (POST /contato)
-  // por enquanto, simula:
   setTimeout(() => {
     this.loading = false;
     this.msgOk = 'Mensagem enviada! Vamos te responder por e-mail.';

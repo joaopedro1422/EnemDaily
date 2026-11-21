@@ -1,10 +1,5 @@
 import { Paleta, iso, f1, shade, mix, box, topo, faceY, faceX, linha3, arvore, pessoa, caminho, U } from './motor';
 
-/**
- * Praça de alimentação, nos fundos do campus (do outro lado de um rio, com ponte).
- * Abre com 30 acertos no total (terreno + placa + pizzaria) e, a cada 30 acertos, ganha um negócio novo (até 300)
- * (restaurante ou quiosque, alternando) junto com o caminho de acesso até a calçada central.
- */
 
 export const ACERTOS_ABRE_PRACA = 30;
 export const ACERTOS_POR_NEGOCIO = 30;
@@ -69,7 +64,6 @@ function mesas(x: number, y: number, cor: string, P: Paleta): string {
   return o;
 }
 
-// texto pintado num plano voltado para y+ (acompanha a inclinação da vista, como a placa da entrada)
 function letreiro(xc: number, Y: number, z: number, texto: string, cor: string, tam = 6.2): string {
   const c = iso(xc, Y, z);
   return `<text transform="translate(${f1(c[0])} ${f1(c[1])}) skewY(30)" y="${f1(tam * .36)}" text-anchor="middle" font-family="Schibsted Grotesk, Arial, sans-serif" font-size="${tam}" font-weight="800" fill="${cor}" letter-spacing=".2">${texto}</text>`;
@@ -117,7 +111,6 @@ function quiosque(x: number, y: number, n: Negocio, P: Paleta): string {
   return o + placaNoTelhado(xc, y + d / 2, zt + .1, n, P, 9.5);
 }
 
-// Placa da praça na borda dos fundos, alta, no mesmo plano do terreno (como a da entrada do campus)
 function varalDeLuzes(xa: number, xb: number, y: number, P: Paleta): string {
   let o = '';
   const postes: number[] = [];
@@ -136,14 +129,12 @@ function varalDeLuzes(xa: number, xb: number, y: number, P: Paleta): string {
 
 export interface Praca { svg: string; y0: number; x0: number; x1: number; }
 
-/** A praça fica nos fundos (y menor que o campus). `novos` = índices de negócios recém-abertos (para animar). */
 export function desenharPraca(x0: number, x1: number, yCampus: number, acertos: number, P: Paleta, acertosAntes: number | null = null, atraso = 0): Praca | null {
   const abertos = negociosAbertos(acertos);
   if (abertos < 0) return null;
   const antes = acertosAntes === null ? abertos : negociosAbertos(acertosAntes);
   const RIO = 1.4, PROF = 7.2, xc = 13;
   const ya1 = yCampus - RIO, ya0 = ya1 - PROF, ym = ya0 + 3.4;
-  // negócios numa fileira, de frente para a calçada, saindo do centro para os dois lados
   const largura = (n: Negocio) => (n.tipo === 'restaurante' ? 3.0 : 1.9);
   let dir = xc + 1.3, esq = xc - 1.3;
   const pos = NEGOCIOS.map((n, i) => {
@@ -183,7 +174,6 @@ export function desenharPraca(x0: number, x1: number, yCampus: number, acertos: 
   return { svg, y0: ya0 - 1.5, x0: xmin, x1: xmax };
 }
 
-/** Miniatura da praça para o card da tela do campus. */
 export function miniaturaPraca(P: Paleta, acertos = 180): string {
   const pr = desenharPraca(6, 20, 8, acertos, P)!;
   const c = iso(13, 2.4, 1.4), w = 15 * 2 * .866 * U, h = w * .62;

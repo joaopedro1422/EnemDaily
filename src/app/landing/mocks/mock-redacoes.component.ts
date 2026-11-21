@@ -5,7 +5,6 @@ import { COMPETENCIAS } from '../../home-redacoes/competencias';
 import { RED } from './dados';
 import { graficoDeLinhas } from './grafico-mock';
 
-/** Cópia estática da tela de Redações (mesmo HTML e CSS), com dados de exemplo. */
 @Component({
   selector: 'ld-mock-redacoes',
   standalone: true,
@@ -15,7 +14,6 @@ import { graficoDeLinhas } from './grafico-mock';
 })
 export class MockRedacoesComponent implements AfterViewInit, OnDestroy {
   @Input() visao: 'nota' | 'comp' = 'nota';
-  /** Abre a folha de detalhe de uma competência (índice 0 a 4), como quando a pessoa toca nela. */
   @Input() detalhe: number | null = null;
   @Input() fab = true;
   @ViewChild('grafico') canvas?: ElementRef<HTMLCanvasElement>;

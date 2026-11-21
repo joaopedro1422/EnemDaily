@@ -32,7 +32,6 @@
     align-items: center;
     padding-right: 30px;
 }
-/* Container do Modal Branco */
 .modal {
   position: fixed;
   top: 380px;
@@ -138,7 +137,6 @@ background: linear-gradient(to bottom,#fcfcfc,#ffffff);
   font-weight: bold;
 }
 
-/* Imagem com bordas arredondadas */
 .image-wrapper {
   margin: 10px 0;
 
@@ -162,7 +160,6 @@ background: linear-gradient(to bottom,#fcfcfc,#ffffff);
     margin-bottom: 18px;
 }
 
-/* Barra de XP */
 .xp-container {
  
   width: 90%;
@@ -187,12 +184,11 @@ background: linear-gradient(to bottom,#fcfcfc,#ffffff);
 }
 
 .progress-fill {
-  width: 91.27%; /* Dinâmico no Angular */
+  width: 91.27%;
   height: 100%;
  background: linear-gradient(90deg, #5557cf, #5c6ae4);
 }
 
-/* Grid de Status */
 .stats-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -210,7 +206,7 @@ background: linear-gradient(to bottom,#fcfcfc,#ffffff);
 }
 
 .stat-card.highlight {
-  grid-column: span 2; /* Ocupa as duas colunas */
+  grid-column: span 2;
   background: #fffdf0;
   border-color: #ffeeba;
 }
@@ -231,17 +227,17 @@ background: linear-gradient(to bottom,#fcfcfc,#ffffff);
   color: #777;
 }
 .loading{
-  position: fixed; /* Garante que ele fique sobre a tela toda */
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 70vh;
-  background: rgba(255, 255, 255, 0); /* Ou a cor do seu app */
+  background: rgba(255, 255, 255, 0);
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  z-index: 9999; /* Fica acima de qualquer outro elemento */
+  z-index: 9999;
 }
 
 .swal2-title {

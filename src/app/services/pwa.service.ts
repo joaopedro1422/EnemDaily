@@ -10,7 +10,6 @@ export type EstadoLembrete = 'carregando' | 'ativo' | 'inativo' | 'negado' | 'pr
 const DISPENSADO = 'ed-instalar-dispensado';
 const DIAS_DISPENSADO = 14;
 
-/** Tudo do PWA num lugar só: convite de instalação, atualização de versão e lembrete diário por push. */
 @Injectable({ providedIn: 'root' })
 export class PwaService {
   private swUpdate = inject(SwUpdate);
@@ -76,7 +75,6 @@ export class PwaService {
     this.swUpdate.activateUpdate().then(() => location.reload()).catch(() => location.reload());
   }
 
-  // ------------------------------------------------------------------ lembrete diário
 
   private get headers() {
     return new HttpHeaders({ Authorization: `Bearer ${localStorage.getItem('tokenUser') ?? ''}` });
@@ -86,7 +84,6 @@ export class PwaService {
     return this.swPush.isEnabled && 'PushManager' in window && 'Notification' in window;
   }
 
-  /** Lê o estado do aparelho e, se já houver inscrição, garante que o backend conhece ela (troca de conta, reinstalação). */
   async verificarLembrete() {
     if (!this.suportaPush()) {
       this.lembrete$.next(this.ios && !this.standalone ? 'precisa-instalar' : 'indisponivel');
@@ -132,7 +129,6 @@ export class PwaService {
     }
   }
 
-  /** Ao sair da conta, o aparelho para de receber lembretes daquela conta. */
   async desvincular(): Promise<void> {
     if (!this.suportaPush()) return;
     const sub = await firstValueFrom(this.swPush.subscription);

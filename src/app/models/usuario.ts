@@ -193,5 +193,4 @@ export const EMBLEMAS_MOCK: Emblema[] = [
     codigo: 'tempo_mat',
     desc: 'Acerto em 1 minuto - Exatas'
   },
-  // adicionar para primeira resposta '1_respostas' e para 50 respostas
 ];

@@ -6,7 +6,6 @@ import { Duelo } from '../../models/comunidade';
 import { AvatarComponent } from '../avatar/avatar.component';
 import { IconeComponent } from '../icone/icone.component';
 
-/** Cartão da home com o placar ao vivo dos duelos marcados para hoje. */
 @Component({
   selector: 'ed-duelo-hoje',
   standalone: true,

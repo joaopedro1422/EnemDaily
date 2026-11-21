@@ -91,7 +91,7 @@ export class HomeDesafioComponent implements OnInit, OnDestroy{
     const agora = new Date();
     const amanha = new Date();
 
-    amanha.setHours(24, 0, 0, 0); // meia-noite
+    amanha.setHours(24, 0, 0, 0);
 
     const diff = amanha.getTime() - agora.getTime();
 

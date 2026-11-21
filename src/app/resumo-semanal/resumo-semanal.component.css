@@ -12,7 +12,6 @@
 .rs-fechar { width: 38px; height: 38px; flex-shrink: 0; border-radius: 50%; border: 0; display: grid; place-items: center; background: var(--ed-fundo-2); color: var(--ed-tinta-2); cursor: pointer; }
 .rs-carregando { display: grid; place-items: center; min-height: 340px; }
 
-/* time-lapse do campus */
 .lapse { position: relative; height: 300px; border-radius: 22px; overflow: hidden; background: linear-gradient(#CFE6FF, #EEF6FF); animation: ed-surgir 420ms var(--ed-curva) both; }
 .lapse.noite { background: linear-gradient(#0E1433, #1C2552); }
 .lapse-cena { position: absolute; inset: 0; }
@@ -65,7 +64,6 @@
 .vira { transform: rotate(180deg); }
 .rs-aviso { text-align: center; font-size: 13.5px; font-weight: 600; color: var(--ed-tinta-2); }
 
-/* ---------------- a arte postável: 1080 x 1920 ---------------- */
 .arte { position: relative; isolation: isolate; overflow: hidden; width: 1080px; height: 1920px; padding: 90px 80px 80px; display: flex; flex-direction: column; color: #FFFFFF; font-family: 'Schibsted Grotesk', Arial, sans-serif;
   background: radial-gradient(120% 70% at 85% 0%, #3E4EEA 0%, #2836C6 38%, #141B5A 78%, #0B1038 100%); }
 .arte-luz { position: absolute; z-index: -1; inset: 0; }

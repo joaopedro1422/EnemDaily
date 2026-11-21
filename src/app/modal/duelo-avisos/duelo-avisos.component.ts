@@ -15,7 +15,6 @@ type Aviso = { tipo: 'convite' | 'resultado'; duelo: Duelo };
 const ADIADOS = 'ed-duelos-adiados';
 const INTERVALO = 90_000;
 
-/** Ao abrir o site mostra os convites de duelo recebidos e os resultados que a pessoa ainda não viu. */
 @Component({
   selector: 'app-duelo-avisos',
   standalone: true,
@@ -94,7 +93,6 @@ export class DueloAvisosComponent implements OnInit, OnDestroy {
   }
 
   private mostrarProximo() {
-    // não interrompe quem está no meio de uma questão
     if (this.router.url.startsWith('/desafio/')) { this.atual = null; return; }
     this.erro = ''; this.aceito = null; this.fechando = false;
     this.atual = this.fila.shift() ?? null;
@@ -112,7 +110,6 @@ export class DueloAvisosComponent implements OnInit, OnDestroy {
     setTimeout(() => this.mostrarProximo(), 240);
   }
 
-  // ---------- convite
   aceitar() {
     if (!this.atual || this.ocupado) return;
     this.ocupado = true; this.erro = '';
@@ -143,7 +140,6 @@ export class DueloAvisosComponent implements OnInit, OnDestroy {
     this.router.navigate(['/u', u]);
   }
 
-  // ---------- resultado
   fecharResultado() {
     if (!this.atual) return;
     this.comunidade.marcarVisto(this.atual.duelo.id).subscribe({ error: () => {} });

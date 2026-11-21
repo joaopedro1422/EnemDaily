@@ -54,7 +54,6 @@
   cursor: pointer;
 }
 
-/* Upload */
 .image-upload {
   margin: 20px 0;
 }
@@ -136,14 +135,12 @@ background-color: #F4F9FF;
   height: 24px;
 }
 
-/* Esconde o checkbox padrão */
 .modern-switch input {
   opacity: 0;
   width: 0;
   height: 0;
 }
 
-/* O "Corpo" do Switch */
 .modern-slider {
   position: absolute;
   cursor: pointer;
@@ -156,7 +153,6 @@ background-color: #F4F9FF;
   border-radius: 34px;
 }
 
-/* A "Bolinha" (Knob) */
 .modern-slider:before {
   position: absolute;
   content: "";
@@ -170,17 +166,14 @@ background-color: #F4F9FF;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-/* Estado: Ativado (Verde) */
 input:checked + .modern-slider {
-  background-color: #25d366; /* Verde sucesso */
+  background-color: #25d366;
 }
 
-/* Movimento da bolinha para a direita */
 input:checked + .modern-slider:before {
   transform: translateX(20px);
 }
 
-/* Efeito de foco/hover discreto */
 .modern-switch:hover .modern-slider {
   filter: brightness(0.95);
 }

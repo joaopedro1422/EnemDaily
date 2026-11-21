@@ -105,7 +105,6 @@ export class AdminComponent implements OnInit, OnDestroy {
     this.recarregarTudo();
   }
 
-  // ---------- usuários ----------
   buscar(v: string) { this.busca$.next(v.trim()); }
 
   carregarUsuarios() {
@@ -172,7 +171,6 @@ export class AdminComponent implements OnInit, OnDestroy {
     });
   }
 
-  // ---------- calendário ----------
   mudarMes(delta: number) {
     this.mes = new Date(this.mes.getFullYear(), this.mes.getMonth() + delta, 1);
     this.carregarMes();
@@ -250,7 +248,6 @@ export class AdminComponent implements OnInit, OnDestroy {
 
   pct(a: number, b: number): string { return b ? Math.round((100 * a) / b) + '%' : '—'; }
 
-  // ---------- geração ----------
   get dataGeracao(): string {
     const d = new Date();
     if (this.diaGeracao === 'amanha') d.setDate(d.getDate() + 1);
@@ -302,7 +299,7 @@ export class AdminComponent implements OnInit, OnDestroy {
       error: e => {
         this.disparando = false;
         this.falha(e);
-        if (e instanceof HttpErrorResponse && e.status === 0) this.avisoGeracao = 'Não foi possível falar com o backend. Confira se ele está rodando na porta 8080.';
+        if (e instanceof HttpErrorResponse && e.status === 0) this.avisoGeracao = 'Não foi possível falar com o backend. Confira se ele está no ar.';
         if (e instanceof HttpErrorResponse && e.status === 403) this.avisoGeracao = 'O servidor recusou o pedido (acesso de admin).';
       }
     });
@@ -335,7 +332,6 @@ export class AdminComponent implements OnInit, OnDestroy {
     this.poll = null;
   }
 
-  // ---------- assuntos ----------
   carregarAssuntos() {
     this.api.assuntos().subscribe({ next: a => (this.assuntos = a), error: e => this.falha(e) });
   }
@@ -371,7 +367,6 @@ export class AdminComponent implements OnInit, OnDestroy {
     this.api.excluirAssunto(a.id).subscribe({ next: () => this.carregarAssuntos(), error: e => this.falha(e) });
   }
 
-  // ---------- util ----------
   dataCurta(v: string | null): string {
     if (!v) return '—';
     const [a, m, d] = v.slice(0, 10).split('-');

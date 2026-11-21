@@ -44,7 +44,6 @@ export class PerfilComponent implements OnInit, OnDestroy {
   fechando = false;
   private herdado: Motivo | null = null;
 
-  // recorte da foto
   recorte: { img: HTMLImageElement; url: string; zoom: number; x: number; y: number } | null = null;
   private arrasto: { px: number; py: number; x: number; y: number } | null = null;
   readonly janela = 240;
@@ -82,7 +81,6 @@ export class PerfilComponent implements OnInit, OnDestroy {
   escolherMoldura(m: Moldura) { if (this.livreMoldura(m)) this.config = this.com({ moldura: m }); }
   escolherSelo(s: Selo) { this.config = this.com({ selo: s }); }
 
-  // ---------- foto
   abrirArquivo(ev: Event) {
     const input = ev.target as HTMLInputElement, arquivo = input.files?.[0];
     input.value = '';
@@ -158,7 +156,6 @@ export class PerfilComponent implements OnInit, OnDestroy {
     this.persistir(false).then(ok => { if (ok) this.firebase.apagaFotoPerfil(antigo); });
   }
 
-  // ---------- salvar
   async salvar() {
     if (!this.usuario) return;
     if (this.usuario.demo) { this.irParaCadastro(); return; }

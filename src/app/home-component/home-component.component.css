@@ -1,6 +1,5 @@
 :host { display: block; }
 
-/* Visitante */
 .landing { display: grid; gap: 18px; padding-block: 12px 32px !important; }
 .hero { display: grid; gap: 16px; }
 .title-landing { font-size: 30px; font-weight: 800; letter-spacing: -.035em; line-height: 1.08; color: var(--ed-tinta); text-wrap: balance; }
@@ -21,7 +20,6 @@
 .btn-ghost { background: transparent; color: var(--ed-tinta); border-color: var(--ed-pauta-forte); }
 .btn-ghost:hover { background: var(--ed-fundo-2); }
 
-/* Painel */
 .painel {
   max-width: var(--ed-largura);
   margin: 0 auto;
@@ -67,7 +65,6 @@
 button { font-family: inherit; }
 button:focus-visible, a:focus-visible { outline: 2px solid var(--ed-caneta); outline-offset: 2px; }
 
-/* Desafio de hoje */
 .desafio {
   background: var(--ed-folha);
   border: 1px solid var(--ed-pauta);
@@ -183,7 +180,6 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--ed-caneta); out
 .desafio-rodape a { font-weight: 700; color: var(--ed-caneta-texto); text-decoration: none; }
 .desafio-rodape a:hover { text-decoration: underline; text-underline-offset: 3px; }
 
-/* Números */
 .numeros { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .numero {
   background: var(--ed-folha); border: 1px solid var(--ed-pauta); border-radius: var(--ed-r-cartao);
@@ -193,7 +189,6 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--ed-caneta); out
 .numero b { font-size: 26px; font-weight: 800; letter-spacing: -.02em; line-height: 1.15; color: var(--ed-tinta); }
 .numero-detalhe { font-size: 12.5px; color: var(--ed-tinta-3); }
 
-/* Blocos */
 .bloco {
   background: var(--ed-folha); border: 1px solid var(--ed-pauta); border-radius: 20px;
   padding: 18px; display: flex; flex-direction: column; gap: 14px; min-width: 0;
@@ -204,7 +199,6 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--ed-caneta); out
 .bloco-cab a:hover { text-decoration: underline; text-underline-offset: 3px; }
 .bloco-sub { display: block; margin-top: 2px; font-size: 13px; color: var(--ed-tinta-3); }
 
-/* Desempenho por área */
 .areas { list-style: none; margin: -4px -6px; padding: 0; display: grid; gap: 2px; }
 .area {
   width: 100%;
@@ -220,13 +214,11 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--ed-caneta); out
 .area-barra i { display: block; height: 100%; border-radius: 3px; background: var(--a); transition: width 700ms var(--ed-curva); }
 .area-pct { font-size: 14px; font-weight: 700; text-align: right; }
 
-/* XP por mês */
 .legenda { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 16px; }
 .legenda li { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--ed-tinta-2); }
 .legenda i { width: 14px; height: 3px; border-radius: 2px; background: var(--a); }
 .grafico { position: relative; height: 220px; }
 
-/* Sequência */
 .sequencia-topo { display: flex; gap: 12px; align-items: flex-start; }
 .sequencia-ico {
   width: 42px; height: 42px; flex: none; display: grid; place-items: center; border-radius: 50%;
@@ -255,7 +247,6 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--ed-caneta); out
 .bonus-marcos span { font-size: 11.5px; color: var(--ed-tinta-3); }
 .bonus-marcos li.ganho b { color: var(--ed-caneta-texto); }
 
-/* Campus */
 .campus { padding: 0; gap: 0; overflow: hidden; }
 .campus-info { padding: 16px 18px 18px; display: grid; gap: 10px; }
 .campus-linha { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
@@ -277,7 +268,6 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--ed-caneta); out
 .btn-secundario:hover { background: var(--ed-fundo-2); }
 .btn-secundario:active { transform: scale(.97); }
 
-/* Grupos */
 .grupos { list-style: none; margin: -4px -6px; padding: 0; display: grid; gap: 2px; }
 .grupo {
   display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 12px; align-items: center;
@@ -296,7 +286,6 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--ed-caneta); out
 .vazio { display: grid; gap: 12px; }
 .vazio p { font-size: 14px; color: var(--ed-tinta-2); }
 
-/* Estudos */
 .estudos { gap: 6px; }
 .estudos .bloco-cab { margin-bottom: 6px; }
 .estudo {
@@ -312,7 +301,6 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--ed-caneta); out
 .estudo-texto span { font-size: 13px; color: var(--ed-tinta-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .estudo-total { font-size: 12.5px; font-weight: 700; color: var(--ed-tinta-2); background: var(--ed-fundo-2); border-radius: 999px; padding: 3px 9px; font-variant-numeric: tabular-nums; }
 
-/* Rodapé */
 .rodape {
   display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 20px;
   margin-top: 8px; padding: 18px 2px 4px; border-top: 1px solid var(--ed-pauta);
@@ -359,12 +347,10 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--ed-caneta); out
   .grafico { height: 260px; }
 }
 
-/* Aviso de sessão */
 .aviso { display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: center; padding: 14px 16px; border-radius: var(--ed-r-cartao); background: var(--ed-tinta); color: var(--ed-folha); }
 .aviso p { font-size: 14px; }
 .aviso button { font: 700 14px var(--ed-fonte); color: var(--ed-tinta); background: var(--ed-folha); border: 0; border-radius: 10px; padding: 9px 14px; cursor: pointer; }
 
-/* Folha de confirmação */
 .folha-veu { position: fixed; inset: 0; z-index: 80; background: rgba(11, 16, 32, .45); animation: veu var(--ed-t-medio) var(--ed-curva); }
 @keyframes veu { from { opacity: 0; } }
 .folha {
@@ -400,7 +386,6 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--ed-caneta); out
   @keyframes aparecer { from { opacity: 0; transform: translate(-50%, -46%); } }
 }
 
-/* Relógio da capa e ajuda */
 .capa-relogio { display: grid; gap: 0; margin-top: 8px; }
 .capa-relogio span { font-size: 13px; font-weight: 600; color: rgba(255, 255, 255, .76); }
 .capa-relogio b { font-size: 38px; font-weight: 800; letter-spacing: -.02em; line-height: 1.05; color: rgba(255, 255, 255, .84); }
@@ -417,14 +402,12 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--ed-caneta); out
 .folha { max-height: 90vh; overflow-y: auto; }
 @media (min-width: 640px) { .capa-relogio b { font-size: 44px; } }
 
-/* Números em bloco único */
 .numeros { gap: 0; background: var(--ed-folha); border: 1px solid var(--ed-pauta); border-radius: 20px; overflow: hidden; }
 .numero { border: 0; border-radius: 0; background: transparent; padding: 16px 18px; }
 .numero:nth-child(odd) { border-right: 1px solid var(--ed-pauta); }
 .numero:nth-child(-n+2) { border-bottom: 1px solid var(--ed-pauta); }
 
 
-/* Grupos com imagem padronizada */
 .grupo .grupo-img { width: 40px; height: 40px; border-radius: 12px; object-fit: cover; background: var(--ed-fundo-2); box-shadow: inset 0 0 0 1px var(--ed-pauta), 0 0 0 1px var(--ed-pauta); }
 .grupo-iniciais { display: grid; place-items: center; font-size: 13.5px; font-weight: 800; color: var(--ed-caneta-texto); background: var(--ed-caneta-suave) !important; }
 
@@ -437,7 +420,6 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--ed-caneta); out
 @media (min-width: 1024px) {
 }
 
-/* Campus vivo no painel */
 .campus-palco { position: relative; margin: 10px 10px 0; border-radius: 14px; overflow: hidden; aspect-ratio: 4 / 3; max-width: 100%; }
 .campus-palco ed-campus { position: absolute; inset: 0; border-radius: 14px; }
 .campus-abrir { position: absolute; right: 10px; top: 10px; z-index: 4; width: 34px; height: 34px; border-radius: 10px; border: 0; display: grid; place-items: center; background: rgba(255, 255, 255, .92); color: #121A33; cursor: pointer; box-shadow: 0 4px 14px -8px rgba(18, 26, 51, .5); }

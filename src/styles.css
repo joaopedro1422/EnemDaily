@@ -80,9 +80,6 @@ button:hover{
   backdrop-filter: blur(2px);
 }
 
-/* =========================
-   BALÃO PRINCIPAL
-========================= */
 .enem-shepherd.shepherd-element {
   background: linear-gradient(
     180deg,
@@ -107,9 +104,6 @@ button:hover{
     opacity: 1;
   }
 }
-/* =========================
-   TEXTO
-========================= */
 .enem-shepherd .shepherd-text {
   font-family: Inter, system-ui, sans-serif;
   font-size: 14px;
@@ -117,18 +111,12 @@ button:hover{
   color: #001235;
 }
 
-/* =========================
-   TÍTULO
-========================= */
 .enem-shepherd .shepherd-title {
   font-size: 16px;
   font-weight: 600;
   color: #060127;
 }
 
-/* =========================
-   BOTÕES
-========================= */
 .enem-shepherd .shepherd-footer {
   margin-top: 14px;
 }
@@ -141,7 +129,6 @@ button:hover{
   transition: all 0.25s ease;
 }
 
-/* Botão principal */
 .enem-shepherd .shepherd-button-primary {
   background: linear-gradient(
     135deg,
@@ -157,23 +144,16 @@ button:hover{
   box-shadow: 0 12px 35px rgba(99, 102, 241, 0.65);
 }
 
-/* Botão secundário */
 .enem-shepherd .shepherd-button-secondary {
   background: transparent;
   color: #a5b4fc;
 }
 
-/* =========================
-   FECHAR
-========================= */
 .enem-shepherd .shepherd-cancel-icon {
   color: #a5b4fc;
   font-size: 18px;
 }
 
-/* =========================
-   SETA DO BALÃO
-========================= */
 .enem-shepherd .shepherd-arrow:before {
   background: #0f172a;
   border: 1px solid rgba(99, 102, 241, 0.25);
@@ -193,9 +173,6 @@ button:hover{
   }
 }
 
-/* =========================
-   ANIMAÇÃO PREMIUM
-========================= */
 @keyframes enemPop {
   0% {
     opacity: 0;
@@ -231,7 +208,6 @@ button:hover{
   
 }
 
-/* 1. Efeito de Brilho de Fundo (Giratório) */
 .achievement-shine {
   position: absolute;
   top: 50%;
@@ -246,7 +222,6 @@ button:hover{
   z-index: 1;
 }
 
-/* 2. O Emblema em Camadas */
 .achievement-emblem {
   position: relative;
   display: flex;
@@ -256,24 +231,22 @@ button:hover{
   z-index: 2;
 }
 
-/* Asas Metálicas */
 .emblem-wings {
   font-size: 3rem;
-  color: #c0c0c0; /* Prata metálico */
+  color: #c0c0c0;
   text-shadow: 0 0 15px rgba(192, 192, 192, 0.5);
   animation: ach-wobble-wings 3s ease-in-out infinite;
 }
 .left-wing { transform: rotate(-20deg) translateX(15px); }
 .right-wing { transform: rotate(20deg) scaleX(-1) translateX(15px); }
 
-/* O Escudo Dourado */
 .emblem-shield {
   position: relative;
   width: 120px;
   height: 140px;
   background: linear-gradient(135deg, #663dc0 0%, #3946b9 50%, #7a71f0 100%);
   
-  border-radius: 20px 20deg 60px 60px; /* Formato de escudo */
+  border-radius: 20px 20deg 60px 60px;
   border: 5px solid #fff;
   box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 0 15px rgba(0,0,0,0.2);
   display: flex;
@@ -318,7 +291,6 @@ button:hover{
   filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
 }
 
-/* Reflexo de Vidro no Escudo */
 .shield-glare {
   position: absolute;
   top: -100%;
@@ -329,7 +301,6 @@ button:hover{
   animation: ach-glare-swipe 4s infinite;
 }
 
-/* 3. Textos Estilizados */
 .achievement-info {
   text-align: center;
   color: white;
@@ -340,7 +311,7 @@ button:hover{
 .ach-title {
   font-size: 1rem;
   font-weight: 800;
-  color: #fdfdfd; /* Verde sucesso do ENEM.DAILY */
+  color: #fdfdfd;
   text-transform: uppercase;
   letter-spacing: 2px;
   margin-bottom: 5px;
@@ -349,7 +320,7 @@ button:hover{
 .ach-rank-name {
   font-size: 1.8rem;
   font-weight: 900;
-  color: #ffffff; /* Dourado */
+  color: #ffffff;
   text-shadow: 0 0 10px rgba(255, 187, 0, 0.5);
   margin-bottom: 15px;
 }
@@ -375,9 +346,8 @@ button:hover{
 .p2 { top: 60%; right: 15%; animation-delay: 1s; }
 .p3 { bottom: 10%; left: 25%; animation-delay: 2s; }
 
-/* 5. Customizações do Swal */
 .ach-popup-class {
-  background: transparent !important; /* Para ver o brilho de fundo */
+  background: transparent !important;
   border: none !important;
   width: auto !important;
   padding: 0 !important;
@@ -395,7 +365,6 @@ button:hover{
   width: 100% !important;
 }
 
-/* 6. Animações Customizadas */
 
 @keyframes ach-glare-swipe {
   0% { top: -150%; left: -150%; }
@@ -420,7 +389,6 @@ button:hover{
   position: relative;
 }
 
-/* TÍTULO */
 .reward-title {
   font-size: 1.4rem;
   color: #ffd700;
@@ -428,7 +396,6 @@ button:hover{
   letter-spacing: 1px;
 }
 
-/* CARD 3D */
 .card-scene {
   perspective: 1000px;
   display: flex;
@@ -450,7 +417,6 @@ button:hover{
   transform: rotateY(180deg) scale(1.1);
 }
 
-/* FACES */
 .card-face-reward {
   position: absolute;
   width: 100%;
@@ -461,7 +427,6 @@ button:hover{
   inset: 0; 
 }
 
-/* FRENTE */
 .card-front-reward {
   background: linear-gradient(145deg, #1e2a78, #3f51b5);
   transform: rotateY(180deg);
@@ -478,7 +443,6 @@ button:hover{
   filter: drop-shadow(0 0 10px gold);
 }
 
-/* VERSO */
 .card-back-reward {
   background: linear-gradient(145deg, #111, #333);
   display: flex;
@@ -492,7 +456,6 @@ button:hover{
   color: #aaa;
 }
 
-/* INFO */
 .reward-info {
   margin-top: 30px;
 }
@@ -507,7 +470,6 @@ button:hover{
   opacity: 0.9;
 }
 
-/* BOTÃO */
 .reward-btn {
   background: linear-gradient(90deg, #3d3fc0, #4d5bda) !important;
   color: rgb(255, 255, 255) !important;
@@ -516,7 +478,6 @@ button:hover{
   border-radius: 10px !important;
 }
 
-/* PARTÍCULAS */
 .particles {
   position: absolute;
   font-size: 20px;
@@ -575,7 +536,6 @@ button:hover{
   border-radius: 8px !important;
   border: none !important;
 }
-/* aviso de versão nova do app (service worker) */
 .ed-nova-versao { position: fixed; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom)); z-index: 1400; transform: translateX(-50%); width: min(420px, calc(100% - 24px)); display: flex; align-items: center; gap: 12px; padding: 12px 12px 12px 16px; border-radius: 16px; background: #121A33; color: #FFFFFF; font-family: var(--ed-fonte); box-shadow: 0 18px 40px -18px rgba(5, 10, 30, .8); animation: ed-nova-versao 420ms cubic-bezier(.2, .9, .25, 1) both; }
 .ed-nova-versao span { flex: 1; display: grid; gap: 1px; }
 .ed-nova-versao b { font-size: 14.5px; }

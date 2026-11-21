@@ -9,7 +9,6 @@ export type Progresso = Record<Trilha, number>;
 export type Caixa = [number, number, number, number];
 
 export const ORDEM_TRILHAS: Trilha[] = ['geral', 'linguagens', 'humanas', 'naturezas', 'exatas'];
-/** Peças "de verdade" de cada trilha; nas áreas, depois delas vêm os níveis de acabamento. */
 export const PECAS_BASE = Object.fromEntries(ORDEM_TRILHAS.map(t => [t, TRILHAS[t].length])) as Record<Trilha, number>;
 export const TOTAL_POR_TRILHA = Object.fromEntries(ORDEM_TRILHAS.map(t => [t, TRILHAS[t].length + (t === 'geral' ? 0 : NIVEIS_ACABAMENTO.length)])) as Record<Trilha, number>;
 export const TOTAL_PECAS = ORDEM_TRILHAS.reduce((s, t) => s + TOTAL_POR_TRILHA[t], 0);
@@ -31,9 +30,6 @@ export interface DadosCampus {
 
 const limitar = (t: Trilha, n: number) => Math.max(0, Math.min(TOTAL_POR_TRILHA[t], Math.floor(n || 0)));
 
-// Cada acerto numa área libera uma ETAPA, não uma peça: ou um avanço de prédio, ou um pacote inteiro de
-// decoração (árvores, canteiros, bancos, caminhos... juntos). As etapas alternam prédio e decoração.
-// 1ª etapa = terreno + fundação. Peça de terreno ampliado e decoração solta vão junto com a etapa seguinte.
 const ehPredio = (p: Peca) => p.nome.includes(' · ') && !p.lote;
 function etapasDe(lista: Peca[]): number[] {
   const tamanhos: number[] = [];
@@ -60,7 +56,6 @@ const pecasDaEtapa = (t: Trilha, acertos: number) => {
   if (n <= e.length) return e.slice(0, n).reduce((s, k) => s + k, 0);
   return PECAS_BASE[t] + (n - e.length);
 };
-/** Nível de acabamento já liberado na área (0 enquanto a construção base não terminou). */
 export const nivelAcabamento = (t: Trilha, prog: Progresso) => (t === 'geral' ? 0 : Math.max(0, prog[t] - PECAS_BASE[t]));
 
 export function calcularProgresso(d: DadosCampus): Progresso {
@@ -128,7 +123,6 @@ export const ESTRADA_PEDRAS = 70;
 export const ESTRADA_ASFALTO = 200;
 export const tipoEstrada = (pecas: number): TipoEstrada => (pecas >= ESTRADA_ASFALTO ? 'asfalto' : pecas >= ESTRADA_PEDRAS ? 'pedras' : 'terra');
 
-/** Estrada na frente do campus, de ponta a ponta: começa de terra, vira paralelepípedo e depois asfalto. */
 function estrada(xa: number, xb: number, y: number, tipo: TipoEstrada, P: Paleta): string {
   const L = 1.15, z = .006, y2 = y + L;
   const base = box(xa, y, -.9, xb - xa, L, .9, shade(P.grama, .96), { l: P.placaL, r: P.placaR });
@@ -185,7 +179,6 @@ export function renderizarCampus(prog: Progresso, P: Paleta, o: OpcoesCena = {})
   [...acabNovas].forEach((p, i) => atraso.set(p, (o.atrasoInicial ?? 350) + (novas.length + Math.floor(i / 3)) * (o.intervalo ?? 520)));
   const atrasoMarcos = (o.atrasoInicial ?? 350) + novas.length * (o.intervalo ?? 520);
 
-  // no começo os caminhos internos são de terra; quando a estrada vira paralelepípedo, eles também são calçados
   const Pc: Paleta = tipoEstrada(totalDePecas(prog)) === 'terra'
     ? { ...P, caminho: P.noite ? '#5E4B3A' : '#D6B88E', caminho2: P.noite ? '#4E3E30' : '#BC9A6E' }
     : P;
@@ -208,10 +201,8 @@ export function renderizarCampus(prog: Progresso, P: Paleta, o: OpcoesCena = {})
     }
   }
 
-  // o caminho de entrada sempre chega até a estrada, mesmo quando uma região nova empurra a frente do campus
   const acesso = y1 > 16.05 && visiveis.some(p => p.nome === 'Primeiros caminhos') ? caminho(12.5, 15.9, 13.5, y1, Pc) : '';
   if (portaoNaFrente) corpo += `<g class="cv-peca">${portaoSimples(y1 - .28, Pc)}</g>`;
-  // cada novidade tem a sua vez: a câmera visita uma de cada vez e a animação toca quando ela chega
   const CENTRO: ChaveMarco[] = ['praca', 'reitoria', 'fonte', 'portal'];
   const upgradesCentro = MARCOS.filter(m => novosMarcos.has(m.chave) && CENTRO.includes(m.chave));
   let vez = atrasoMarcos + (upgradesCentro.length ? 1600 : 0);
@@ -223,7 +214,6 @@ export function renderizarCampus(prog: Progresso, P: Paleta, o: OpcoesCena = {})
   const novoNaPraca = negAntes !== null && negAgora >= 0 && negAgora > negAntes;
   const aPraca = novoNaPraca ? turno(negAntes! < 0 ? 2600 : 1600) : atrasoMarcos;
   const distrito = desenharDistrito(x1, y0, y1, marcos, P, novosMarcos, aDistrito, 13);
-  // os caminhos chegam às pontes: o da praça segue até a área de lazer e outro sai de trás da reitoria até a praça de alimentação
   const ligaLazer = x1 > 16 && (distrito || visiveis.some(p => p.trilha === 'exatas' && p.lote)) && visiveis.some(p => p.nome === 'Primeiros caminhos') ? caminho(16, 12.5, x1, 13.5, Pc) : '';
   const terreno = box(x0, y0, -.9, x1 - x0, y1 - y0, .9, P.grama, { l: P.placaL, r: P.placaR }) +
     topo(x0, y1 - .08, x1, y1, .001, shade(P.grama, .95)) + topo(x1 - .08, y0, x1, y1, .001, shade(P.grama, .9)) + grama(x0, y0, x1, y1, P);

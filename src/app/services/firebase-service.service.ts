@@ -21,7 +21,6 @@ export class FirebaseServiceService {
       }
   }
 
-  /** Sobe a foto de perfil já recortada e devolve só a referência (caminho + token) para guardar no backend. */
   async salvaFotoPerfil(foto: Blob, idUsuario: string, caminhoAntigo = ''): Promise<{ caminho: string; token: string }> {
     const storage = getStorage();
     const extensao = foto.type === 'image/webp' ? 'webp' : 'jpg';
@@ -39,7 +38,6 @@ export class FirebaseServiceService {
     try { await deleteObject(ref(getStorage(), caminho)); } catch (e) { console.warn('Não deu para apagar a foto antiga:', e); }
   }
 
-  /** Apaga todas as fotos de perfil de um usuário (avatares/{id}-*), inclusive versões antigas que tenham sobrado. Devolve quantas apagou. */
   async apagaFotosDoUsuario(idUsuario: string, caminhoAtual = ''): Promise<number> {
     const caminhos = new Set<string>();
     if (caminhoAtual.startsWith('avatares/')) caminhos.add(caminhoAtual);
