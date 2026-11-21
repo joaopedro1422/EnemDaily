@@ -41,9 +41,8 @@
 ## Visão geral
 
 - **4 questões por dia**, uma de cada área do ENEM: Linguagens, Ciências Humanas, Ciências da Natureza e Matemática.
-- **Questões inéditas**, geradas por IA na noite anterior e aprovadas por um pipeline de revisão automática.
+- **Questões inéditas**, geradas por IA com base em 3.000 questões disponibilizadas pelo INEP como contexto e aprovadas por um pipeline de revisão automática.
 - **Formato oficial:** texto-base, comando e 5 alternativas, com 3min30 por questão.
-- **Correção comentada**, focada na alternativa marcada.
 - **XP por acerto** (quanto mais rápido, mais XP) e sequência de dias.
 - **Uma animação de campus universitário que evolui a cada acerto seu**, com estruturas especiais liberadas por metas.
 - **Social:** grupos com ranking, duelos diários entre amigos e resumo do dia compartilhável.
@@ -66,12 +65,12 @@
 
 ### Resumo do pipeline
 
-Uma chamada única ao modelo gera questões com problemas frequentes: conta errada, mais de uma resposta defensável, distratores absurdos e o gabarito sempre na alternativa mais longa. Por isso a geração segue o mesmo fluxo de uma banca de elaboração:
+Em janeiro de 2026, durante o início da minha implementação, utilizava uma única chamada ao modelo de LLM para geração das questões, causando alucinações, erros de raciocínio e estruturação das questões. Por isso, depois de meses finalizei uma estrutura satisfatória para a geração das questões e segue o mesmo fluxo de uma banca de elaboração:
 
-1. **Elaborar:** o modelo escreve o item com base na Matriz de Referência da área e em textos-base de questões reais do ENEM.
-2. **Verificar com código:** o Java confere as regras de formato e **refaz as contas**.
-3. **Resolver às cegas:** outra chamada resolve o item sem conhecer o gabarito.
-4. **Revisar:** um revisor avalia o item com uma rubrica de 11 critérios.
+1. **Busca:** o sistema possui um banco com mais de 2.000 questões exemplo de provas antigas do ENEM. De acordo com o assunto sorteado para o dia, o sistema busca questões (com full-text search) que possam servir de exemplo no contexto para a IA.
+2. **Elaborar:** nesta chamada, a IA escreve a questão com base na Matriz de Referência do INEP para a área e nas questões exemplo encontradas no banco, caso hajam.
+3. **Resolver às cegas:** outra chamada para a IA resolve a questão sem conhecer o gabarito.
+4. **Revisar:** outra chamada  avalia a questão com uma rubrica de 11 critérios.
 5. **Corrigir ou publicar:** se alguma etapa reprovar, o item volta ao elaborador com todos os apontamentos. Se tudo passar, vira a questão do dia.
 
 ```mermaid
@@ -92,7 +91,7 @@ flowchart LR
 
 ### 1. Modelo e esforço de raciocínio
 
-O modelo é o **GPT-5.5**, acessado pela **Responses API**. O cliente HTTP é próprio, feito com `java.net.http`, para ter controle total dos parâmetros. Cada etapa usa um nível de *reasoning effort*, configurável por propriedade:
+O modelo é o **GPT-5.5**, acessado pela **Responses API**. O cliente HTTP é próprio, feito com `java.net.http`, para ter controle total dos parâmetros. Cada etapa usa um nível de *raciocínio*, configurável por propriedade:
 
 | Etapa | Esforço | Motivo |
 |---|---|---|
@@ -106,11 +105,9 @@ Os níveis foram escolhidos por medição. Com esforço baixo, o item reprovava 
 
 Todas as etapas usam **Structured Outputs com `strict: true`**. A resposta sempre respeita o schema e é desserializada direto em `record`s Java, sem parsing frágil de texto.
 
-A **ordem dos campos** no schema também guia o raciocínio, porque o modelo gera o JSON na ordem definida:
-
-- `verificacao_numerica` vem **antes** das alternativas, então o cálculo é fixado antes das opções serem escritas.
-- Em cada distrator, `hipotese_de_erro` vem **antes** do `texto`. O modelo primeiro define qual erro real aquela alternativa representa (ex.: "não converteu minutos em horas") e só depois a escreve. Isso elimina distratores sem sentido.
-- No revisor, a lista de problemas vem antes das notas e as notas antes do veredito. Assim o veredito é consequência da análise, e não o contrário.
+Isso é fundamental tanto para o fluxo da geração quanto para a estrutura das questões:
+- A questão é estruturada em texto base, enunciado, alternativas, gabarito, explicação geral, assunto e explicação de cada alternativa.
+- O fluxo utiliza métricas como nível de confiabilidade (avaliada pelo chamada de revisão), sugestões de correção e ordens de volta ao elaborador.
 
 ### 3. Engenharia de prompt
 
@@ -163,8 +160,6 @@ Tudo o que pode ser verificado por código é verificado antes das etapas de IA:
 - gabarito sem ser muito mais longo que os distratores;
 - tamanho mínimo do texto-base e ausência de referência a figuras inexistentes.
 
-**Recálculo numérico:** o elaborador entrega a expressão do cálculo (ex.: `150 * 0.8 * 1.1`). Um **avaliador de expressões próprio** (parser recursivo, sem `eval`) recalcula o resultado e compara com o gabarito, considerando arredondamento. Se não bater, o item volta para revisão.
-
 **Posição do gabarito:** modelos tendem a repetir posições, então a ordem final é definida pelo sistema. Alternativas numéricas ficam em ordem crescente, como recomenda o Inep. As textuais são embaralhadas, com o gabarito na letra menos usada nas últimas questões.
 
 **Sanitização:** o HTML retornado pela IA passa por uma lista de tags permitidas antes de ser salvo.
@@ -172,16 +167,14 @@ Tudo o que pode ser verificado por código é verificado antes das etapas de IA:
 ### 8. Robustez e custo
 
 - **Background mode com polling**, para que chamadas longas de raciocínio não dependam de uma conexão aberta por minutos.
-- **Retentativas com backoff** em 429/5xx, respeitando `retry-after`.
 - **Log de custo por chamada**, com tokens de entrada, cache, saída e raciocínio.
 - **Status da geração em tempo real** no painel de admin.
 - **Agendamento:** geração às 20h para o dia seguinte e repescagem às 00h05 para as áreas que falharam.
 
-### 9. Conteúdo de estudo com revisão humana
+### 9. Blog de estudos sobre os conteúdos
 
-Cada assunto pode ter uma **página de estudo voltada para SEO**, com resumo, "como cai no ENEM" (relacionando habilidades da Matriz) e erros comuns. O rascunho é gerado com prompt e schema próprios, a cerca de US$ 0,10 por página.
-
-Nenhuma página é publicada automaticamente: a revisão e a publicação são feitas no editor do admin, que mostra a pré-visualização e a prévia do resultado no Google.
+Aqui a ideia é que o aluno também possa obter mais conhecimentos dentro da própria plataforma, com páginas de estudo sobre os principais assuntos presentes no ENEM, também geradas por IA.
+Ex: "1° Guerra mundial" -> O modelo de IA é orientado a gerar um resumo inicial do assunto, seguido de um tópico "Como cai no enem" explicando exatamente as estratégias de estudo específicas para a prova e posteriormente uma questão de exemplo para resolver.
 
 <p align="center">
   <img src="docs/readme/admin-conteudo.jpg" width="300" alt="Editor de conteúdo no admin">
@@ -212,34 +205,19 @@ Nenhuma página é publicada automaticamente: a revisão e a publicação são f
 
 **Stack:** Angular 19 com componentes *standalone* e control flow novo (`@if`, `@for`, `@defer`).
 
-- **Design system próprio** em tokens CSS, com tema claro e escuro.
 - **Motor isométrico do campus em SVG:**
   - mais de 400 peças entre prédios, andares, terrenos e acabamentos;
   - versões de dia e de noite;
   - animação de construção e câmera que acompanha a obra nova;
   - estruturas especiais liberadas por metas (acertos, dias ativos, XP).
 - **PWA instalável**, com aviso de nova versão e notificações push.
-- **Sons sintetizados com Web Audio API**, sem arquivos de áudio, com opção de desligar.
 - **Resumo do dia compartilhável**, com a imagem desenhada em `canvas` e enviada pelo compartilhamento nativo do celular.
 - **Desempenho:** rotas lazy e landing carregada só para visitantes. O bundle inicial caiu de **1,86 MB para 1,19 MB**.
-- **SEO sem SSR:** no build da Vercel, um script gera o HTML estático de cada página de conteúdo, além do `sitemap.xml` e do `robots.txt`. Publicar um conteúdo no admin dispara um novo deploy por *deploy hook*.
+
 
 ---
 
-## Como rodar
 
-```bash
-npm install
-npx ng serve
-```
-
-O app abre em `http://localhost:4200` e usa o backend em `http://localhost:8080`.
-
-Build de produção com as páginas de conteúdo pré-renderizadas:
-
-```bash
-API_URL=https://sua-api SITE_URL=https://seu-site npm run build:vercel
-```
 
 ---
 
