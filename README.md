@@ -57,7 +57,6 @@
   <img src="docs/readme/conteudo.jpg" width="230" alt="Página de conteúdo de estudo">
 </p>
 
-> Este repositório contém o **frontend** (Angular). O backend (Spring Boot) fica em um repositório separado e está descrito abaixo.
 
 ---
 
@@ -70,7 +69,7 @@ Em janeiro de 2026, durante o início da minha implementação, utilizava uma ú
 1. **Busca:** o sistema possui um banco com mais de 2.000 questões exemplo de provas antigas do ENEM. De acordo com o assunto sorteado para o dia, o sistema busca questões (com full-text search) que possam servir de exemplo no contexto para a IA.
 2. **Elaborar:** nesta chamada, a IA escreve a questão com base na Matriz de Referência do INEP para a área e nas questões exemplo encontradas no banco, caso hajam.
 3. **Resolver às cegas:** outra chamada para a IA resolve a questão sem conhecer o gabarito.
-4. **Revisar:** outra chamada  avalia a questão com uma rubrica de 11 critérios.
+4. **Revisar:** outra chamada  avalia a questão com uma rubrica de 11 critérios para definir o nível de confiabilidade da questão.
 5. **Corrigir ou publicar:** se alguma etapa reprovar, o item volta ao elaborador com todos os apontamentos. Se tudo passar, vira a questão do dia.
 
 ```mermaid
