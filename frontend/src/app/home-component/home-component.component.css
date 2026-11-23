@@ -54,6 +54,7 @@
 .estudos { order: 6; }
 .bloco-grupos { order: 7; }
 .bloco-evolucao { order: 8; }
+.insight { order: 9; }
 
 .grade section { animation: ed-surgir 420ms var(--ed-curva) both; }
 .desafio { animation-delay: 0ms; }
