@@ -13,6 +13,7 @@ import { NovaRedacaoModalComponent } from '../modal/nova-redacao-modal/nova-reda
 import { EstruturasPremiumService } from '../services/estruturas-premium.service';
 import { IconeComponent } from '../shared/icone/icone.component';
 import { COMPETENCIAS, InfoCompetencia } from './competencias';
+import { FAVORITAR_PAGINAS } from '../shared/dia';
 
 Chart.register(...registerables);
 
@@ -63,6 +64,7 @@ export class HomeRedacoesComponent implements OnInit, AfterViewInit, OnDestroy {
   mostrarModal = false;
   fabRecolhido = false;
   favorito = false;
+  readonly favoritarPaginas = FAVORITAR_PAGINAS;
   visao: 'nota' | 'comp' = 'nota';
   analise: 'fechada' | 'gerando' | 'pronta' = 'fechada';
   etapaAnalise = '';

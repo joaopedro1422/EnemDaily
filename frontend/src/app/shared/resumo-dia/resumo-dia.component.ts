@@ -18,7 +18,9 @@ export interface ResultadoArea { nome: string; cor: string; acertou: boolean; }
 
         <div class="rd-bolhas" [attr.aria-label]="acertos + ' de 4 acertos'">
           @for (r of resultados; track r.nome; let i = $index) {
-            <span class="rd-bolha" [class.cheia]="preenchidas.has(i)" [style.--c]="r.cor" [attr.title]="r.nome + (r.acertou ? ': acertou' : ': errou')"></span>
+            <span class="rd-bolha" [class.cheia]="preenchidas.has(i)" [class.erro]="!r.acertou" [style.--c]="r.cor" [attr.title]="r.nome + (r.acertou ? ': acertou' : ': errou')">
+              @if (!r.acertou) { <svg class="rd-xis" viewBox="0 0 20 20" aria-hidden="true"><path d="M6 6l8 8M14 6l-8 8"/></svg> }
+            </span>
           }
         </div>
 
@@ -58,6 +60,10 @@ export interface ResultadoArea { nome: string; cor: string; acertou: boolean; }
     .rd-bolha::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: var(--c); transform: scale(0); }
     .rd-bolha.cheia { border-color: rgba(255, 255, 255, .95); box-shadow: 0 10px 24px -10px rgba(0, 0, 0, .55); }
     .rd-bolha.cheia::after { animation: rd-tinta 460ms cubic-bezier(.3, 1.5, .5, 1) both; }
+    .rd-bolha.erro::after { background: rgba(255, 255, 255, .2); }
+    .rd-bolha.erro.cheia { border-color: rgba(255, 255, 255, .7); box-shadow: none; }
+    .rd-xis { position: absolute; z-index: 1; inset: 0; margin: auto; width: 26px; height: 26px; fill: none; stroke: rgba(255, 255, 255, .7); stroke-width: 2; stroke-linecap: round; opacity: 0; transition: opacity 300ms ease 200ms; }
+    .rd-bolha.cheia .rd-xis { opacity: 1; }
     @keyframes rd-tinta { 0% { transform: scale(0); } 100% { transform: scale(1); } }
     .rd-legenda { list-style: none; margin: -4px 0 0; padding: 0; display: grid; grid-template-columns: repeat(2, 84px); column-gap: 16px; row-gap: 4px; justify-items: center; font-size: 12px; font-weight: 600; color: rgba(255, 255, 255, .75); white-space: nowrap; }
     .rd-legenda li { display: inline-flex; align-items: center; gap: 5px; }
@@ -91,9 +97,8 @@ export class ResumoDiaComponent implements OnInit, OnDestroy {
     this.data = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
     let passo = 0;
     this.resultados.forEach((r, i) => {
-      if (!r.acertou) return;
       const nota = passo++;
-      this.timers.push(setTimeout(() => { this.preenchidas.add(i); this.som.bolinha(nota, true); }, 650 + nota * 420));
+      this.timers.push(setTimeout(() => { this.preenchidas.add(i); this.som.bolinha(nota, r.acertou); }, 650 + nota * 420));
     });
     if (this.sequencia > 1) this.timers.push(setTimeout(() => this.som.fogo(), 650 + passo * 420 + 250));
   }
@@ -152,8 +157,13 @@ export class ResumoDiaComponent implements OnInit, OnDestroy {
     this.resultados.forEach((res, i) => {
       const cx = cx0 + (i % 2) * (2 * r + gap), cy = cy0 + Math.floor(i / 2) * (2 * r + gap);
       g.beginPath(); g.arc(cx, cy, r, 0, Math.PI * 2);
-      if (res.acertou) { g.fillStyle = cores[i]; g.fill(); }
-      g.lineWidth = 14; g.strokeStyle = res.acertou ? 'rgba(255,255,255,.95)' : 'rgba(255,255,255,.45)'; g.stroke();
+      g.fillStyle = res.acertou ? cores[i] : 'rgba(255,255,255,.2)'; g.fill();
+      g.lineWidth = 14; g.strokeStyle = res.acertou ? 'rgba(255,255,255,.95)' : 'rgba(255,255,255,.7)'; g.stroke();
+      if (!res.acertou) {
+        const d = 30;
+        g.beginPath(); g.moveTo(cx - d, cy - d); g.lineTo(cx + d, cy + d); g.moveTo(cx + d, cy - d); g.lineTo(cx - d, cy + d);
+        g.lineWidth = 7; g.lineCap = 'round'; g.strokeStyle = 'rgba(255,255,255,.7)'; g.stroke();
+      }
     });
 
     g.font = `600 30px ${fonte}`;

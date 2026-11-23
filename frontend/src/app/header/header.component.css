@@ -99,12 +99,6 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--ed-caneta); out
 .perfil-texto b { font-size: 16px; font-weight: 700; color: var(--ed-tinta); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .perfil-texto span { font-size: 13px; color: var(--ed-tinta-3); }
 
-.ver-perfil {
-  display: flex; align-items: center; justify-content: space-between;
-  margin: 0 4px 8px; padding: 12px 14px;
-  font: 600 14.5px var(--ed-fonte); color: var(--ed-caneta-texto);
-  background: var(--ed-caneta-suave); border: 0; border-radius: var(--ed-r-controle);
-}
 
 .gaveta-nav { display: flex; flex-direction: column; gap: 2px; }
 .gaveta-rotulo {

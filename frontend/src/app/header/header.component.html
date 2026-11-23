@@ -60,11 +60,6 @@
     </button>
   </div>
 
-  <button class="ver-perfil" type="button" (click)="abrirPerfil()">
-    <span>Meu perfil</span>
-    <ed-icone nome="chevron-right" [tamanho]="18" />
-  </button>
-
   <nav class="gaveta-nav">
     <span class="gaveta-rotulo">Desafio Diário</span>
     <a routerLink="/Home" routerLinkActive="ativo" [routerLinkActiveOptions]="{ exact: true }" (click)="fecharMenu()"><ed-icone nome="house" />Início</a>
@@ -101,13 +96,6 @@
       <span class="app-txt"><b>Sons</b><small>{{ sons ? 'Efeitos sonoros ligados' : 'Efeitos sonoros desligados' }}</small></span>
       <input type="checkbox" role="switch" [checked]="sons" (change)="alternarSons($event)" aria-label="Efeitos sonoros" />
     </label>
-    @if (lembrete !== 'indisponivel') {
-      <label class="app-lembrete" [class.ativo]="lembrete === 'ativo'">
-        <span class="app-sino"><ed-icone nome="bell" [tamanho]="17" /></span>
-        <span class="app-txt"><b>Lembrete às 10h</b><small>{{ textoLembrete }}</small></span>
-        <input type="checkbox" role="switch" [checked]="lembrete === 'ativo'" [disabled]="lembrete === 'carregando' || lembrete === 'negado' || lembrete === 'precisa-instalar'" (change)="alternarLembrete($event)" aria-label="Lembrete diário às 10h" />
-      </label>
-    }
     @if (!confirmandoSaida) {
       <div class="gaveta-rodape">
         <button class="gaveta-acao" type="button" (click)="confirmandoSaida = true"><ed-icone nome="log-out" />Sair</button>

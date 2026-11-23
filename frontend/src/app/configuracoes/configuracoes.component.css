@@ -39,3 +39,16 @@
   .cf { padding: 40px 24px 88px; }
   .cf-bloco { padding: 24px; }
 }
+
+.cf-switch { display: flex; align-items: center; gap: 14px; cursor: pointer; }
+.cf-switch-ico { flex: none; width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: var(--ed-fundo-2); color: var(--ed-tinta-2); transition: background var(--ed-t-rapido), color var(--ed-t-rapido); }
+.cf-switch.ativo .cf-switch-ico { background: var(--ed-caneta-suave); color: var(--ed-caneta-texto); }
+.cf-switch-txt { flex: 1; min-width: 0; display: grid; gap: 3px; }
+.cf-switch-txt b { font-size: 15px; font-weight: 800; color: var(--ed-tinta); }
+.cf-switch-txt small { font-size: 13px; line-height: 1.45; color: var(--ed-tinta-3); }
+.cf-switch input { appearance: none; flex: none; width: 46px; height: 28px; margin: 0; border-radius: 14px; background: var(--ed-pauta-forte); position: relative; cursor: pointer; transition: background var(--ed-t-rapido); }
+.cf-switch input::after { content: ''; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: #FFFFFF; box-shadow: 0 1px 3px rgba(0, 0, 0, .25); transition: transform var(--ed-t-medio) var(--ed-curva); }
+.cf-switch input:checked { background: var(--ed-caneta); }
+.cf-switch input:checked::after { transform: translateX(18px); }
+.cf-switch input:disabled { opacity: .5; cursor: default; }
+.cf-switch input:focus-visible { outline: 2px solid var(--ed-caneta); outline-offset: 2px; }

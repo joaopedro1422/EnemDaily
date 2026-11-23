@@ -1,6 +1,7 @@
 import { Usuario } from '../models/usuario';
 
 export const MODO_TESTE = false;
+export const FAVORITAR_PAGINAS = false;
 
 export type ChaveArea = 'linguagens' | 'humanas' | 'naturezas' | 'exatas';
 export type EstadoArea = 'pendente' | 'acertou' | 'errou';
@@ -31,8 +32,13 @@ export function estadoArea(usuario: Usuario | null, chave: ChaveArea): EstadoAre
   return area.acertoHoje ? 'acertou' : 'errou';
 }
 
+export const COR_ERRO = 'erro';
+
 export function coresDoDia(usuario: Usuario | null): (string | null)[] {
-  return AREAS.map(a => (estadoArea(usuario, a.chave) === 'pendente' ? null : a.cor));
+  return AREAS.map(a => {
+    const e = estadoArea(usuario, a.chave);
+    return e === 'pendente' ? null : e === 'errou' ? COR_ERRO : a.cor;
+  });
 }
 
 export function formatarNumero(valor: number): string {

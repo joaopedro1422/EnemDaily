@@ -42,6 +42,8 @@
 .semana-dias svg { width: 100%; max-width: 44px; aspect-ratio: 1; overflow: visible; }
 .semana-dias .anel { fill: none; stroke: var(--ed-caneta); stroke-width: 5.6; }
 .semana-dias li.vazio .anel { stroke: var(--ed-pauta-forte); }
+.semana-dias .erro circle { fill: var(--ed-pauta); }
+.semana-dias .erro path { fill: none; stroke: var(--ed-tinta-3); stroke-width: 1.6; stroke-linecap: round; opacity: .7; }
 .semana-dias .ponto { transform-box: fill-box; transform-origin: center; animation: pingar 420ms cubic-bezier(.2, 1.6, .5, 1) both; animation-delay: calc(var(--i) * 70ms + 300ms); }
 @keyframes pingar { from { transform: scale(0); } }
 .semana-dias b { font-size: 13px; font-weight: 800; }
@@ -91,6 +93,8 @@
 .arte-semana svg { width: 92px; height: 92px; }
 .arte-semana .anel { fill: none; stroke: rgba(255, 255, 255, .9); stroke-width: 5.6; }
 .arte-semana li.vazio .anel { stroke: rgba(255, 255, 255, .35); }
+.arte-semana .erro circle { fill: rgba(255, 255, 255, .2); }
+.arte-semana .erro path { fill: none; stroke: rgba(255, 255, 255, .7); stroke-width: 1.8; stroke-linecap: round; }
 .arte-semana span { font-size: 34px; font-weight: 800; opacity: .85; }
 
 .arte-grade { margin-top: 46px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }

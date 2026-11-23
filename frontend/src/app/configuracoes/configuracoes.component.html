@@ -78,6 +78,17 @@
         @if (eSenha.erro) { <p class="cf-erro">{{ eSenha.erro }}</p> }
       </form>
     </section>
+
+    @if (lembrete !== 'indisponivel') {
+      <section class="cf-bloco" aria-labelledby="t-notificacoes">
+        <h2 id="t-notificacoes">Notificações</h2>
+        <label class="cf-switch" [class.ativo]="lembrete === 'ativo'">
+          <span class="cf-switch-ico"><ed-icone nome="bell" [tamanho]="18" /></span>
+          <span class="cf-switch-txt"><b>Lembrete do desafio</b><small>{{ textoLembrete }}</small></span>
+          <input type="checkbox" role="switch" [checked]="lembrete === 'ativo'" [disabled]="lembrete === 'carregando' || lembrete === 'negado' || lembrete === 'precisa-instalar'" (change)="alternarLembrete($event)" aria-label="Lembrete do desafio" />
+        </label>
+      </section>
+    }
   </main>
 
   @if (editandoAvatar) {

@@ -9,6 +9,7 @@ import { Usuario } from '../models/usuario';
 import { IconeComponent } from '../shared/icone/icone.component';
 import { AvatarComponent } from '../shared/avatar/avatar.component';
 import { PerfilComponent } from '../perfil/perfil.component';
+import { EstadoLembrete, PwaService } from '../services/pwa.service';
 
 type Estado = { salvando: boolean; ok: string; erro: string };
 const novo = (): Estado => ({ salvando: false, ok: '', erro: '' });
@@ -24,6 +25,7 @@ export class ConfiguracoesComponent implements OnInit, OnDestroy {
   private auth = inject(AuthServiceService);
   private conta = inject(ContaService);
   private router = inject(Router);
+  private pwa = inject(PwaService);
   private subs = new Subscription();
   private usuario$ = new Subject<string>();
 
@@ -45,8 +47,24 @@ export class ConfiguracoesComponent implements OnInit, OnDestroy {
   eUsuario = novo();
   eEmail = novo();
   eSenha = novo();
+  lembrete: EstadoLembrete = 'carregando';
+
+  get textoLembrete(): string {
+    switch (this.lembrete) {
+      case 'ativo': return 'Ativado neste aparelho. Avisamos às 10h, e às 20h se ainda faltar alguma questão.';
+      case 'negado': return 'Bloqueado pelo navegador. Libere as notificações do site nas configurações dele.';
+      case 'precisa-instalar': return 'No iPhone, instale o app na tela inicial para receber lembretes.';
+      case 'carregando': return 'Um instante...';
+      default: return 'Avisamos às 10h, e às 20h se ainda faltar alguma questão.';
+    }
+  }
+
+  alternarLembrete(e: Event) {
+    if ((e.target as HTMLInputElement).checked) this.pwa.ativarLembrete(); else this.pwa.desativarLembrete();
+  }
 
   ngOnInit() {
+    this.subs.add(this.pwa.lembrete$.subscribe(e => (this.lembrete = e)));
     this.subs.add(this.auth.usuario$.subscribe(u => {
       if (!u) { this.router.navigate(['/Home']); return; }
       const primeira = !this.usuario;

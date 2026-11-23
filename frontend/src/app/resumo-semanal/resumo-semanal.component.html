@@ -41,7 +41,7 @@
       <section class="semana" aria-label="Seus dias na semana">
         <div class="semana-cab">
           <h3>Sua semana em 4 cores</h3>
-          <span>cada bolinha é uma área que você acertou</span>
+          <span>colorida é acerto, cinza é erro</span>
         </div>
         <ol class="semana-dias">
           @for (d of dias; track $index; let i = $index) {
@@ -49,10 +49,13 @@
               <svg viewBox="0 0 100 100" aria-hidden="true">
                 <circle cx="32.5" cy="32.5" r="13.2" class="anel"/><circle cx="67.5" cy="32.5" r="13.2" class="anel"/>
                 <circle cx="32.5" cy="67.5" r="13.2" class="anel"/><circle cx="67.5" cy="67.5" r="13.2" class="anel"/>
-                @if (d.cores[0]) { <circle class="ponto" cx="32.5" cy="32.5" r="8.4" [attr.fill]="d.cores[0]"/> }
-                @if (d.cores[1]) { <circle class="ponto" cx="67.5" cy="32.5" r="8.4" [attr.fill]="d.cores[1]"/> }
-                @if (d.cores[2]) { <circle class="ponto" cx="32.5" cy="67.5" r="8.4" [attr.fill]="d.cores[2]"/> }
-                @if (d.cores[3]) { <circle class="ponto" cx="67.5" cy="67.5" r="8.4" [attr.fill]="d.cores[3]"/> }
+                @for (p of posicoes; track $index; let k = $index) {
+                  @if (d.cores[k] === erro) {
+                    <g class="ponto erro"><circle [attr.cx]="p.x" [attr.cy]="p.y" r="8.4"/><path [attr.d]="xis(p)"/></g>
+                  } @else if (d.cores[k]) {
+                    <circle class="ponto" [attr.cx]="p.x" [attr.cy]="p.y" r="8.4" [attr.fill]="d.cores[k]"/>
+                  }
+                }
               </svg>
               <b>{{ d.letra }}</b>
               <small>{{ d.respondidas ? d.acertos + '/' + d.respondidas : '—' }}</small>
@@ -99,10 +102,13 @@
                     <svg viewBox="0 0 100 100" aria-hidden="true">
                       <circle cx="32.5" cy="32.5" r="13.2" class="anel"/><circle cx="67.5" cy="32.5" r="13.2" class="anel"/>
                       <circle cx="32.5" cy="67.5" r="13.2" class="anel"/><circle cx="67.5" cy="67.5" r="13.2" class="anel"/>
-                      @if (d.cores[0]) { <circle cx="32.5" cy="32.5" r="8.4" [attr.fill]="d.cores[0]"/> }
-                      @if (d.cores[1]) { <circle cx="67.5" cy="32.5" r="8.4" [attr.fill]="d.cores[1]"/> }
-                      @if (d.cores[2]) { <circle cx="32.5" cy="67.5" r="8.4" [attr.fill]="d.cores[2]"/> }
-                      @if (d.cores[3]) { <circle cx="67.5" cy="67.5" r="8.4" [attr.fill]="d.cores[3]"/> }
+                      @for (p of posicoes; track $index; let k = $index) {
+                        @if (d.cores[k] === erro) {
+                          <g class="erro"><circle [attr.cx]="p.x" [attr.cy]="p.y" r="8.4"/><path [attr.d]="xis(p)"/></g>
+                        } @else if (d.cores[k]) {
+                          <circle [attr.cx]="p.x" [attr.cy]="p.y" r="8.4" [attr.fill]="d.cores[k]"/>
+                        }
+                      }
                     </svg>
                     <span>{{ d.letra }}</span>
                   </li>

@@ -14,7 +14,7 @@ import { RedacaoService } from '../services/redacao.service';
 import { mockRedacoes } from '../models/redacao';
 import { EstruturasPremiumService } from '../services/estruturas-premium.service';
 import { IconeComponent } from '../shared/icone/icone.component';
-import { AREAS, ChaveArea, InfoArea } from '../shared/dia';
+import { AREAS, ChaveArea, InfoArea, FAVORITAR_PAGINAS } from '../shared/dia';
 
 Chart.register(...registerables);
 
@@ -89,6 +89,7 @@ export class HomeSimuladosComponent implements OnInit, AfterViewInit, OnDestroy 
   mostrarModal = false;
   fabRecolhido = false;
   favorito = false;
+  readonly favoritarPaginas = FAVORITAR_PAGINAS;
   analise: 'fechada' | 'gerando' | 'pronta' = 'fechada';
   etapaAnalise = '';
   visao: Visao = 'dias';

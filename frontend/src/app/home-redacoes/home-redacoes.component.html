@@ -12,10 +12,12 @@
         @if (!carregando && !redacoes.length) { <p>Registre as notas das suas redações e acompanhe cada competência até o ENEM.</p> }
       </div>
     </div>
-    <button class="estrela" type="button" [class.ativa]="favorito" (click)="toggleFavorito()" [attr.aria-pressed]="favorito"
-            [title]="favorito ? 'Página inicial do app' : 'Definir como página inicial'" [attr.aria-label]="favorito ? 'Remover dos favoritos' : 'Favoritar página'">
-      <ed-icone nome="star" [tamanho]="20" />
-    </button>
+    @if (favoritarPaginas) {
+      <button class="estrela" type="button" [class.ativa]="favorito" (click)="toggleFavorito()" [attr.aria-pressed]="favorito"
+              [title]="favorito ? 'Página inicial do app' : 'Definir como página inicial'" [attr.aria-label]="favorito ? 'Remover dos favoritos' : 'Favoritar página'">
+        <ed-icone nome="star" [tamanho]="20" />
+      </button>
+    }
   </header>
 
   @if (carregando) {

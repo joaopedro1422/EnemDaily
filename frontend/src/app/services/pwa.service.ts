@@ -9,6 +9,7 @@ export type EstadoLembrete = 'carregando' | 'ativo' | 'inativo' | 'negado' | 'pr
 
 const DISPENSADO = 'ed-instalar-dispensado';
 const DIAS_DISPENSADO = 14;
+const LEMBRETE_DESLIGADO = 'ed-lembrete-desligado';
 
 @Injectable({ providedIn: 'root' })
 export class PwaService {
@@ -17,6 +18,7 @@ export class PwaService {
   private http = inject(HttpClient);
   private convite: any = (window as any).__edInstalar ?? null;
   private sincronizado = false;
+  private aguardandoToque = false;
 
   readonly instalacao$ = new BehaviorSubject<EstadoInstalacao>('indisponivel');
   readonly atualizacao$ = new BehaviorSubject<boolean>(false);
@@ -98,10 +100,29 @@ export class PwaService {
       }
     } else {
       this.lembrete$.next(Notification.permission === 'denied' ? 'negado' : 'inativo');
+      this.ativarPorPadrao();
     }
   }
 
+  private ativarPorPadrao() {
+    if (this.aguardandoToque || this.desligadoPeloUsuario || Notification.permission === 'denied') return;
+    if (Notification.permission === 'granted' && localStorage.getItem('tokenUser')) { this.ativarLembrete(); return; }
+    this.aguardandoToque = true;
+    const aoTocar = () => {
+      if (!localStorage.getItem('tokenUser')) return;
+      document.removeEventListener('pointerdown', aoTocar, true);
+      this.aguardandoToque = false;
+      if (this.lembrete$.value === 'inativo' && !this.desligadoPeloUsuario) this.ativarLembrete();
+    };
+    document.addEventListener('pointerdown', aoTocar, true);
+  }
+
+  private get desligadoPeloUsuario(): boolean {
+    try { return localStorage.getItem(LEMBRETE_DESLIGADO) === '1'; } catch { return false; }
+  }
+
   async ativarLembrete(): Promise<void> {
+    try { localStorage.removeItem(LEMBRETE_DESLIGADO); } catch { }
     if (!this.suportaPush()) { await this.verificarLembrete(); return; }
     this.lembrete$.next('carregando');
     try {
@@ -117,6 +138,7 @@ export class PwaService {
   }
 
   async desativarLembrete(): Promise<void> {
+    try { localStorage.setItem(LEMBRETE_DESLIGADO, '1'); } catch { }
     this.lembrete$.next('carregando');
     try {
       const sub = await firstValueFrom(this.swPush.subscription);

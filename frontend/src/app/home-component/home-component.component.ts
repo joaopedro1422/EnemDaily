@@ -25,7 +25,7 @@ import { BoasVindasComponent } from '../boas-vindas/boas-vindas.component';
 import { IconeComponent } from '../shared/icone/icone.component';
 import { SimboloDiaComponent } from '../shared/simbolo-dia/simbolo-dia.component';
 import { ResumoDiaComponent, ResultadoArea } from '../shared/resumo-dia/resumo-dia.component';
-import { AREAS, MODO_TESTE, ChaveArea, EstadoArea, InfoArea, coresDoDia, estadoArea, formatarNumero, hojeISO } from '../shared/dia';
+import { AREAS, FAVORITAR_PAGINAS, MODO_TESTE, ChaveArea, EstadoArea, InfoArea, coresDoDia, estadoArea, formatarNumero, hojeISO } from '../shared/dia';
 import { CampusComponent } from '../shared/campus/campus.component';
 import { Progresso, TOTAL_PECAS, progressoDoUsuario, totalDePecas } from '../shared/campus/campus';
 
@@ -579,6 +579,7 @@ export class HomeComponentComponent implements OnInit, OnDestroy {
   }
 
   private verificarRedirecionamentoFavorito() {
+    if (!FAVORITAR_PAGINAS) return;
     const usuario = this.authService.getUsuario();
     if (!usuario || !usuario.pagFavorita || usuario.pagFavorita === 'nenhuma') return;
     const hoje = new Date().toLocaleDateString();

@@ -7,7 +7,7 @@ import { EstruturasPremiumService } from '../services/estruturas-premium.service
 import { Usuario } from '../models/usuario';
 import { IconeComponent } from '../shared/icone/icone.component';
 import { CarregandoComponent } from '../shared/carregando/carregando.component';
-import { AREAS, ChaveArea, InfoArea, MODO_TESTE, formatarNumero } from '../shared/dia';
+import { AREAS, COR_ERRO, ChaveArea, InfoArea, MODO_TESTE, formatarNumero } from '../shared/dia';
 import { Progresso, calcularProgresso, paletaDe, progressoDoUsuario, renderizarCampus, totalDePecas } from '../shared/campus/campus';
 import { baixarArquivo, compartilharArquivo, gerarPng } from '../shared/exportar/exportar-imagem';
 
@@ -31,6 +31,14 @@ const ORDEM_SIMBOLO: ChaveArea[] = ['linguagens', 'humanas', 'naturezas', 'exata
   styleUrl: './resumo-semanal.component.css'
 })
 export class ResumoSemanalComponent implements OnInit, AfterViewInit, OnDestroy {
+  readonly posicoes = [{ x: 32.5, y: 32.5 }, { x: 67.5, y: 32.5 }, { x: 32.5, y: 67.5 }, { x: 67.5, y: 67.5 }];
+  readonly erro = COR_ERRO;
+
+  xis(p: { x: number; y: number }): string {
+    const d = 2.8;
+    return `M${p.x - d} ${p.y - d}L${p.x + d} ${p.y + d}M${p.x + d} ${p.y - d}L${p.x - d} ${p.y + d}`;
+  }
+
   @Output() fechar = new EventEmitter<void>();
   @ViewChild('arte') arteRef?: ElementRef<HTMLElement>;
   @ViewChild('moldura') molduraRef?: ElementRef<HTMLElement>;
@@ -127,7 +135,8 @@ export class ResumoSemanalComponent implements OnInit, AfterViewInit, OnDestroy 
       const doDia = linhas.filter(l => l.dia === chave);
       const cores = ORDEM_SIMBOLO.map(c => {
         const l = doDia.find(x => x.area?.toLowerCase() === c);
-        return l && l.acertos > 0 ? AREAS.find(a => a.chave === c)!.cor : null;
+        if (!l) return null;
+        return l.acertos > 0 ? AREAS.find(a => a.chave === c)!.cor : COR_ERRO;
       });
       doDia.forEach(l => {
         const k = l.area?.toLowerCase() as ChaveArea;

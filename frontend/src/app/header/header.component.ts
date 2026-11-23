@@ -1,4 +1,4 @@
-import { EstadoInstalacao, EstadoLembrete, PwaService } from '../services/pwa.service';
+import { EstadoInstalacao, PwaService } from '../services/pwa.service';
 import { ComunidadeService } from '../services/comunidade.service';
 import { SomService } from '../shared/som/som.service';
 import { AvatarComponent } from '../shared/avatar/avatar.component';
@@ -36,7 +36,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   pendentesComunidade = 0;
   instalacao: EstadoInstalacao = 'indisponivel';
-  lembrete: EstadoLembrete = 'carregando';
   private pwa = inject(PwaService);
   private comunidade = inject(ComunidadeService);
   private som = inject(SomService);
@@ -45,7 +44,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
   constructor(private authService: AuthServiceService, private router: Router, private rankingStore: RankingStoreServiceService) {
     this.comunidade.notificacoes$.subscribe(n => (this.pendentesComunidade = n ? n.amizades + n.duelos : 0));
     this.pwa.instalacao$.subscribe(e => (this.instalacao = e));
-    this.pwa.lembrete$.subscribe(e => (this.lembrete = e));
   }
 
   ngOnInit() {
@@ -92,25 +90,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
     return (this.instalacao === 'disponivel' || this.instalacao === 'ios') && !this.pwa.dispensado;
   }
 
-  get textoLembrete(): string {
-    switch (this.lembrete) {
-      case 'ativo': return 'Ativado neste aparelho';
-      case 'negado': return 'Bloqueado. Libere as notificações nas configurações do navegador.';
-      case 'precisa-instalar': return 'No iPhone, instale o app para ativar';
-      case 'carregando': return 'Um instante...';
-      default: return 'Avisamos quando o desafio do dia te esperar';
-    }
-  }
-
   alternarSons(e: Event) {
     this.sons = (e.target as HTMLInputElement).checked;
     this.som.alternar(this.sons);
     if (this.sons) this.som.pop();
-  }
-
-  alternarLembrete(e: Event) {
-    const ligar = (e.target as HTMLInputElement).checked;
-    if (ligar) this.pwa.ativarLembrete(); else this.pwa.desativarLembrete();
   }
 
   marcarGanhoDeXp() {
