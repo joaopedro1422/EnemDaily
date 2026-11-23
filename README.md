@@ -8,7 +8,7 @@
 <p align="center">
   <b>Desafio diário com 4 questões inéditas no padrão ENEM, geradas e revisadas por IA.</b>
   <br><br>
-  <b>Acesse em: <a>https://enem-daily.vercel.app/</a></b>
+  <b>Acesse em: <a href="https://enem-daily.vercel.app/">enem-daily.vercel.app</a></b>
 </p>
 
 <p align="center">
@@ -54,7 +54,7 @@
   <img src="docs/readme/resolucao.jpg" width="230" alt="Resolução da alternativa marcada">
 </p>
 <p align="center">
-  <img src="docs/readme/campus-obra.jpg" width="230" alt="Campus com uma peça nova em construção">
+  <img src="docs/readme/campus-obra.png" width="230" alt="Campus com uma peça nova em construção">
 </p>
 
 
