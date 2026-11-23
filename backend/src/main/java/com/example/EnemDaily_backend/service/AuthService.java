@@ -18,8 +18,12 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.security.SecureRandom;
+import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @RequiredArgsConstructor
@@ -33,20 +37,51 @@ public class AuthService {
     private final JwtService jwtService;
     private final JavaMailSender javaMailSender;
 
-    public CodigoResponse processarRecuperacao(String email){
-        var usuario = usuarioRepository.findByEmail(email)
+    private record CodigoPendente(String hash, Instant expira, int tentativas) {}
+    private static final Duration VALIDADE_CODIGO = Duration.ofMinutes(15);
+    private static final int MAX_TENTATIVAS = 5;
+    private final SecureRandom aleatorio = new SecureRandom();
+    private final Map<String, CodigoPendente> codigos = new ConcurrentHashMap<>();
+
+    public void processarRecuperacao(String email){
+        String chave = normalizar(email);
+        usuarioRepository.findByEmail(chave)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
-        String codigo = String.format("%06d", new Random().nextInt(999999));
-        enviarEmail(email, codigo);
-        return  new CodigoResponse(codigo);
+        CodigoPendente anterior = codigos.get(chave);
+        if (anterior != null && anterior.expira().minus(VALIDADE_CODIGO).plusSeconds(60).isAfter(Instant.now())) {
+            throw new RuntimeException("Aguarde um minuto para pedir outro código.");
+        }
+        String codigo = String.format("%06d", aleatorio.nextInt(1_000_000));
+        codigos.put(chave, new CodigoPendente(passwordEncoder.encode(codigo), Instant.now().plus(VALIDADE_CODIGO), 0));
+        enviarEmail(chave, codigo);
     }
 
-    public boolean salvaNovaSenha(NovaSenhaRequest request){
-        Usuario usuario = usuarioRepository.findByEmail(request.email())
+    public boolean codigoValido(String email, String codigo){
+        String chave = normalizar(email);
+        CodigoPendente p = codigos.get(chave);
+        if (p == null || p.expira().isBefore(Instant.now()) || p.tentativas() >= MAX_TENTATIVAS) {
+            codigos.remove(chave);
+            return false;
+        }
+        if (codigo != null && passwordEncoder.matches(codigo, p.hash())) return true;
+        codigos.put(chave, new CodigoPendente(p.hash(), p.expira(), p.tentativas() + 1));
+        return false;
+    }
+
+    public void salvaNovaSenha(NovaSenhaRequest request){
+        String chave = normalizar(request.email());
+        if (!codigoValido(chave, request.codigo())) throw new RuntimeException("Código inválido ou expirado.");
+        if (request.senha() == null || !request.senha().matches("^(?=.*\\d)\\S{6,}$")) throw new RuntimeException("A senha precisa ter pelo menos 6 caracteres e um número.");
+        Usuario usuario = usuarioRepository.findByEmail(chave)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
         usuario.setSenha(passwordEncoder.encode(request.senha()));
-        this.usuarioRepository.save(usuario);
-        return true;
+        usuario.setTokenSessao(null);
+        usuarioRepository.save(usuario);
+        codigos.remove(chave);
+    }
+
+    private static String normalizar(String email){
+        return email == null ? "" : email.trim().toLowerCase();
     }
 
     private void enviarEmail(String destinatario, String codigo) {
