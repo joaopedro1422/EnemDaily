@@ -17,6 +17,7 @@ import java.util.UUID;
 @Repository
 public interface EventRepository extends JpaRepository<Event, Long> {
     List<Event> findByIdUsuarioOrderByDataAsc(UUID idUsuario);
+    List<Event> findByIdUsuarioAndDataGreaterThanEqual(UUID idUsuario, LocalDateTime desde);
 
     @org.springframework.data.jpa.repository.Modifying
     @Query("delete from Event e where e.idUsuario = :idUsuario and e.data >= :desde")

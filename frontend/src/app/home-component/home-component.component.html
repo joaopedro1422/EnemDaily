@@ -179,27 +179,41 @@
         </section>
         }
 
-        <section class="bloco bloco-evolucao" aria-labelledby="titulo-evolucao">
-          <div class="bloco-cab">
-            <div>
-              <h2 id="titulo-evolucao">Sua evolução</h2>
-              <span class="bloco-sub">XP acumulado em {{ anoAtual }} · <b>{{ formatarNumero(xpAno) }} XP</b></span>
+        @if (recomendacao?.modo !== 'vazio' && recomendacao; as r) {
+          <section class="bloco insight" [class.positivo]="r.modo === 'positivo'" [style.--ia]="corArea(r.area)" aria-labelledby="titulo-insight">
+            <div class="insight-cab">
+              <span class="insight-ico"><ed-icone [nome]="r.modo === 'positivo' ? 'trophy' : 'target'" [tamanho]="18" /></span>
+              <div>
+                <span class="insight-rot">Recomendação para você</span>
+                <h2 id="titulo-insight">{{ r.modo === 'positivo' ? 'Tudo em dia por aqui' : 'O que revisar agora' }}</h2>
+              </div>
             </div>
-          </div>
-          <ul class="legenda">
-            <li class="total" style="--a: var(--ed-caneta)"><i></i>Total</li>
-            @for (d of desempenho; track d.info.chave) {
-              <li [style.--a]="d.info.cor"><i></i>{{ d.info.nome }}</li>
+            @if (r.modo === 'positivo') {
+              <p class="insight-texto">O seu rendimento está incrível! Por enquanto não temos recomendações de revisão.</p>
+            } @else {
+              <p class="insight-texto">
+                @if (r.modo === 'simulados') {
+                  <b>{{ nomeArea(r.area) }}</b> tem a pior média de acertos nos seus simulados. Recomendamos revisar estes assuntos com base no seu histórico do desafio diário.
+                } @else {
+                  Nos últimos dias, <b>{{ nomeArea(r.area) }}</b> foi a área em que você mais errou. Estes assuntos merecem uma revisão.
+                }
+              </p>
+              <ol class="insight-lista">
+                @for (a of r.assuntos; track a.nome) {
+                  <li>
+                    <div class="insight-assunto">
+                      <b>{{ a.nome }}</b>
+                      <small>{{ a.erros }} {{ a.erros === 1 ? 'erro' : 'erros' }} em {{ a.total }} {{ a.total === 1 ? 'questão' : 'questões' }} recentes</small>
+                    </div>
+                    @if (linksEstudo[a.nome]; as link) {
+                      <a class="insight-btn" [routerLink]="link">Estudar<ed-icone nome="arrow-right" [tamanho]="15" /></a>
+                    }
+                  </li>
+                }
+              </ol>
             }
-          </ul>
-          @if (xpAno > 0) {
-            <div class="grafico">
-              <canvas #graficoXp aria-label="Gráfico do XP acumulado ao longo do ano, total e por área" role="img"></canvas>
-            </div>
-          } @else {
-            <p class="vazio-texto">Sua curva de evolução no ano aparece aqui assim que você acertar a primeira questão.</p>
-          }
-        </section>
+          </section>
+        }
       </div>
 
       <aside class="coluna-lateral">

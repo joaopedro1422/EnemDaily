@@ -48,13 +48,13 @@
 .numeros dd { font-size: 20px; font-weight: 800; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
 .numeros dd small { font-size: 14px; font-weight: 700; color: var(--ed-tinta-3); }
 
-.revisar { padding: 16px 18px; border-radius: var(--ed-r-cartao); background: color-mix(in srgb, var(--mal) 7%, var(--ed-folha)); border: 1px solid color-mix(in srgb, var(--mal) 22%, var(--ed-folha)); }
-.revisar h2 { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 800; color: var(--mal); }
-.revisar ol { list-style: none; margin-top: 10px; display: grid; gap: 6px; counter-reset: r; }
-.revisar li { counter-increment: r; display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 8px; align-items: baseline; font-size: 14.5px; }
-.revisar li::before { content: counter(r); font-size: 12px; font-weight: 800; color: var(--mal); }
-.revisar li span { color: var(--ed-tinta); line-height: 1.35; }
-.revisar li b { font-size: 13px; font-weight: 700; color: var(--ed-tinta-3); font-variant-numeric: tabular-nums; }
+.caixa-revisar { padding: 16px 18px; border-radius: var(--ed-r-cartao); background: color-mix(in srgb, var(--mal) 7%, var(--ed-folha)); border: 1px solid color-mix(in srgb, var(--mal) 22%, var(--ed-folha)); }
+.caixa-revisar h2 { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 800; color: var(--mal); }
+.caixa-revisar ol { list-style: none; margin-top: 10px; display: grid; gap: 6px; counter-reset: r; }
+.caixa-revisar li { counter-increment: r; display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 8px; align-items: baseline; font-size: 14.5px; }
+.caixa-revisar li::before { content: counter(r); font-size: 12px; font-weight: 800; color: var(--mal); }
+.caixa-revisar li span { color: var(--ed-tinta); line-height: 1.35; }
+.caixa-revisar li b { font-size: 13px; font-weight: 700; color: var(--ed-tinta-3); font-variant-numeric: tabular-nums; }
 
 .assuntos { padding: 18px; border-radius: var(--ed-r-cartao); border: 1px solid var(--ed-pauta); background: var(--ed-folha); display: grid; gap: 14px; align-content: start; }
 .assuntos-cab { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }

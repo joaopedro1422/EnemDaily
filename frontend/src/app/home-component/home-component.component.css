@@ -439,3 +439,19 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--ed-caneta); out
 .saudacao-contagem b { color: var(--ed-caneta-texto); font-weight: 800; font-variant-numeric: tabular-nums; }
 .saudacao-contagem.hoje b, .saudacao-contagem.hoje ed-icone { color: var(--ed-ok); }
 .carregando-landing { min-height: 70svh; display: grid; place-items: center; }
+
+.insight { --ia: var(--ed-caneta); position: relative; overflow: hidden; display: grid; gap: 14px; background: linear-gradient(160deg, color-mix(in srgb, var(--ia) 9%, var(--ed-folha)) 0%, var(--ed-folha) 65%); border: 1px solid color-mix(in srgb, var(--ia) 24%, var(--ed-pauta)); }
+.insight.positivo { --ia: var(--ed-ok); }
+.insight-cab { display: flex; align-items: center; gap: 12px; }
+.insight-ico { flex: none; width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: var(--ia); color: #FFFFFF; box-shadow: 0 8px 18px -10px var(--ia); }
+.insight-rot { display: block; font-size: 11.5px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--ed-tinta-3); }
+.insight h2 { margin: 2px 0 0; font-size: 20px; font-weight: 800; letter-spacing: -.02em; }
+.insight-texto { margin: 0; font-family: var(--ed-fonte-leitura); font-size: 15.5px; line-height: 1.6; color: var(--ed-tinta-2); }
+.insight-texto b { color: var(--ed-tinta); }
+.insight-lista { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; counter-reset: ins; }
+.insight-lista li { counter-increment: ins; display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 14px; background: var(--ed-folha); border: 1px solid var(--ed-pauta); }
+.insight-lista li::before { content: counter(ins); flex: none; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; background: color-mix(in srgb, var(--ia) 14%, var(--ed-folha)); color: var(--ia); font: 800 12.5px var(--ed-fonte); }
+.insight-assunto { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.insight-assunto b { font-size: 15px; font-weight: 700; }
+.insight-assunto small { font-size: 12.5px; color: var(--ed-tinta-3); }
+.insight-btn { flex: none; display: inline-flex; align-items: center; gap: 4px; height: 34px; padding: 0 12px; border-radius: 10px; background: var(--ia); color: #FFFFFF; font: 700 13.5px var(--ed-fonte); text-decoration: none; }

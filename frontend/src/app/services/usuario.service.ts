@@ -15,6 +15,10 @@ export class UsuarioService {
    private apiUrl =  APIURL+'/usuarios';
    constructor(private http: HttpClient, private authService: AuthServiceService) { }
 
+   getRecomendacao(): Observable<Recomendacao> {
+    const headers = new HttpHeaders({ Authorization: `Bearer ${localStorage.getItem('tokenUser')}` });
+    return this.http.get<Recomendacao>(`${this.apiUrl}/recomendacao`, { headers });
+  }
    getResumoSemanal(): Observable<LinhaResumoSemanal[]> {
     const headers = new HttpHeaders({ Authorization: `Bearer ${localStorage.getItem('tokenUser')}` });
     return this.http.get<LinhaResumoSemanal[]>(`${this.apiUrl}/resumo-semanal`, { headers });
@@ -41,3 +45,5 @@ export class UsuarioService {
     return this.http.post<Usuario>(`${this.apiUrl}/pagina-favorita`, pag, {headers}).pipe(tap(res => console.log(res)));
    }
 }
+export interface AssuntoRecomendado { nome: string; area: string; erros: number; total: number; }
+export interface Recomendacao { modo: 'simulados' | 'recente' | 'positivo' | 'vazio'; area: string | null; assuntos: AssuntoRecomendado[]; }

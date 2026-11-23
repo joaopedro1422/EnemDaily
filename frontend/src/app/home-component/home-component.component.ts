@@ -1,7 +1,8 @@
 import { LandingComponent } from '../landing/landing.component';
 import { DueloHojeComponent } from '../shared/duelo/duelo-hoje.component';
 import { CarregandoComponent } from '../shared/carregando/carregando.component';
-import { UsuarioService } from '../services/usuario.service';
+import { Recomendacao, UsuarioService } from '../services/usuario.service';
+import { ConteudoService } from '../services/conteudo.service';
 import { Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
@@ -97,6 +98,10 @@ export class HomeComponentComponent implements OnInit, OnDestroy {
   taxaAcerto = 0;
   tempoMedio = '0:00';
   xpAno = 0;
+  recomendacao: Recomendacao | null = null;
+  linksEstudo: Record<string, string> = {};
+  private conteudos = inject(ConteudoService);
+  private ultimaRecomendacao = '';
 
   ultimoSimulado: Simulado | null = null;
   totalSimulados = 0;
@@ -383,6 +388,7 @@ export class HomeComponentComponent implements OnInit, OnDestroy {
     this.progressoCampus = progressoDoUsuario(usuario);
     this.totalPecas = totalDePecas(this.progressoCampus);
 
+    this.carregarRecomendacao(usuario);
     this.xpAno = (usuario.xpAnoAreas ?? []).reduce((s, m) => s + (m.naturezas ?? 0) + (m.humanas ?? 0) + (m.linguagens ?? 0) + (m.exatas ?? 0), 0);
     if (this.canvas) this.desenharGrafico();
   }
@@ -447,6 +453,29 @@ export class HomeComponentComponent implements OnInit, OnDestroy {
       },
       error: () => {}
     });
+  }
+
+  private carregarRecomendacao(usuario: Usuario) {
+    const chave = `${usuario.id}|${usuario.xpTotal}|${coresDoDia(usuario).join()}|${hojeISO()}`;
+    if (chave === this.ultimaRecomendacao) return;
+    this.ultimaRecomendacao = chave;
+    this.usuarioService.getRecomendacao().subscribe({
+      next: r => {
+        this.recomendacao = r;
+        for (const a of r.assuntos) {
+          this.conteudos.doAssunto(a.area, a.nome).subscribe(c => { if (c) this.linksEstudo[a.nome] = `/conteudos/${c.area}/${c.slug}`; });
+        }
+      },
+      error: () => (this.recomendacao = null)
+    });
+  }
+
+  nomeArea(area: string | null): string {
+    return AREAS.find(a => a.chave === ({ LINGUAGENS: 'linguagens', HUMANAS: 'humanas', NATUREZAS: 'naturezas', EXATAS: 'exatas' } as Record<string, string>)[area ?? ''])?.nome ?? '';
+  }
+
+  corArea(area: string | null): string {
+    return AREAS.find(a => a.chave === ({ LINGUAGENS: 'linguagens', HUMANAS: 'humanas', NATUREZAS: 'naturezas', EXATAS: 'exatas' } as Record<string, string>)[area ?? ''])?.cor ?? 'var(--ed-caneta)';
   }
 
   private desenharGrafico() {

@@ -20,6 +20,8 @@ public class UsuariosController {
     private final UsuarioService usuarioService;
     private final GrupoService grupoService;
     private final CorrecaoService correcaoService;
+    @org.springframework.beans.factory.annotation.Autowired
+    private com.example.EnemDaily_backend.service.RecomendacaoService recomendacaoService;
     public UsuariosController(UsuarioService usuarioService, GrupoService grupoService, CorrecaoService correcaoService){
         this.correcaoService = correcaoService;
         this.usuarioService = usuarioService;
@@ -62,6 +64,11 @@ public class UsuariosController {
     public ResponseEntity<?> getResumoSemanal(Authentication authentication){
         Usuario usuario = (Usuario) authentication.getPrincipal();
         return ResponseEntity.ok().body(usuarioService.getResumoSemanal(usuario.getId()));
+    }
+    @GetMapping("/recomendacao")
+    public ResponseEntity<?> getRecomendacao(Authentication authentication){
+        Usuario usuario = (Usuario) authentication.getPrincipal();
+        return ResponseEntity.ok(recomendacaoService.recomendar(usuario.getId()));
     }
     @GetMapping("/relatorio-assuntos")
     public ResponseEntity<?> getResumoAssuntos(Authentication authentication){
