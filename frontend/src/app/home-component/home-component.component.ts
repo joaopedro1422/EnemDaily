@@ -3,6 +3,7 @@ import { DueloHojeComponent } from '../shared/duelo/duelo-hoje.component';
 import { CarregandoComponent } from '../shared/carregando/carregando.component';
 import { Recomendacao, UsuarioService } from '../services/usuario.service';
 import { ConteudoService } from '../services/conteudo.service';
+import { chaveConteudoDaQuestao } from '../models/conteudo';
 import { Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
@@ -463,6 +464,9 @@ export class HomeComponentComponent implements OnInit, OnDestroy {
       next: r => {
         this.recomendacao = r;
         for (const a of r.assuntos) {
+          const slug = a.nome.toLowerCase().normalize('NFD').replace(/\p{M}/gu, '').replace(/[ºª]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+          const area = chaveConteudoDaQuestao(a.area);
+          if (area) this.linksEstudo[a.nome] = `/conteudos/${area}/${slug}`;
           this.conteudos.doAssunto(a.area, a.nome).subscribe(c => { if (c) this.linksEstudo[a.nome] = `/conteudos/${c.area}/${c.slug}`; });
         }
       },
