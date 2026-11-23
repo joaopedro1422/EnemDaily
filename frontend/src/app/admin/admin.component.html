@@ -4,10 +4,12 @@
       <span class="adm-selo">Admin</span>
       <h1>Painel do enem<span class="pt"></span>daily</h1>
     </div>
+    @if (liberado) {
     <div class="adm-topo-acoes">
       <a class="adm-btn-sec" routerLink="/admin/conteudos"><ed-icone nome="book-open" [tamanho]="16" />Conteúdos</a>
       <button class="adm-btn-sec" type="button" (click)="recarregarTudo()"><ed-icone nome="rotate-ccw" [tamanho]="16" />Atualizar</button>
     </div>
+    }
   </header>
 
   @if (semConexao) {
@@ -22,19 +24,21 @@
   }
 
   @if (acessoNegado) {
-    <section class="adm-negado">
-      <ed-icone nome="lock" [tamanho]="18" />
-      <div>
-        <b>Acesso negado pelo servidor</b>
-        <p>Sem chave configurada, o painel só funciona com o backend rodando localmente. Em produção, informe a chave definida em <code>ENEMDAILY_ADMIN_CHAVE</code>.</p>
-        <form class="adm-chave" (ngSubmit)="salvarChave()">
-          <input type="password" name="chave" [(ngModel)]="chave" placeholder="Chave de admin" autocomplete="off" />
-          <button class="adm-btn" type="submit">Usar chave</button>
-        </form>
-      </div>
+    <section class="adm-bloqueio" aria-labelledby="t-bloqueio">
+      <span class="adm-bloqueio-ico"><ed-icone nome="lock" [tamanho]="22" /></span>
+      <h2 id="t-bloqueio">Acesso restrito</h2>
+      <p>Informe a chave de admin para abrir o painel.</p>
+      <form class="adm-chave" (ngSubmit)="salvarChave()">
+        <input type="password" name="chave" [(ngModel)]="chave" placeholder="Chave de admin" autocomplete="off" aria-label="Chave de admin" />
+        <button class="adm-btn" type="submit" [disabled]="!chave.trim()">Entrar</button>
+      </form>
+      @if (chaveRecusada) { <p class="adm-bloqueio-erro">Chave incorreta. Confira e tente de novo.</p> }
     </section>
+  } @else if (!liberado && !semConexao) {
+    <p class="adm-verificando">Verificando acesso...</p>
   }
 
+  @if (liberado) {
   <section class="adm-numeros" aria-label="Resumo">
     <div class="num"><span>Usuários</span><b>{{ resumo?.usuarios ?? '—' }}</b><small>+{{ resumo?.novos7dias ?? 0 }} nos últimos 7 dias</small></div>
     <div class="num"><span>Ativos hoje</span><b>{{ resumo?.ativosHoje ?? '—' }}</b><small>responderam ao menos 1 questão</small></div>
@@ -275,6 +279,7 @@
       </nav>
     }
   </section>
+  }
 </div>
 
 @if (excluindo; as u) {

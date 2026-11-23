@@ -32,6 +32,8 @@ export class AdminComponent implements OnInit, OnDestroy {
   readonly nomesMes = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
 
   acessoNegado = false;
+  liberado = false;
+  chaveRecusada = false;
   semConexao = false;
   private tentativa: ReturnType<typeof setTimeout> | null = null;
   chave = this.api.chave;
@@ -92,7 +94,7 @@ export class AdminComponent implements OnInit, OnDestroy {
     this.acessoNegado = false;
     this.semConexao = false;
     if (this.tentativa) { clearTimeout(this.tentativa); this.tentativa = null; }
-    this.api.resumo().subscribe({ next: r => (this.resumo = r), error: e => this.falha(e) });
+    this.api.resumo().subscribe({ next: r => { this.resumo = r; this.liberado = true; }, error: e => this.falha(e) });
     this.carregarUsuarios();
     this.carregarMes();
     this.selecionarDia(this.diaSelecionado);
@@ -376,7 +378,7 @@ export class AdminComponent implements OnInit, OnDestroy {
   private falha(e: unknown) {
     this.carregandoUsuarios = false;
     if (!(e instanceof HttpErrorResponse)) return;
-    if (e.status === 403) { this.acessoNegado = true; return; }
+    if (e.status === 403) { this.acessoNegado = true; this.liberado = false; this.chaveRecusada = !!this.api.chave; return; }
     if (e.status === 0) {
       this.semConexao = true;
       if (!this.tentativa) this.tentativa = setTimeout(() => { this.tentativa = null; this.recarregarTudo(); }, 5000);

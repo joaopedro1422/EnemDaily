@@ -151,7 +151,7 @@ public class UsuarioService {
         List<GrupoUsuario> gruposUsuarios = grupoUsuarioRepository.findAllByUsuario(usuario);
 
         setAreasRespondidasHoje(usuario);
-        usuario = this.verificaEmblemas(usuario, resposta);
+        if (!usuario.isDemo()) usuario = this.verificaEmblemas(usuario, resposta);
         usuarioRepository.save(usuario);
         if (resposta.acerto()) {
             for (GrupoUsuario gu : gruposUsuarios) {

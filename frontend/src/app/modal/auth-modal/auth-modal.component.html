@@ -57,7 +57,7 @@
               @if (carregando) { <ed-carregando [mini]="true" /> } @else { Entrar }
             </button>
             <button class="btn-demo" type="button" (click)="entrarDemo()" [disabled]="carregandoDemo">
-              @if (carregandoDemo) { <ed-carregando [mini]="true" /> } @else { <ed-icone nome="sparkles" [tamanho]="17" />Conta demonstrativa }
+              @if (carregandoDemo) { <ed-carregando [mini]="true" /> } @else { <ed-icone nome="eye" [tamanho]="18" />Conta demonstrativa }
             </button>
             @if (erroDemo) { <span class="erro au-demo-erro">{{ erroDemo }}</span> }
             <p class="au-troca">Ainda não tem conta? <button type="button" class="link" (click)="irPara('cadastro')">Criar conta grátis</button></p>

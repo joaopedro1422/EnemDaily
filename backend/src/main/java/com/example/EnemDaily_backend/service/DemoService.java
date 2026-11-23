@@ -20,9 +20,10 @@ import java.util.*;
 public class DemoService {
 
     static final String EMAIL = "demo@enemdaily.app";
-    private static final String USUARIO = "marina.demo";
-    private static final String NOME = "Marina Costa";
-    private static final String AVATAR = "ed1|caneta|dia4|ouro|medicina||";
+    private static final String USUARIO = "usuario.demo";
+    private static final String NOME = "Usuário";
+    private static final String AVATAR = "ed1|ameixa|diagonal|nenhuma|||";
+    private static final UUID GRUPO_BRASIL = UUID.fromString("16599b34-57a9-41e3-b1cb-eb255671c3f1");
 
     private static final int SEQUENCIA_ATUAL = 26;
     private static final int DIAS_ANTES_DA_PAUSA = 24;
@@ -44,6 +45,8 @@ public class DemoService {
     private final AssuntoRepository assuntoRepository;
     private final SimuladoRepository simuladoRepository;
     private final RedacaoRepository redacaoRepository;
+    private final GrupoRepository grupoRepository;
+    private final GrupoUsuarioRepository grupoUsuarioRepository;
     private final UsuarioService usuarioService;
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
@@ -61,6 +64,7 @@ public class DemoService {
     public synchronized void recriar() {
         usuarioRepository.findByEmail(EMAIL).ifPresent(u -> {
             apagarDados(u.getId());
+            grupoUsuarioRepository.deleteAll(grupoUsuarioRepository.findAllByUsuario(u));
             usuarioRepository.delete(u);
             usuarioRepository.flush();
         });
@@ -107,9 +111,36 @@ public class DemoService {
             semearRedacoes(u.getId(), hoje);
             u.setDataCadastro(diasDeEstudo(hoje).get(0).minusDays(2).atTime(19, 12));
         }
+        u.setNome(NOME);
+        u.setUsuario(USUARIO);
+        u.setAvatar(AVATAR);
+        u.setEmblemas("");
         recalcular(u, eventos, hoje);
-        usuarioRepository.save(u);
+        u = usuarioRepository.save(u);
         eventRepository.flush();
+        garantirGrupo(u, diasDeEstudo(hoje).get(0));
+    }
+
+    private void garantirGrupo(Usuario u, LocalDate entrada) {
+        grupoRepository.findById(GRUPO_BRASIL).ifPresent(g -> {
+            GrupoUsuario gu = grupoUsuarioRepository.findAllByUsuario(u).stream()
+                    .filter(x -> x.getGrupo().getId().equals(g.getId())).findFirst()
+                    .orElseGet(() -> {
+                        GrupoUsuario novo = new GrupoUsuario();
+                        novo.setGrupo(g);
+                        novo.setUsuario(u);
+                        novo.setAdmin(false);
+                        return novo;
+                    });
+            int xp = 0;
+            if (g.isLinguagens()) xp += u.getLinguagens().getXp();
+            if (g.isHumanas()) xp += u.getHumanas().getXp();
+            if (g.isNaturezas()) xp += u.getNaturezas().getXp();
+            if (g.isExatas()) xp += u.getExatas().getXp();
+            gu.setXp(xp);
+            gu.setDataEntrada(entrada.atTime(19, 30));
+            grupoUsuarioRepository.save(gu);
+        });
     }
 
     private List<LocalDate> diasDeEstudo(LocalDate hoje) {
