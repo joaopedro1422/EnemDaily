@@ -7,6 +7,8 @@
 
 <p align="center">
   <b>Desafio diário com 4 questões inéditas no padrão ENEM, geradas e revisadas por IA.</b>
+  <br><br>
+  <b>Acesse em: <a>https://enem-daily.vercel.app/</a></b>
 </p>
 
 <p align="center">
