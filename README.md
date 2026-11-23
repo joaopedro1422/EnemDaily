@@ -31,7 +31,7 @@
   - [Loop de revisão](#6-loop-de-revisão)
   - [Verificações determinísticas](#7-verificações-determinísticas)
   - [Robustez e custo](#8-robustez-e-custo)
-  - [Conteúdo de estudo com revisão humana](#9-conteúdo-de-estudo-com-revisão-humana)
+- [Páginas de estudo geradas por IA](#páginas-de-estudo-geradas-por-ia)
 - [Backend](#backend)
 - [Frontend](#frontend)
 
@@ -53,7 +53,6 @@
 </p>
 <p align="center">
   <img src="docs/readme/campus-obra.jpg" width="230" alt="Campus com uma peça nova em construção">
-  <img src="docs/readme/conteudo.jpg" width="230" alt="Página de conteúdo de estudo">
 </p>
 
 
@@ -169,14 +168,37 @@ Tudo o que pode ser verificado por código é verificado antes das etapas de IA:
 - **Status da geração em tempo real** no painel de admin.
 - **Agendamento:** geração às 20h para o dia seguinte e repescagem às 00h05 para as áreas que falharam.
 
-### 9. Blog de estudos sobre os conteúdos
+---
 
-Aqui a ideia é que o aluno também possa obter mais conhecimentos dentro da própria plataforma, com páginas de estudo sobre os principais assuntos presentes no ENEM, também geradas por IA. Além de também poder servir como porta de entrada da plataforma para pessoas que pesquisem sobre estes conteúdos no GOOGLE, através de SEO.
+## Páginas de estudo geradas por IA
 
-Ex: "1° Guerra mundial" -> O modelo de IA é orientado a gerar um resumo inicial do assunto, seguido de um tópico "Como cai no enem" explicando exatamente as estratégias de estudo específicas para a prova e posteriormente uma questão de exemplo para resolver.
+Para cada assunto de cada área do ENEM, o sistema gera com IA uma **página de estudo completa** sobre aquele tema. Com isso, o aluno aprofunda o conteúdo dentro da própria plataforma, e as páginas também servem de porta de entrada para quem pesquisa esses assuntos no Google, através de SEO.
+
+Cada página segue a mesma estrutura:
+
+- **Resumo** do assunto, dividido em tópicos;
+- **Como cai no ENEM**: como o tema costuma ser cobrado, quais habilidades da Matriz de Referência aparecem e quais distratores são comuns;
+- **Para não errar**: os erros mais frequentes dos alunos naquele assunto;
+- **Teste seu conhecimento**: uma questão do próprio enem.daily sobre o tema.
+
+Ex.: "Primeira Guerra Mundial" → resumo das causas, fases e consequências, seguido de como o tema é cobrado na prova e de uma questão para resolver.
+
+**Nada vai ao ar sem revisão humana.** No painel de admin, escolho o assunto e clico em gerar. Em menos de 2 minutos o rascunho fica pronto, com título, descrição para o Google e prévia de como a página aparece na busca. Só depois de revisar eu publico, e a publicação dispara um novo deploy que gera o HTML estático da página e atualiza o sitemap.
+
+<table>
+  <tr>
+    <td align="center"><img src="docs/readme/conteudo-gerando.png" alt="Admin gerando o conteúdo de um assunto com IA"></td>
+    <td align="center"><img src="docs/readme/conteudo-pronto.png" alt="Rascunho gerado, pronto para revisar e publicar"></td>
+  </tr>
+  <tr>
+    <td align="center"><b>1.</b> A IA escreve a página do assunto</td>
+    <td align="center"><b>2.</b> O rascunho fica pronto para revisão</td>
+  </tr>
+</table>
 
 <p align="center">
-  <img src="docs/readme/admin-conteudo.jpg" width="300" alt="Editor de conteúdo no admin">
+  <img src="docs/readme/conteudo.jpg" width="300" alt="Página de estudo publicada">
+  <br><sub><b>3.</b> A página publicada, como o aluno vê</sub>
 </p>
 
 ---
