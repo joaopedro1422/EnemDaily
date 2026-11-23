@@ -47,7 +47,6 @@ export class AuthModalComponent implements OnInit, OnDestroy {
   erroCodigo = '';
   senhaNova = '';
   senhaNovaConfirmacao = '';
-  private codigoRetorno = '';
   private musica = new Audio('som-grupo.mp3');
   private audioLiberado = false;
 
@@ -180,16 +179,17 @@ export class AuthModalComponent implements OnInit, OnDestroy {
     this.carregando = true;
     this.erroRecuperacao = '';
     this.authService.enviaCodigo(this.emailRecuperacao.trim()).subscribe({
-      next: res => {
+      next: () => {
         this.carregando = false;
-        this.codigoRetorno = res.codigo;
         this.codigo = ['', '', '', '', '', ''];
         this.irPara('rec-codigo');
         setTimeout(() => this.inputs?.first?.nativeElement.focus(), 50);
       },
       error: err => {
         this.carregando = false;
-        this.erroRecuperacao = err.status === 400 ? 'Não encontramos uma conta com esse e-mail.' : 'Não foi possível enviar o código agora.';
+        const msg = typeof err.error === 'string' ? err.error : '';
+        this.erroRecuperacao = msg.startsWith('Aguarde') ? 'Aguarde um minuto para pedir outro código.'
+          : err.status === 400 ? 'Não encontramos uma conta com esse e-mail.' : 'Não foi possível enviar o código agora.';
       }
     });
   }
@@ -224,20 +224,22 @@ export class AuthModalComponent implements OnInit, OnDestroy {
   verificarCodigo() {
     if (!this.codigoCompleto || this.carregando) return;
     this.carregando = true;
-    setTimeout(() => {
-      this.carregando = false;
-      if (this.codigo.join('') === String(this.codigoRetorno)) {
+    this.authService.verificaCodigo(this.emailRecuperacao.trim(), this.codigo.join('')).subscribe({
+      next: () => {
+        this.carregando = false;
         this.irPara('rec-novaSenha');
-      } else {
-        this.erroCodigo = 'Código incorreto. Confira o e-mail e tente de novo.';
+      },
+      error: () => {
+        this.carregando = false;
+        this.erroCodigo = 'Código incorreto ou expirado. Confira o e-mail e tente de novo.';
       }
-    }, 600);
+    });
   }
 
   salvarSenha() {
     if (!this.novaSenhaOk || this.carregando) return;
     this.carregando = true;
-    this.authService.salvaSenha(this.senhaNova, this.emailRecuperacao.trim()).subscribe({
+    this.authService.salvaSenha(this.senhaNova, this.emailRecuperacao.trim(), this.codigo.join('')).subscribe({
       next: () => {
         this.carregando = false;
         this.emailLogin = this.emailRecuperacao.trim();

@@ -1,7 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
-import {  CodigoResponse, LoginRequest, RegisterRequest } from '../models/dtos';
+import { LoginRequest, RegisterRequest } from '../models/dtos';
 import { AuthResponse } from '../models/usuario';
 import { Usuario } from '../models/usuario';
 import { APIURL } from '../models/Environment';
@@ -31,13 +31,16 @@ export class AuthServiceService {
       );
   }
 
-  enviaCodigo(email: string): Observable<CodigoResponse> {
-    return this.http.post<CodigoResponse>(`${this.apiUrl}/envia-codigo`, {email:email} ).pipe(tap(res => console.log(res)));
+  enviaCodigo(email: string): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/envia-codigo`, { email });
   }
 
-  salvaSenha(senha: string, email : string): Observable<Object>{
-    return this.http.post<any>(`${this.apiUrl}/salva-senha`, {senha: senha, email: email} ).pipe(tap(res => console.log(res)));
-  
+  verificaCodigo(email: string, codigo: string): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/verifica-codigo`, { email, codigo });
+  }
+
+  salvaSenha(senha: string, email: string, codigo: string): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/salva-senha`, { senha, email, codigo });
   }
 
   logout() {

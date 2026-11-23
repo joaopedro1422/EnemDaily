@@ -1,6 +1,6 @@
 import { Usuario } from '../models/usuario';
 
-export const MODO_TESTE = true;
+export const MODO_TESTE = false;
 
 export type ChaveArea = 'linguagens' | 'humanas' | 'naturezas' | 'exatas';
 export type EstadoArea = 'pendente' | 'acertou' | 'errou';
