@@ -20,10 +20,12 @@ public class AdminController {
 
     private final AdminService admin;
     private final AcessoAdmin acesso;
+    private final com.example.EnemDaily_backend.service.DemoService demoService;
 
-    public AdminController(AdminService admin, AcessoAdmin acesso) {
+    public AdminController(AdminService admin, AcessoAdmin acesso, com.example.EnemDaily_backend.service.DemoService demoService) {
         this.admin = admin;
         this.acesso = acesso;
+        this.demoService = demoService;
     }
 
     @GetMapping("resumo")
@@ -65,6 +67,13 @@ public class AdminController {
     @GetMapping("assuntos")
     public ResponseEntity<?> assuntos(@RequestHeader(value = "X-Admin-Chave", required = false) String chave, HttpServletRequest req) {
         return protegido(chave, req, admin::assuntos);
+    }
+
+    @PostMapping("demo/recriar")
+    public ResponseEntity<?> recriarDemo(@RequestHeader(value = "X-Admin-Chave", required = false) String chave, HttpServletRequest req) {
+        if (!acesso.autorizado(chave, req)) return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        demoService.recriar();
+        return ResponseEntity.ok().build();
     }
 
     public record NovoAssunto(String nome, String area) {}

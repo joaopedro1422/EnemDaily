@@ -16,6 +16,16 @@ import java.util.UUID;
 
 @Repository
 public interface EventRepository extends JpaRepository<Event, Long> {
+    List<Event> findByIdUsuarioOrderByDataAsc(UUID idUsuario);
+
+    @org.springframework.data.jpa.repository.Modifying
+    @Query("delete from Event e where e.idUsuario = :idUsuario and e.data >= :desde")
+    int apagarDesde(@Param("idUsuario") UUID idUsuario, @Param("desde") LocalDateTime desde);
+
+    @org.springframework.data.jpa.repository.Modifying
+    @Query("delete from Event e where e.idUsuario = :idUsuario")
+    int apagarTodos(@Param("idUsuario") UUID idUsuario);
+
     @Query(value = """
     SELECT DISTINCT EXTRACT(DOW FROM data) AS dia_semana
     FROM event

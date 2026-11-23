@@ -123,3 +123,9 @@
 .tinta:hover { transform: scale(1.08); }
 .tinta:focus-visible { outline: 2px solid var(--ed-caneta); outline-offset: 3px; }
 .tinta.sel { box-shadow: 0 0 0 3px var(--ed-folha), 0 0 0 5px var(--c); }
+
+.btn-demo { height: 50px; border: 1.5px solid var(--ed-pauta-forte); border-radius: 16px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: var(--ed-folha); color: var(--ed-caneta-texto); font: 700 15.5px var(--ed-fonte); cursor: pointer; transition: border-color var(--ed-t-rapido), background var(--ed-t-rapido), transform var(--ed-t-rapido); }
+.btn-demo:not(:disabled):hover { border-color: var(--ed-caneta); background: var(--ed-caneta-suave); }
+.btn-demo:not(:disabled):active { transform: scale(.985); }
+.btn-demo:disabled { cursor: default; opacity: .7; }
+.au-demo-erro { text-align: center; }

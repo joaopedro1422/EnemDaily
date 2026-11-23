@@ -3,6 +3,7 @@ package com.example.EnemDaily_backend.controller;
 import com.example.EnemDaily_backend.DTO.*;
 import com.example.EnemDaily_backend.Infra.AcessoAdmin;
 import com.example.EnemDaily_backend.service.AuthService;
+import com.example.EnemDaily_backend.service.DemoService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,7 @@ import java.util.List;
 public class AuthController {
     private final AuthService authService;
     private final AcessoAdmin acessoAdmin;
+    private final DemoService demoService;
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody UsuarioRequestDTO dto){
         if(authService.existeUsuarioEmail(dto.email())){
@@ -36,6 +38,10 @@ public class AuthController {
             authService.register(dto);
         }
         return ResponseEntity.ok().build();
+    }
+    @PostMapping("/demo")
+    public ResponseEntity<?> entrarDemo(){
+        return ResponseEntity.ok(demoService.entrar());
     }
     @PostMapping("/envia-codigo")
     public ResponseEntity<?> enviarCodigo(@RequestBody RecuperacaoRequest recuperacaoRequest){

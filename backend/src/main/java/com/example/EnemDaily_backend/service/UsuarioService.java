@@ -204,7 +204,7 @@ public class UsuarioService {
                 diasSet.contains(5),
                 diasSet.contains(6)
         );
-        return  new UsuarioResponseDTO(usuario.getId(),usuario.getDataUtilmoAcesso(), usuario.getPagFavorita(), usuario.getEmblemas(), usuario.getNome(), usuario.getUsuario(), usuario.getAvatar(), usuario.isDemo(),
+        return  new UsuarioResponseDTO(usuario.getId(),usuario.getDataUtilmoAcesso(), usuario.getPagFavorita(), usuario.getEmblemas(), usuario.getNome(), usuario.getUsuario(), usuario.getAvatar(), usuario.isDemo() && !DemoService.EMAIL.equals(usuario.getEmail()),
                 usuario.getXpTotal(), eventRepository.xpHoje(usuario.getId()),  usuario.getStreak(),getStreakDiasAtivos(usuario.getId()), eventRepository.contarDiasAtivos(usuario.getId()),  usuario.getNaturezas(), usuario.getHumanas(), usuario.getLinguagens(), usuario.getExatas(),
                 usuario.isHumRespondidaHj(), usuario.isExatRespondidaHj(), usuario.isLingRespondidaHj(), usuario.isNatRespondidaHj(), presenca, getXpAnoAtual(usuario.getId()), getGruposUsuario(usuario), eventRepository.maiorSequenciaDiasAtivos(usuario.getId()), !Boolean.FALSE.equals(usuario.getOnboardingVisto()), usuario.getEmail());
     }

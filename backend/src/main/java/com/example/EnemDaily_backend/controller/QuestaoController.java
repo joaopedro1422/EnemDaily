@@ -51,8 +51,8 @@ public class QuestaoController {
         if (authentication == null || !(authentication.getPrincipal() instanceof Usuario usuario)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        String jwtApenas = token.replace("Bearer ", "");
-        if(token == null || !jwtApenas.equals(usuario.getTokenSessao())){
+        String jwtApenas = token == null ? null : token.replace("Bearer ", "");
+        if (!usuario.isDemo() && (jwtApenas == null || !jwtApenas.equals(usuario.getTokenSessao()))) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         var q = geradorQuestaoService.getQuestaoDia(AreaEnum.parse(area));

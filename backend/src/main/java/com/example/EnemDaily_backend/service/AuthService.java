@@ -46,6 +46,7 @@ public class AuthService {
     public void processarRecuperacao(String email){
         String chave = normalizar(email);
         usuarioRepository.findByEmail(chave)
+                .filter(u -> !u.isDemo())
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
         CodigoPendente anterior = codigos.get(chave);
         if (anterior != null && anterior.expira().minus(VALIDADE_CODIGO).plusSeconds(60).isAfter(Instant.now())) {

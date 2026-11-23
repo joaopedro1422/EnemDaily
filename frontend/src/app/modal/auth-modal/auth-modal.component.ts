@@ -124,6 +124,25 @@ export class AuthModalComponent implements OnInit, OnDestroy {
     });
   }
 
+  carregandoDemo = false;
+  erroDemo = '';
+
+  entrarDemo() {
+    if (this.carregandoDemo) return;
+    this.carregandoDemo = true;
+    this.erroDemo = '';
+    this.authService.loginDemo().subscribe({
+      next: () => {
+        this.carregandoDemo = false;
+        this.fechar();
+      },
+      error: () => {
+        this.carregandoDemo = false;
+        this.erroDemo = 'Não foi possível abrir a conta demonstrativa agora.';
+      }
+    });
+  }
+
   continuarCadastro() {
     if (!this.cadastroOk) return;
     this.erroEmail = '';
