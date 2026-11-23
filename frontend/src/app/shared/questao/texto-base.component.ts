@@ -28,7 +28,7 @@ import { Questao } from '../../models/questao';
     @if (questao.fonte) { <p class="tb-fonte" [innerHTML]="questao.fonte"></p> }
   `,
   styles: [`
-    :host { display: block; margin-bottom: 14px; }
+    :host { display: block; min-width: 0; max-width: 100%; margin-bottom: 14px; }
     .tb-img { display: block; max-width: 100%; margin: 0 auto 16px; border-radius: 4px; border: 1px solid var(--ed-pauta); }
     .tb-texto { font-family: var(--ed-fonte-leitura); font-size: 16.5px; line-height: 1.7; color: var(--ed-tinta); white-space: pre-line; text-align: justify; hyphens: auto; }
     .tb-tabela { margin: 16px 0 0; }

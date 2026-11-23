@@ -12,7 +12,8 @@
 
 .art-grade { display: grid; gap: 24px; margin-top: 28px; }
 .art-indice { display: none; }
-.art-corpo { min-width: 0; max-width: 720px; display: grid; gap: 40px; }
+.art-corpo { min-width: 0; max-width: 720px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 40px; }
+.art-corpo > * { min-width: 0; }
 
 .art-sec h2 { display: flex; align-items: center; gap: 10px; margin: 0 0 14px; font-size: 25px; font-weight: 800; letter-spacing: -.025em; line-height: 1.2; }
 .art-sec h2 ed-icone { color: var(--ct); }

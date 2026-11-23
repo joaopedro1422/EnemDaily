@@ -51,7 +51,7 @@ import { ResolucaoComponent } from './resolucao.component';
   `,
   styleUrls: ['../../desafio/desafio.component.css'],
   styles: [`
-    :host { display: grid; gap: 14px; }
+    :host { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; min-width: 0; }
     .qi { animation: none; }
     .qi-acao { padding: 6px 18px 18px; }
     .qi-btn { width: 100%; height: 50px; border: 0; border-radius: 14px; background: var(--ed-caneta); color: var(--ed-sobre-caneta); font: 800 15.5px var(--ed-fonte); cursor: pointer; }
