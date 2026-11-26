@@ -2,8 +2,8 @@ import { Paleta, iso, f1, shade, mix, box, topo, faceY, faceX, poly, linha3, cil
 
 
 export const ACERTOS_ABRE_PRACA = 15;
-export const ACERTOS_POR_NEGOCIO = 25;
-export const LOJA_DO_DEQUE = 5;
+export const ACERTOS_POR_NEGOCIO = 30;
+export const LOJA_DO_DEQUE = 6;
 
 type Icone = 'pizza' | 'suco' | 'pastel' | 'bebida' | 'bolo' | 'sorvete' | 'cafe' | 'acai' | 'burger' | 'tapioca';
 interface Negocio { nome: string; tipo: 'restaurante' | 'quiosque'; icone: Icone; cor: string; parede: string; }

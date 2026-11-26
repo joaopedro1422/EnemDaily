@@ -61,14 +61,14 @@
 .cv-modal-chip i { width: 9px; height: 9px; border-radius: 50%; }
 .cv-modal-botao { background: var(--ed-caneta) !important; color: var(--ed-sobre-caneta) !important; border-radius: 12px !important; font: 700 15px var(--ed-fonte) !important; padding: 12px 22px !important; margin: 4px 0 18px !important; }
 
-.cv-metro { animation: cv-metro 18s linear infinite; }
+.cv-metro { animation: cv-metro 22s linear infinite; }
 @keyframes cv-metro {
   0% { transform: translate(0, 0); opacity: 0; animation-timing-function: linear; }
-  3% { transform: translate(0, 0); opacity: 1; animation-timing-function: cubic-bezier(.25, .6, .35, 1); }
-  38% { transform: translate(var(--ex), var(--ey)); opacity: 1; animation-timing-function: linear; }
-  60% { transform: translate(var(--ex), var(--ey)); opacity: 1; animation-timing-function: cubic-bezier(.6, 0, .75, .4); }
-  94% { transform: translate(var(--fx), var(--fy)); opacity: 1; }
-  97%, 100% { transform: translate(var(--fx), var(--fy)); opacity: 0; }
+  2.5% { transform: translate(0, 0); opacity: 1; animation-timing-function: cubic-bezier(.25, .6, .35, 1); }
+  31% { transform: translate(var(--ex), var(--ey)); opacity: 1; animation-timing-function: linear; }
+  49% { transform: translate(var(--ex), var(--ey)); opacity: 1; animation-timing-function: cubic-bezier(.6, 0, .75, .4); }
+  77% { transform: translate(var(--fx), var(--fy)); opacity: 1; }
+  79.5%, 100% { transform: translate(var(--fx), var(--fy)); opacity: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {

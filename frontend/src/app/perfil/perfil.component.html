@@ -5,8 +5,8 @@
     <div class="av-alca" aria-hidden="true"></div>
     <header class="av-cab">
       <div>
-        <h2 id="av-titulo">Seu avatar</h2>
-        <p>É assim que você aparece nos grupos e no ranking.</p>
+        <h2 id="av-titulo">{{ aba === 'capa' ? 'Capa do perfil' : 'Seu avatar' }}</h2>
+        <p>{{ aba === 'capa' ? 'Ela aparece no topo do seu perfil para os colegas.' : 'É assim que você aparece nos grupos e no ranking.' }}</p>
       </div>
       <button class="av-fechar" type="button" (click)="fechar()" aria-label="Fechar"><ed-icone nome="x" [tamanho]="18" /></button>
     </header>
@@ -37,6 +37,15 @@
         </div>
       </div>
     } @else {
+      @if (aba === 'capa') {
+        <div class="av-capa-previa">
+          <ed-capa [codigo]="capaAtual" [dados]="{ sequencia: maiorSequencia }" />
+          <div class="av-capa-id">
+            <ed-avatar [config]="config" [nome]="nome" [tamanho]="64" />
+            <span><b>{{ nome }}</b><small>&#64;{{ usuario?.usuario }}</small></span>
+          </div>
+        </div>
+      } @else {
       <div class="av-previa">
         <div class="av-previa-img">
           <ed-avatar [config]="config" [nome]="nome" [tamanho]="124" />
@@ -53,13 +62,15 @@
           </div>
         </div>
       </div>
+      }
       @if (erro) { <p class="av-erro" role="alert">{{ erro }}</p> }
 
       <nav class="av-abas" role="tablist" aria-label="Personalizar avatar">
         <button role="tab" type="button" [attr.aria-selected]="aba === 'cor'" [class.ativa]="aba === 'cor'" (click)="aba = 'cor'" [disabled]="temFoto">Cor</button>
         <button role="tab" type="button" [attr.aria-selected]="aba === 'motivo'" [class.ativa]="aba === 'motivo'" (click)="aba = 'motivo'" [disabled]="temFoto">Motivo</button>
-        <button role="tab" type="button" [attr.aria-selected]="aba === 'moldura'" [class.ativa]="aba === 'moldura' || (temFoto && aba !== 'curso')" (click)="aba = 'moldura'">Moldura</button>
+        <button role="tab" type="button" [attr.aria-selected]="aba === 'moldura'" [class.ativa]="aba === 'moldura' || (temFoto && (aba === 'cor' || aba === 'motivo'))" (click)="aba = 'moldura'">Moldura</button>
         <button role="tab" type="button" [attr.aria-selected]="aba === 'curso'" [class.ativa]="aba === 'curso'" (click)="aba = 'curso'">Curso</button>
+        <button role="tab" type="button" [attr.aria-selected]="aba === 'capa'" [class.ativa]="aba === 'capa'" (click)="aba = 'capa'">Capa</button>
       </nav>
 
       <div class="av-painel" role="tabpanel">
@@ -97,6 +108,35 @@
               }
             </div>
             <p class="av-nota">Molduras são conquistas de dias seguidos. Sua maior sequência é de {{ maiorSequencia }} {{ maiorSequencia === 1 ? 'dia' : 'dias' }}.</p>
+          }
+          @case ('capa') {
+            <p class="av-capa-conta"><ed-icone nome="sparkles" [tamanho]="14" />{{ capasLiberadas }} de {{ totalCapas }} capas liberadas</p>
+            @for (g of categoriasCapa; track g.nome) {
+              <h3 class="av-capa-cat">{{ g.nome }}</h3>
+              <div class="av-capas">
+                @for (c of g.capas; track c.codigo) {
+                  @let livre = livreCapa(c);
+                  @let pr = progressoCapa(c);
+                  <button type="button" class="av-capa" [class.sel]="capaAtual === c.codigo" [class.preso]="!livre" [style.--r]="raridades[c.raridade].cor"
+                          (click)="escolherCapa(c)" [attr.aria-pressed]="capaAtual === c.codigo" [attr.aria-disabled]="!livre" [attr.title]="c.descricao">
+                    <span class="av-capa-mini"><ed-capa [codigo]="c.codigo" [dados]="{ sequencia: maiorSequencia }" [animar]="false" />
+                      @if (!livre) { <i class="av-capa-trava"><ed-icone nome="lock" [tamanho]="16" /></i> }
+                    </span>
+                    <span class="av-capa-info">
+                      <b>{{ c.nome }}</b>
+                      <em>{{ raridades[c.raridade].nome }}</em>
+                    </span>
+                    @if (!livre) {
+                      <span class="av-capa-req">{{ c.requisito }}</span>
+                      <span class="av-capa-barra" [attr.aria-label]="pr.atual + ' de ' + pr.meta"><i [style.width.%]="pr.pct"></i></span>
+                    } @else {
+                      <span class="av-capa-req livre">{{ c.descricao }}</span>
+                    }
+                  </button>
+                }
+              </div>
+            }
+            <p class="av-nota">Novas capas liberam com sequência, dias ativos, acertos por área, XP, duelos, simulados e redações.</p>
           }
           @case ('curso') {
             <div class="av-grade">

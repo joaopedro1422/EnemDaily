@@ -311,3 +311,18 @@ export function antenaSatelite(b: Predio, n: number, P: Paleta): string {
     `<ellipse cx="${f1(c[0])}" cy="${f1(c[1])}" rx="8" ry="5" fill="${P.noite ? '#C9CEE0' : '#F4F6FA'}" stroke="${P.ferro}" stroke-width=".8" transform="rotate(-28 ${f1(c[0])} ${f1(c[1])})"/>` +
     `<path d="M${f1(c[0])},${f1(c[1])} L${f1(c[0] + 5)},${f1(c[1] - 7)}" stroke="${P.ferro}" stroke-width="1"/><circle cx="${f1(c[0] + 5)}" cy="${f1(c[1] - 7)}" r="1.4" fill="${P.ch}"/>`;
 }
+
+export function obelisco(x: number, y: number, P: Paleta): string {
+  const m = marmore(P), ms = marmoreSombra(P), h = 2.9, b0 = .22, b1 = .12;
+  let o = sombraChao(x, y, .7, .35, P);
+  o += box(x - .6, y - .6, 0, 1.2, 1.2, .14, ms, { t: m }) + box(x - .45, y - .45, .14, .9, .9, .14, m, { r: ms }) + box(x - .32, y - .32, .28, .64, .64, .32, m, { r: ms });
+  o += faceY(y + .32 + .003, x - .2, x + .2, .34, .54, OURO);
+  const z0 = .6, z1 = z0 + h;
+  o += poly([[x - b0, y + b0, z0], [x + b0, y + b0, z0], [x + b1, y + b1, z1], [x - b1, y + b1, z1]], m);
+  o += poly([[x + b0, y - b0, z0], [x + b0, y + b0, z0], [x + b1, y + b1, z1], [x + b1, y - b1, z1]], ms);
+  for (let k = 1; k < 6; k++) { const z = z0 + .3 + k * .42, t = (z - z0) / h, r = b0 + (b1 - b0) * t; o += linha3([[x - r * .5, y + r + .002, z], [x + r * .5, y + r + .002, z]], ms, .7, ' opacity=".7"'); }
+  const ap: [number, number, number] = [x, y, z1 + .34];
+  o += poly([[x - b1, y + b1, z1], [x + b1, y + b1, z1], ap], OURO) + poly([[x + b1, y - b1, z1], [x + b1, y + b1, z1], ap], shade(OURO, .78));
+  if (P.noite) { const g = iso(x, y, z1 + .2); o += `<circle cx="${f1(g[0])}" cy="${f1(g[1])}" r="9" fill="#FFE9A8" opacity=".3"/>`; }
+  return o;
+}

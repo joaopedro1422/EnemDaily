@@ -7,18 +7,22 @@ import { FirebaseServiceService } from '../services/firebase-service.service';
 import { AvatarComponent } from '../shared/avatar/avatar.component';
 import { IconeComponent } from '../shared/icone/icone.component';
 import { CarregandoComponent } from '../shared/carregando/carregando.component';
+import { CapaComponent } from '../shared/capas/capa.component';
+import { CAPAS, Capa, CategoriaCapa, RARIDADES, StatsCapa, capaLiberada } from '../shared/capas/capas';
+import { ComunidadeService } from '../services/comunidade.service';
+import { EstruturasPremiumService } from '../services/estruturas-premium.service';
 import {
   ConfigAvatar, MOLDURAS, MOTIVOS, Moldura, Motivo, SELOS, Selo, TINTAS,
   gravarAvatar, lerAvatar, molduraLiberada, motivoHerdado, motivoLiberado
 } from '../shared/avatar/avatar';
 
-type Aba = 'cor' | 'motivo' | 'moldura' | 'curso';
+type Aba = 'cor' | 'motivo' | 'moldura' | 'curso' | 'capa';
 const LADO = 320;
 
 @Component({
   selector: 'app-perfil',
   standalone: true,
-  imports: [AvatarComponent, IconeComponent, CarregandoComponent],
+  imports: [AvatarComponent, IconeComponent, CarregandoComponent, CapaComponent],
   templateUrl: './perfil.component.html',
   styleUrl: './perfil.component.css'
 })
@@ -28,7 +32,16 @@ export class PerfilComponent implements OnInit, OnDestroy {
   private authService = inject(AuthServiceService);
   private usuarioService = inject(UsuarioService);
   private firebase = inject(FirebaseServiceService);
+  private comunidade = inject(ComunidadeService);
+  private premium = inject(EstruturasPremiumService);
   private sub?: Subscription;
+  private subPremium?: Subscription;
+
+  readonly raridades = RARIDADES;
+  readonly categoriasCapa: { nome: CategoriaCapa; capas: Capa[] }[] = (['Estudos', 'Cursos', 'Conquistas', 'Games', 'Paisagens'] as CategoriaCapa[]).map(nome => ({ nome, capas: CAPAS.filter(c => c.categoria === nome) }));
+  private duelosVencidos = 0;
+  private redacoes = 0;
+  private simulados = 0;
 
   readonly tintas = Object.entries(TINTAS).map(([chave, t]) => ({ chave, ...t }));
   readonly motivos = MOTIVOS;
@@ -65,10 +78,12 @@ export class PerfilComponent implements OnInit, OnDestroy {
       this.config = lerAvatar(u.avatar, this.nome);
       this.herdado = motivoHerdado(u.avatar);
       this.original = u.avatar?.startsWith('ed1|') ? u.avatar : '';
+      if (!u.demo && u.usuario) this.comunidade.perfil(u.usuario).subscribe({ next: p => (this.duelosVencidos = p.duelosVencidos ?? 0), error: () => {} });
     });
+    this.subPremium = this.premium.contagem$.subscribe(c => { this.redacoes = c.redacoes ?? 0; this.simulados = c.simulados ?? 0; });
   }
 
-  ngOnDestroy() { this.sub?.unsubscribe(); if (this.recorte) URL.revokeObjectURL(this.recorte.url); }
+  ngOnDestroy() { this.sub?.unsubscribe(); this.subPremium?.unsubscribe(); if (this.recorte) URL.revokeObjectURL(this.recorte.url); }
 
   com(parcial: Partial<ConfigAvatar>): ConfigAvatar { return { ...this.config, ...parcial }; }
 
@@ -80,6 +95,21 @@ export class PerfilComponent implements OnInit, OnDestroy {
   escolherMotivo(m: Motivo) { if (this.livreMotivo(m)) this.config = this.com({ motivo: m }); }
   escolherMoldura(m: Moldura) { if (this.livreMoldura(m)) this.config = this.com({ moldura: m }); }
   escolherSelo(s: Selo) { this.config = this.com({ selo: s }); }
+
+  get statsCapa(): StatsCapa {
+    const u = this.usuario;
+    return {
+      xp: this.xp, maiorSequencia: this.maiorSequencia, diasAtivos: u?.qntDiasAtivos ?? 0,
+      acertos: { linguagens: u?.linguagens?.acertos ?? 0, humanas: u?.humanas?.acertos ?? 0, naturezas: u?.naturezas?.acertos ?? 0, exatas: u?.exatas?.acertos ?? 0 },
+      duelosVencidos: this.duelosVencidos, redacoes: this.redacoes, simulados: this.simulados, emblemas: (u?.emblemas ?? '').split('|').filter(Boolean)
+    };
+  }
+  get capaAtual(): string { return this.config?.capa || 'caderno'; }
+  livreCapa(c: Capa) { return capaLiberada(c, this.statsCapa); }
+  progressoCapa(c: Capa) { const [a, m] = c.progresso(this.statsCapa); return { atual: Math.min(a, m), meta: m, pct: Math.min(100, Math.round((a / m) * 100)) }; }
+  get capasLiberadas() { return CAPAS.filter(c => this.livreCapa(c)).length; }
+  readonly totalCapas = CAPAS.length;
+  escolherCapa(c: Capa) { if (this.livreCapa(c)) this.config = this.com({ capa: c.codigo === 'caderno' ? '' : c.codigo }); }
 
   abrirArquivo(ev: Event) {
     const input = ev.target as HTMLInputElement, arquivo = input.files?.[0];

@@ -2,10 +2,14 @@ import { Component, EventEmitter, HostListener, Input, OnDestroy, OnInit, Output
 import confetti from 'canvas-confetti';
 import { Emblema } from '../../models/usuario';
 import { IconeComponent } from '../../shared/icone/icone.component';
+import { EmblemaComponent } from '../../shared/emblemas/emblema.component';
+import { nomeDoEmblema } from '../../shared/emblemas/emblemas';
+import { CapaComponent } from '../../shared/capas/capa.component';
+import { capaDoEmblema } from '../../shared/capas/capas';
 
 @Component({
   selector: 'app-novo-emblema',
-  imports: [IconeComponent],
+  imports: [IconeComponent, EmblemaComponent, CapaComponent],
   templateUrl: './novo-emblema.component.html',
   styleUrl: './novo-emblema.component.css'
 })
@@ -21,6 +25,9 @@ export class NovoEmblemaComponent implements OnInit, OnDestroy {
   get emblema(): Emblema | undefined {
     return this.emblemas[this.atual];
   }
+
+  readonly nomeDoEmblema = nomeDoEmblema;
+  get capaJunto() { const e = this.emblema; return e ? capaDoEmblema(e.codigo) : null; }
 
   get ultimo(): boolean {
     return this.atual >= this.emblemas.length - 1;

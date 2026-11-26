@@ -108,7 +108,7 @@ export class UniversityComponent implements OnInit, OnDestroy {
           return {
             grupo: m.grupo, nome: m.nome, icone: m.icone, liberada: true,
             descricao: `${abertos} de ${NEGOCIOS.length} negócios abertos.` + (prox ? ` Próximo: ${prox.nome}, em ${prox.faltam} ${prox.faltam === 1 ? 'acerto' : 'acertos'}.` : ' Todos abertos!'),
-            requisito: 'Um negócio a cada 25 acertos', feitas: abertos, meta: NEGOCIOS.length,
+            requisito: 'Um negócio a cada 30 acertos', feitas: abertos, meta: NEGOCIOS.length,
             svg: this.sanitizer.bypassSecurityTrustHtml(miniaturaMarco(m.chave, P)), rota, acao: 'Responder o desafio'
           };
         }

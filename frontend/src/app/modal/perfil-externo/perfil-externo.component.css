@@ -40,7 +40,7 @@
 .grade-trofeus { --linha: 118px; width: calc(var(--cols) / 4 * 100%); display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); grid-auto-rows: var(--linha); row-gap: 6px; padding: 0 10px; background-image: linear-gradient(180deg, transparent 0, transparent calc(var(--linha) - 13px), #4A5492 calc(var(--linha) - 13px), #2D3568 calc(var(--linha) - 9px), #1B2149 var(--linha), transparent var(--linha)); background-size: 100% calc(var(--linha) + 6px); background-repeat: repeat-y; }
 .nicho { scroll-snap-align: start; position: relative; height: 100%; border: 0; padding: 0 0 13px; background: none; display: grid; place-items: end center; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .nicho:focus-visible { outline: 2px solid rgba(var(--luz), .9); outline-offset: -4px; border-radius: 12px; }
-.trofeu { position: relative; z-index: 2; width: 54px; height: 54px; object-fit: contain; margin-bottom: 4px; transition: transform 300ms cubic-bezier(.2, 1.4, .5, 1), filter 300ms, opacity 300ms; }
+.trofeu { display: block; position: relative; z-index: 2; width: 54px; height: 54px; margin-bottom: 4px; transition: transform 300ms cubic-bezier(.2, 1.4, .5, 1), filter 300ms, opacity 300ms; }
 .nicho:not(.ganho) .trofeu { filter: grayscale(1) brightness(0) invert(1); opacity: .1; }
 .nicho:not(.ganho):hover .trofeu, .nicho:not(.ganho).ativo .trofeu { opacity: .22; }
 .nicho.ganho .trofeu { filter: drop-shadow(0 8px 10px rgba(0, 0, 0, .55)); animation: aparecer-trofeu 700ms cubic-bezier(.2, 1.5, .5, 1) both, pairar 3.4s ease-in-out infinite alternate; animation-delay: calc(var(--i) * 110ms + 450ms), calc(var(--i) * 110ms + 1200ms); }

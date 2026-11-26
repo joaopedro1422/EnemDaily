@@ -7,6 +7,8 @@ import { Emblema, EMBLEMAS_MOCK, Usuario } from '../../models/usuario';
 import { UsuarioGrupo } from '../../models/grupo';
 import { CampusComponent } from '../../shared/campus/campus.component';
 import { IconeComponent } from '../../shared/icone/icone.component';
+import { EmblemaComponent } from '../../shared/emblemas/emblema.component';
+import { nomeDoEmblema } from '../../shared/emblemas/emblemas';
 import { formatarNumero } from '../../shared/dia';
 import { Progresso, TOTAL_PECAS, progressoDeColega, progressoDoUsuario, totalDePecas } from '../../shared/campus/campus';
 
@@ -18,7 +20,7 @@ interface Trofeu {
 
 @Component({
   selector: 'app-perfil-externo',
-  imports: [AvatarComponent, CampusComponent, IconeComponent, AsyncPipe, RouterLink],
+  imports: [AvatarComponent, CampusComponent, IconeComponent, AsyncPipe, RouterLink, EmblemaComponent],
   templateUrl: './perfil-externo.component.html',
   styleUrl: './perfil-externo.component.css'
 })
@@ -42,6 +44,7 @@ export class PerfilExternoComponent implements OnInit, OnDestroy {
   selecionado: Trofeu | null = null;
   fechando = false;
   readonly totalEmblemas = EMBLEMAS_MOCK.length;
+  readonly nomeDoEmblema = nomeDoEmblema;
   readonly totalCampus = TOTAL_PECAS;
   readonly formatarNumero = formatarNumero;
 

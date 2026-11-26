@@ -53,12 +53,12 @@
                   <span class="feixe" aria-hidden="true"></span>
                   <span class="brilho-base" aria-hidden="true"></span>
                 }
-                <img class="trofeu" [src]="t.emblema.url" alt="" loading="lazy" />
+                <ed-emblema class="trofeu" [codigo]="t.emblema.codigo" [animar]="t.ganho" />
                 @if (!t.ganho) { <ed-icone class="cadeado" nome="lock" [tamanho]="12" /> }
                 @if (selecionado === t) {
                   <span class="balao" [class.esq]="k % colunas === 0" [class.dir]="k % colunas === colunas - 1" role="tooltip">
                     <small [class.ok]="t.ganho">{{ t.ganho ? 'Conquistado' : 'Bloqueado' }}</small>
-                    {{ t.emblema.desc }}
+                    <b>{{ nomeDoEmblema(t.emblema.codigo) }}</b> · {{ t.emblema.desc }}
                   </span>
                 }
               </button>

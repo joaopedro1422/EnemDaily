@@ -4,8 +4,9 @@ import {
   simboloFaceY, caminho, sebe, cerca, bandeirinhas, quiosque, antena, estatua, lago, fumaca, turbina, piramide, degraus, TipoArvore, U, ponteDePedra } from './motor';
 import { teatroFundacao, teatroSalao, teatroCornija, teatroCaixaCenica, teatroPortico, teatroFrontao, teatroLetreiro, teatroCartazes, teatroEstandartes, teatroLuzes, bibliotecaAndar, bibliotecaPorta, bibliotecaCobertura, bibliotecaPaineis, livroAberto, palcoSarau, livrosGigantes, bilheteria, cinemaCorpo, cinemaTorre, cinemaMarquise } from './predios-letras';
 import { observatorioBase, observatorioTorre, observatorioGaleria, observatorioCupula, observatorioTelescopio, observatorioLuzes, computacaoAndar, computacaoEntrada, computacaoCobertura, computacaoCubo, computacaoBits, computacaoTelhadoExtras, institutoCobertura, institutoFormula, institutoTorre, placaPi, xadrez } from './predios-exatas';
-import { temploBase, temploCela, temploColunata, temploEntablamento, temploFrontao, temploLuzes, telhadoClassico, pilastras, globoMonumental, rosaDosVentos, anfora, emEscala, escadariaMarmore, estandartes, relogioFrontao, lanternaCobre, estacaoMeteorologica, rosaFrontao, antenaSatelite, estatuaLiberdade } from './predios-humanas';
+import { temploBase, temploCela, temploColunata, temploEntablamento, temploFrontao, temploLuzes, telhadoClassico, pilastras, globoMonumental, rosaDosVentos, anfora, emEscala, escadariaMarmore, obelisco, estandartes, relogioFrontao, lanternaCobre, estacaoMeteorologica, rosaFrontao, antenaSatelite, estatuaLiberdade } from './predios-humanas';
 import { bibliotecaTerreoSimples, bibliotecaAndarSimples, bibliotecaTelhadoSimples, bibliotecaEntradaSimples, teatroSimples, cinemaSimples, temploLajeSimples, temploPilaresSimples, estufaEstrutura, estufaSimples, observatorioTorreSimples, observatorioCupulaSimples } from './simples';
+import { bancoFundacao, bancoObra, bancoSimples, bancoPremium } from './predios-banco';
 import { Coliseu, coliseuFundacao, coliseuArena, coliseuNivel, coliseuArquibancadas, coliseuMastros, coliseuLuzes } from './coliseu';
 import { estufaBase, estufaPlantas, estufaAlas, estufaPavilhao, estufaCupula, estufaLuzes, galpao, cisterna, pergola, hortaIrrigacao, quimicaAndar, quimicaCobertura, quimicaHexagono, frascoGigante, deque } from './predios-natureza';
 
@@ -522,7 +523,7 @@ function trilhaHumanas(): Peca[] {
   const CO: Coliseu = { cx: 2.72, cy: 19.4, ax: 2.2, ay: 2.85, aax: .8, aay: 1.42 };
   const kC = CO.cx + CO.cy;
   const GE: Predio = { x: 3.9, y: 24.3, w: 3.9, d: 1.4, z0: .2, h: 1.3 };
-  const GL = { x: 10.6, y: 20.3 };
+  const GL = { x: 10.6, y: 21.1 };
   const parAR = (P: Paleta) => (P.noite ? P.parede : '#F3EFE7');
   const nome = 'Humanas';
   const pl = (n: number) => (P: Paleta) => placaRegiao(n, 9.75, 16.4, P, nome, P.ch);
@@ -581,6 +582,7 @@ function trilhaHumanas(): Peca[] {
   add('Fragmentos romanos', 5.35, 22.8, P => colunaAntiga(5.1, 22.5, .5, P) + colunaAntiga(5.75, 23.0, .3, P) + box(5.15, 23.3, 0, .7, .2, .2, P.noite ? '#8E8AA8' : '#E2DCCD'), { anim: 'cresce' });
   add('Totem iluminado', 9.75, 16.4, pl(4), { grupo: 'placa-ch', nivel: 4 });
   add('Estátua da liberdade', 9.35, 25.25, P => estatuaLiberdade(9.35, 25.25, P), { anim: 'cresce' });
+  add('Obelisco · monumento', 11.2, 16.85, P => obelisco(11.2, 16.85, P), { anim: 'cresce' });
   add('Coliseu · iluminação', CO.cx, CO.cy, P => coliseuLuzes(CO, P), { chave: kC + .008, anim: 'surge' });
   return lista;
 }
@@ -690,6 +692,8 @@ function trilhaExatas(): Peca[] {
   const CC: Predio = { x: 21.3, y: 5.5, w: 2.8, d: 3.1, z0: .25, h: 1.2 };
   const IM: Predio = { x: 16.4, y: .45, w: 4.2, d: 2.0, z0: .25, h: 1.25 };
   const porta = { x0: 22.45, x1: 22.95 };
+  const BK: Predio = { x: 22.75, y: .75, w: 2.7, d: 2.2, z0: .32, h: 0 };
+  const kB = BK.x + BK.w / 2 + BK.y + BK.d / 2;
   const nome = 'Matemática';
   const pl = (n: number) => (P: Paleta) => placaRegiao(n, 20.6, 9.55, P, nome, P.mt);
   add('Terreno de Matemática', 18.5, 7.5, loteRegiao([16, 5, 21, 10], 'exatas'), { lote: [16, 5, 21, 10], grupo: 'lote-mt', nivel: 1, camada: 0, anim: 'surge' });
@@ -721,7 +725,7 @@ function trilhaExatas(): Peca[] {
   add('Pirâmide de vidro', 18.0, 4.05, P => sombraChao(18.0, 4.05, 1.5, .75, P) + box(16.75, 2.8, 0, 2.5, 2.5, .12, P.concreto) + piramide(18.0, 4.05, .12, 1.15, 1.9, P), { anim: 'cresce' });
   add('Sólidos geométricos', 20.3, 3.0, P => cuboEscultura(20.3, 3.0, P), { anim: 'cresce' });
   add('Observatório · torre com vitrais', OB.cx, OB.cy, P => observatorioTorre(OB, P), { chave: kO + .01, grupo: 'obra-exatas', nivel: 3, anim: 'cai' });
-  add('Árvores', 21.6, 3.3, P => arvores(P, [[21.4, 2.5, .9], [23.9, 4.45, 1, 'alta']]), {});
+  add('Árvores', 21.4, 2.5, P => arvores(P, [[21.4, 2.5, .9]]), {});
   add('Postes', 22.5, 6, P => arvore(21.05, 5.2, P, .55, 'arbusto') + arvore(24.4, 9.05, P, .55, 'arbusto'), {});
   add('Observatório · galeria', OB.cx, OB.cy, P => observatorioGaleria(OB, P), { chave: kO + .02, anim: 'cai' });
   add('Bancos da pirâmide', 18, 5.6, P => banco(17.4, 5.45, P), {});
@@ -746,25 +750,23 @@ function trilhaExatas(): Peca[] {
   add('Instituto · 2º andar', 18.5, 1.45, P => andar(IM, 1, P, { passo: .7, parede: P.noite ? P.parede : '#F6F1E8' }), { chave: k(IM), anim: 'cai' });
   add('Computação · cubo </> luminoso', 22.7, 7.05, P => computacaoCubo(CC, 3, P), { chave: k(CC) + .03, anim: 'cresce' });
   add('Instituto · 3º andar', 18.5, 1.45, P => andar(IM, 2, P, { passo: .7, parede: P.noite ? P.parede : '#F6F1E8' }), { chave: k(IM), anim: 'cai' });
+  add('Banco · fundação', 24.1, 1.85, P => bancoFundacao(BK, P), { chave: kB, anim: 'cresce' });
   add('Instituto · telhado simples', 18.5, 1.45, P => telhado(IM, 3, P, P.mt) + entrada(IM, P, IM.x + IM.w / 2, P.mt), { chave: k(IM) + .01, grupo: 'im-topo', nivel: 1, anim: 'cai' });
   add('Computação · faixa de bits', 24.1, 8.3, P => computacaoBits(CC, 3, P), { chave: k(CC) + .02, anim: 'surge' });
-  add('Labirinto · cerca-viva externa', 24.1, 2.0, P => sebe(22.6, .5, 3.0, .25, .5, P) + sebe(22.6, .5, .25, 3.0, .5, P) + sebe(25.35, .5, .25, 3.0, .5, P) + sebe(22.6, 3.25, 1.2, .25, .5, P) + sebe(24.4, 3.25, 1.2, .25, .5, P), { anim: 'cresce' });
+  add('Banco · paredes', 24.1, 1.85, P => bancoObra(BK, P), { chave: kB + .01, grupo: 'banco', nivel: 1, anim: 'cai' });
   add('Computação · painéis e antena', 22.7, 7.05, P => computacaoTelhadoExtras(CC, 3, P), { chave: k(CC) + .015, anim: 'cai' });
-  add('Labirinto · caminhos internos', 24.1, 2.0, P => sebe(23.4, 1.2, .2, 1.4, .45, P) + sebe(23.6, 1.2, 1.2, .2, .45, P) + sebe(24.6, 1.8, .2, 1.3, .45, P), { chave: 26.15, anim: 'cresce' });
-  add('Caminho do labirinto', 22.4, 4.0, P => caminho(21.1, 3.8, 25.6, 4.25, P), { camada: 0, anim: 'surge' });
+  add('Banco · primeira versão', 24.1, 1.85, P => bancoSimples(BK, P), { chave: kB + .01, grupo: 'banco', nivel: 2, anim: 'cresce' });
+  add('Caminho do banco', 22.4, 4.0, P => caminho(21.1, 3.8, 25.6, 4.25, P) + caminho(23.85, 3.35, 24.35, 3.8, P), { camada: 0, anim: 'surge' });
   add('Instituto · letreiro MATEMÁTICA', 18.5, 1.45, P => institutoCobertura(IM, 3, P) + entrada(IM, P, IM.x + IM.w / 2, P.mt), { chave: k(IM) + .01, grupo: 'im-topo', nivel: 2, anim: 'cai' });
-  add('Portão do labirinto', 24.1, 3.4, P => box(23.8, 3.25, 0, .14, .25, 1.0, P.mt) + box(24.26, 3.25, 0, .14, .25, 1.0, P.mt) + box(23.76, 3.23, 1.0, .68, .3, .12, P.mt), { anim: 'cresce' });
   add('Tabuleiro de xadrez gigante', 25.25, 5.25, P => xadrez(24.5, 4.55, P), { camada: 0, anim: 'surge' });
   add('Instituto · fórmula na fachada', 18.5, 2.5, P => institutoFormula(IM, 2, P), { chave: k(IM) + .02, anim: 'brota' });
   add('Peças de xadrez', 25.25, 5.25, P => ([[24.68, 4.73, P.branco], [25.73, 5.43, P.ferro], [25.03, 5.78, P.branco], [25.38, 4.73, P.ferro]] as [number, number, string][]).map(([x, y, c]) => cilindro(x, y, 0, .42, .1, c) + elipseChao(x, y, .46, .085, c)).join(''), {});
   add('Monumento ao infinito', 25.4, 7.2, P => { const c = iso(25.4, 7.2, 1.3); return box(25.0, 6.8, 0, .8, .8, .5, P.concreto) + `<path d="M${f1(c[0])},${f1(c[1])} c-6,-8 -16,-8 -16,0 c0,8 10,8 16,0 c6,-8 16,-8 16,0 c0,8 -10,8 -16,0 z" fill="none" stroke="${P.mt}" stroke-width="3.2"/>`; }, { anim: 'cresce' });
   add('Instituto · torre Σ', 18.5, 1.45, P => institutoTorre(IM, 3, P), { chave: k(IM) + .03, anim: 'cai' });
   add('Braço robótico', 25.3, 9.3, P => { const g = iso(25.3, 9.3, .3); return box(25.0, 9.0, 0, .6, .6, .3, P.concreto) + `<g stroke="${P.mt}" stroke-width="3.2" stroke-linecap="round" fill="none"><path d="M${f1(g[0])},${f1(g[1])} l0,-12 l10,-8 l6,6"/></g><circle cx="${f1(g[0])}" cy="${f1(g[1] - 12)}" r="2.4" fill="${P.ferro}"/><circle cx="${f1(g[0] + 10)}" cy="${f1(g[1] - 20)}" r="2.2" fill="${P.ferro}"/>`; }, {});
-  add('Pinheiros no fundo', 23, .4, P => arvores(P, [[21.0, .3, 1, 'pinheiro'], [25.7, 3.9, 1.1, 'pinheiro']]), { chave: 22.0 });
-  add('Postes do labirinto', 22.4, 4.2, P => arvore(22.45, 3.55, P, .55, 'arbusto') + arvore(25.85, 3.7, P, .55, 'arbusto'), {});
+  add('Pinheiros no fundo', 21, .3, P => arvores(P, [[21.0, .3, 1, 'pinheiro']]), { chave: 22.0 });
   add('Canteiros geométricos', 24.9, 8.2, P => canteiro(24.4, 7.95, .5, .5, P, 62) + canteiro(25.1, 7.95, .5, .5, P, 63), {});
   add('Bancos da torre', 24.9, 9.5, P => banco(24.1, 9.85, P, 'x', P.mt), {});
-  add('Estudantes no labirinto', 24, 2, P => pessoas(P, [[23.0, 1.6, 'exatas', 1, [0, .9, 5, 0]], [24.2, 2.6, 'linguagens', 3, [.6, 0, 4, 1]]]), { chave: 26.2 });
   add('Totem iluminado', 20.6, 9.55, pl(4), { grupo: 'placa-mt', nivel: 4 });
   add('Árvores floridas', 18.6, 2.9, P => arvores(P, [[16.35, 4.3, .8, 'florida'], [20.55, 2.0, .75, 'florida']]), {});
   add('Esfera armilar', 17.4, 9.95, P => { const c = iso(17.4, 9.95, 1.1); return box(17.2, 9.75, 0, .4, .4, .5, P.concreto) + `<g fill="none" stroke="${P.bronze}" stroke-width="1.6"><circle cx="${f1(c[0])}" cy="${f1(c[1])}" r="9"/><ellipse cx="${f1(c[0])}" cy="${f1(c[1])}" rx="9" ry="3.2"/><ellipse cx="${f1(c[0])}" cy="${f1(c[1])}" rx="3.2" ry="9" transform="rotate(25 ${f1(c[0])} ${f1(c[1])})"/></g>`; }, { anim: 'cresce' });
@@ -772,6 +774,7 @@ function trilhaExatas(): Peca[] {
   add('Pirâmide iluminada', 18.0, 4.05, P => { const t = iso(18.0, 4.05, 2.02); return `<circle cx="${f1(t[0])}" cy="${f1(t[1])}" r="${P.noite ? 9 : 3}" fill="${P.luz}" opacity="${P.noite ? .5 : .9}"/><circle cx="${f1(t[0])}" cy="${f1(t[1])}" r="2.2" fill="${P.luz}"/>`; }, { chave: 22.06 });
   add('Ábaco gigante', 22.1, 1.5, P => { let o = box(21.65, 1.25, 0, .1, .1, 1.3, P.madeira) + box(22.45, 1.25, 0, .1, .1, 1.3, P.madeira) + box(21.6, 1.2, 1.3, 1.0, .2, .08, P.madeira); for (let r = 0; r < 4; r++) { const z = .35 + r * .25; o += linha3([[21.7, 1.3, z], [22.5, 1.3, z]], P.ferro, .8); for (let i = 0; i < 4; i++) { const c = iso(21.78 + i * .13 + (r % 2) * .1, 1.3, z); o += `<circle cx="${f1(c[0])}" cy="${f1(c[1])}" r="2.3" fill="${[P.lc, P.ch, P.cn, P.mt][r]}"/>`; } } return o; }, { anim: 'cresce' });
   add('Telescópio solar', 16.35, 4.7, P => { const g = iso(16.35, 4.7, 0), t = iso(16.35, 4.7, .6); return `<path d="M${f1(g[0] - 3)},${f1(g[1])} L${f1(t[0])},${f1(t[1])} L${f1(g[0] + 3)},${f1(g[1])}" stroke="${P.ferro}" stroke-width="1.2" fill="none"/><rect x="${f1(t[0] - 2.2)}" y="${f1(t[1] - 11)}" width="4.4" height="12" rx="1.6" fill="${P.branco}" stroke="${P.mt}" stroke-width="1" transform="rotate(35 ${f1(t[0])} ${f1(t[1])})"/>`; }, {});
+  add('Banco · sede premium', 24.1, 1.85, P => bancoPremium(BK, P), { chave: kB + .01, grupo: 'banco', nivel: 3, anim: 'cresce' });
   return lista;
 }
 

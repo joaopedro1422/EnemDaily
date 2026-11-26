@@ -13,11 +13,13 @@ import { CampusComponent } from '../../shared/campus/campus.component';
 import { DueloConviteComponent } from '../../modal/duelo-convite/duelo-convite.component';
 import { Progresso, TOTAL_PECAS, progressoDeColega, totalDePecas } from '../../shared/campus/campus';
 import { AREAS, formatarNumero } from '../../shared/dia';
+import { CapaComponent } from '../../shared/capas/capa.component';
+import { lerAvatar } from '../../shared/avatar/avatar';
 
 @Component({
   selector: 'app-perfil-publico',
   standalone: true,
-  imports: [RouterLink, AvatarComponent, IconeComponent, CarregandoComponent, EspadasComponent, CampusComponent, DueloConviteComponent],
+  imports: [RouterLink, AvatarComponent, IconeComponent, CarregandoComponent, EspadasComponent, CampusComponent, DueloConviteComponent, CapaComponent],
   templateUrl: './perfil-publico.component.html',
   styleUrl: './perfil-publico.component.css'
 })
@@ -52,6 +54,7 @@ export class PerfilPublicoComponent implements OnInit, OnDestroy {
     const v: Record<string, number> = { linguagens: p.acertosLinguagens, humanas: p.acertosHumanas, naturezas: p.acertosNaturezas, exatas: p.acertosExatas };
     return AREAS.map(a => ({ ...a, acertos: v[a.chave] ?? 0 }));
   }
+  get capa(): string { return lerAvatar(this.perfil?.avatar).capa || 'caderno'; }
   get mini(): UsuarioMini | null { const p = this.perfil; return p ? { id: p.id, nome: p.nome, usuario: p.usuario, avatar: p.avatar } : null; }
   get temPlacar() { const p = this.perfil?.placar; return !!p && p.vitorias + p.derrotas + p.empates > 0; }
 

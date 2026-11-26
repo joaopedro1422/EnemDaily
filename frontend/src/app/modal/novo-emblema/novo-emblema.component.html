@@ -16,14 +16,20 @@
           <span class="feixe" aria-hidden="true"></span>
           <span class="raios" aria-hidden="true"></span>
           <div class="trofeu-wrap">
-            <img class="trofeu" [src]="e.url" alt="" />
+            <ed-emblema class="trofeu" [codigo]="e.codigo" />
           </div>
           <span class="brilho-base" aria-hidden="true"></span>
           <span class="tabua" aria-hidden="true"></span>
-          <span class="tabua-placa">{{ e.desc }}</span>
+          <span class="tabua-placa">{{ nomeDoEmblema(e.codigo) }}</span>
         </div>
 
-        <p class="ne-texto">Agora ele brilha na sua estante de conquistas, à vista de todo o seu grupo.</p>
+        <p class="ne-texto">{{ e.desc }}. Agora ele brilha na sua estante de conquistas, à vista de todo o seu grupo.</p>
+        @if (capaJunto; as c) {
+          <div class="ne-capa">
+            <span class="ne-capa-arte"><ed-capa [codigo]="c.codigo" /></span>
+            <span class="ne-capa-txt"><small>Capa liberada junto</small><b>{{ c.nome }}</b><em>Escolha em Avatar → Capa</em></span>
+          </div>
+        }
 
         <button class="ne-botao" type="button" (click)="continuar()">
           {{ ultimo ? 'Guardar na estante' : 'Próximo emblema' }}<ed-icone nome="arrow-right" [tamanho]="18" />

@@ -84,6 +84,8 @@ export class CampusComponent implements OnChanges, OnInit, OnDestroy {
   private quadro = 0;
   private timers: ReturnType<typeof setTimeout>[] = [];
   private arraste: { x: number; y: number; vb: Caixa; id: number } | null = null;
+  private dedos = new Map<number, { x: number; y: number }>();
+  private pinca: { dist: number; mx: number; my: number; vb: Caixa } | null = null;
 
   constructor(private zone: NgZone, private cdr: ChangeDetectorRef) {}
 
@@ -249,12 +251,17 @@ export class CampusComponent implements OnChanges, OnInit, OnDestroy {
   iniciarArraste(e: PointerEvent) {
     if (!this.interativo || !this.vb) return;
     cancelAnimationFrame(this.quadro);
-    this.arraste = { x: e.clientX, y: e.clientY, vb: [...this.vb] as Caixa, id: e.pointerId };
+    this.dedos.set(e.pointerId, { x: e.clientX, y: e.clientY });
     this.cenaRef.nativeElement.setPointerCapture(e.pointerId);
+    if (this.dedos.size === 2) { this.arraste = null; this.iniciarPinca(); return; }
+    if (this.dedos.size > 2) return;
+    this.arraste = { x: e.clientX, y: e.clientY, vb: [...this.vb] as Caixa, id: e.pointerId };
     this.cenaRef.nativeElement.classList.add('cv-arrastando');
   }
 
   arrastar(e: PointerEvent) {
+    if (this.dedos.has(e.pointerId)) this.dedos.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (this.pinca) { this.moverPinca(); return; }
     if (!this.arraste || e.pointerId !== this.arraste.id) return;
     const r = this.cenaRef.nativeElement.getBoundingClientRect();
     const [x, y, w, h] = this.arraste.vb;
@@ -263,9 +270,42 @@ export class CampusComponent implements OnChanges, OnInit, OnDestroy {
   }
 
   soltar(e: PointerEvent) {
-    if (!this.arraste) return;
+    this.dedos.delete(e.pointerId);
     this.cenaRef.nativeElement.releasePointerCapture?.(e.pointerId);
+    if (this.pinca) {
+      this.pinca = null;
+      // o dedo que ficou na tela continua arrastando, sem pular
+      const [id, d] = [...this.dedos.entries()][0] ?? [];
+      this.arraste = id !== undefined && d && this.vb ? { x: d.x, y: d.y, vb: [...this.vb] as Caixa, id } : null;
+      return;
+    }
+    if (!this.arraste) return;
     this.cenaRef.nativeElement.classList.remove('cv-arrastando');
     this.arraste = null;
+  }
+
+  // Pinça: a distância entre os dedos define o zoom e o ponto entre eles fica parado sob os dedos.
+  private medirPinca() {
+    const [a, b] = [...this.dedos.values()];
+    return { dist: Math.max(1, Math.hypot(b.x - a.x, b.y - a.y)), mx: (a.x + b.x) / 2, my: (a.y + b.y) / 2 };
+  }
+
+  private iniciarPinca() {
+    if (!this.vb) return;
+    this.pinca = { ...this.medirPinca(), vb: [...this.vb] as Caixa };
+    this.cenaRef.nativeElement.classList.add('cv-arrastando');
+  }
+
+  private moverPinca() {
+    if (!this.pinca || this.dedos.size < 2) return;
+    const r = this.cenaRef.nativeElement.getBoundingClientRect(), agora = this.medirPinca();
+    const [x, y, w, h] = this.pinca.vb;
+    const limite = this.terreno ? this.terreno[2] * 1.4 : w * 4;
+    const nw = Math.max(160, Math.min(limite, w * this.pinca.dist / agora.dist)), nh = nw * h / w;
+    const e0 = Math.max(w / r.width, h / r.height), e1 = Math.max(nw / r.width, nh / r.height);
+    const px = this.pinca.mx - r.left - r.width / 2, py = this.pinca.my - r.top - r.height / 2;
+    const wx = x + w / 2 + px * e0, wy = y + h / 2 + py * e0;
+    const qx = agora.mx - r.left - r.width / 2, qy = agora.my - r.top - r.height / 2;
+    this.definirViewBox([wx - qx * e1 - nw / 2, wy - qy * e1 - nh / 2, nw, nh]);
   }
 }

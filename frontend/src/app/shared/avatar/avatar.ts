@@ -1,3 +1,4 @@
+import { CAPAS } from '../capas/capas';
 import { AVATARES_MOCK } from '../../models/mockAvatares';
 
 
@@ -55,30 +56,31 @@ const ICONES: Record<string, string> = {
   formatura: '<path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"/><path d="M22 10v6"/><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/>'
 };
 
-export interface ConfigAvatar { tinta: string; motivo: Motivo; moldura: Moldura; selo: Selo; fotoCaminho: string; fotoToken: string; }
+export interface ConfigAvatar { tinta: string; motivo: Motivo; moldura: Moldura; selo: Selo; fotoCaminho: string; fotoToken: string; capa: string; }
 
 function hash(s: string): number { let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return Math.abs(h); }
 
 export function avatarPadrao(nome: string): ConfigAvatar {
   const t = Object.keys(TINTAS);
-  return { tinta: t[hash(nome || '?') % t.length], motivo: 'liso', moldura: 'nenhuma', selo: '', fotoCaminho: '', fotoToken: '' };
+  return { tinta: t[hash(nome || '?') % t.length], motivo: 'liso', moldura: 'nenhuma', selo: '', fotoCaminho: '', fotoToken: '', capa: '' };
 }
 
 export function lerAvatar(valor: string | null | undefined, nome = ''): ConfigAvatar {
   if (!valor || !valor.startsWith('ed1|')) return avatarPadrao(nome);
-  const [, tinta, motivo, moldura, selo, caminho, token] = valor.split('|');
+  const [, tinta, motivo, moldura, selo, caminho, token, capa] = valor.split('|');
   const p = avatarPadrao(nome);
   return {
     tinta: TINTAS[tinta] ? tinta : p.tinta,
     motivo: (MOTIVOS.some(m => m.chave === motivo) ? motivo : 'liso') as Motivo,
     moldura: (MOLDURAS.some(m => m.chave === moldura) ? moldura : 'nenhuma') as Moldura,
     selo: (SELOS.some(s => s.chave === selo) ? selo : '') as Selo,
-    fotoCaminho: caminho ?? '', fotoToken: token ?? ''
+    fotoCaminho: caminho ?? '', fotoToken: token ?? '',
+    capa: CAPAS.some(c => c.codigo === capa) ? capa : ''
   };
 }
 
 export function gravarAvatar(c: ConfigAvatar): string {
-  return ['ed1', c.tinta, c.motivo, c.moldura, c.selo, c.fotoCaminho, c.fotoToken].join('|');
+  return ['ed1', c.tinta, c.motivo, c.moldura, c.selo, c.fotoCaminho, c.fotoToken].join('|') + (c.capa ? '|' + c.capa : '');
 }
 
 export function urlDaFoto(c: ConfigAvatar): string | null {

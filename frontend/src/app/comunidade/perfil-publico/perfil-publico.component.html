@@ -21,7 +21,7 @@
     </section>
   } @else {
     <section class="pp-capa">
-      <div class="pp-capa-fundo" aria-hidden="true"></div>
+      <div class="pp-capa-fundo" aria-hidden="true"><ed-capa [codigo]="capa" [dados]="{ sequencia: perfil.maiorSequencia }" /></div>
       <div class="pp-id">
         <span class="pp-av"><ed-avatar [valor]="perfil.avatar" [nome]="perfil.nome || perfil.usuario" [tamanho]="112" [encher]="true" /></span>
         <div class="pp-nome">
