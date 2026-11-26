@@ -196,7 +196,7 @@
             }
           </ol>
           <div class="bonus">
-            <div class="bonus-trilha"><i [style.width.%]="progressoBonus"></i></div>
+            <div class="bonus-trilha"><i [style.width.%]="progressoBonus"></i>@for (b of bonusMarcos; track b.dias) { <span class="bonus-tique" [class.ganho]="sequenciaDias >= b.dias" [style.left.%]="(b.dias / 20) * 100" aria-hidden="true"></span> }</div>
             <ol class="bonus-marcos">
               @for (b of bonusMarcos; track b.dias) {
                 <li [class.ganho]="sequenciaDias >= b.dias" [style.left.%]="(b.dias / 20) * 100">

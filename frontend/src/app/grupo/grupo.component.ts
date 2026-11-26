@@ -11,7 +11,6 @@ import { AuthServiceService } from '../services/auth-service.service';
 import { AuthModalComponent } from '../modal/auth-modal/auth-modal.component';
 import { PodioMensalComponent } from '../modal/podio-mensal/podio-mensal.component';
 import { GrupoConfigComponent } from '../modal/grupo-config/grupo-config.component';
-import { PerfilExternoComponent } from '../modal/perfil-externo/perfil-externo.component';
 import { Alert } from '../alerts';
 import { CarregandoComponent } from '../shared/carregando/carregando.component';
 import { IconeComponent } from '../shared/icone/icone.component';
@@ -37,7 +36,7 @@ const TEMPO_DESTAQUE = 6500;
 
 @Component({
   selector: 'app-grupo',
-  imports: [AvatarComponent, AuthModalComponent, PodioMensalComponent, GrupoConfigComponent, PerfilExternoComponent, IconeComponent, CarregandoComponent],
+  imports: [AvatarComponent, AuthModalComponent, PodioMensalComponent, GrupoConfigComponent, IconeComponent, CarregandoComponent],
   templateUrl: './grupo.component.html',
   styleUrl: './grupo.component.css'
 })
@@ -81,7 +80,7 @@ export class GrupoComponent implements OnInit, OnDestroy {
   bannerRecolhido = false;
   exibirConfig = false;
   mostrarLogin = false;
-  perfilAberto: UsuarioGrupo | null = null;
+  abrirPerfil(u: UsuarioGrupo) { this.router.navigate(['/u', u.usuario]); }
   confirmandoSaida = false;
 
   readonly formatarNumero = formatarNumero;

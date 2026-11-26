@@ -4,7 +4,10 @@ import { Subscription } from 'rxjs';
 import { AuthServiceService } from '../../services/auth-service.service';
 import { ComunidadeService, nomeDoDia } from '../../services/comunidade.service';
 import { PerfilPublico, UsuarioMini } from '../../models/comunidade';
-import { EMBLEMAS_MOCK } from '../../models/usuario';
+import { EMBLEMAS_MOCK, Emblema } from '../../models/usuario';
+import { EmblemaComponent } from '../../shared/emblemas/emblema.component';
+import { nomeDoEmblema } from '../../shared/emblemas/emblemas';
+import { PerfilComponent } from '../../perfil/perfil.component';
 import { AvatarComponent } from '../../shared/avatar/avatar.component';
 import { IconeComponent } from '../../shared/icone/icone.component';
 import { CarregandoComponent } from '../../shared/carregando/carregando.component';
@@ -19,7 +22,7 @@ import { lerAvatar } from '../../shared/avatar/avatar';
 @Component({
   selector: 'app-perfil-publico',
   standalone: true,
-  imports: [RouterLink, AvatarComponent, IconeComponent, CarregandoComponent, EspadasComponent, CampusComponent, DueloConviteComponent, CapaComponent],
+  imports: [RouterLink, AvatarComponent, IconeComponent, CarregandoComponent, EspadasComponent, CampusComponent, DueloConviteComponent, CapaComponent, EmblemaComponent, PerfilComponent],
   templateUrl: './perfil-publico.component.html',
   styleUrl: './perfil-publico.component.css'
 })
@@ -46,6 +49,10 @@ export class PerfilPublicoComponent implements OnInit, OnDestroy {
   progresso: Progresso | null = null;
   pecas = 0;
   emblemas = 0;
+  estante: { e: Emblema; ganho: boolean }[] = [];
+  emblemaAberto: string | null = null;
+  editando = false;
+  readonly nomeDoEmblema = nomeDoEmblema;
   logado = false;
 
   get areas() {
@@ -81,7 +88,9 @@ export class PerfilPublicoComponent implements OnInit, OnDestroy {
         this.carregando = false;
         this.progresso = p.podeVerCampus ? progressoDeColega(p) : null;
         this.pecas = this.progresso ? totalDePecas(this.progresso) : 0;
-        this.emblemas = (p.emblemas ?? '').split('|').filter(Boolean).length;
+        const ganhos = (p.emblemas ?? '').split('|').filter(Boolean);
+        this.emblemas = ganhos.length;
+        this.estante = [...EMBLEMAS_MOCK.filter(e => ganhos.includes(e.codigo)).map(e => ({ e, ganho: true })), ...EMBLEMAS_MOCK.filter(e => !ganhos.includes(e.codigo)).map(e => ({ e, ganho: false }))];
       },
       error: e => { this.carregando = false; this.perfil = null; this.erro = this.comunidade.erro(e, 'Não foi possível abrir esse perfil.'); }
     });
@@ -109,6 +118,9 @@ export class PerfilPublicoComponent implements OnInit, OnDestroy {
 
   desafiar() { if (this.mini && this.perfil?.podeDesafiar) this.desafiando = this.mini; }
   aoEnviar() { this.carregar(); }
+
+  aoFecharEdicao() { this.editando = false; this.carregar(); }
+  abrirEmblema(c: string) { this.emblemaAberto = this.emblemaAberto === c ? null : c; }
 
   voltar() { history.length > 1 ? history.back() : this.router.navigate(['/amigos']); }
 

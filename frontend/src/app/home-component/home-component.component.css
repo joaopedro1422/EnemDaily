@@ -239,7 +239,10 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--ed-caneta); out
 .semana li.hoje:not(.feito) i { border-style: dashed; border-color: var(--ed-tinta-2); }
 
 .bonus { display: grid; gap: 8px; padding-top: 4px; }
-.bonus-trilha { height: 6px; border-radius: 3px; background: var(--ed-fundo-2); overflow: hidden; }
+.bonus-trilha { position: relative; height: 6px; border-radius: 3px; background: var(--ed-fundo-2); }
+.bonus-tique { position: absolute; top: -4px; width: 2.5px; height: 14px; border-radius: 2px; background: var(--ed-pauta-forte); transform: translateX(-50%); transition: background 400ms; }
+.bonus-tique:last-child { transform: translateX(-100%); }
+.bonus-tique.ganho { background: var(--ed-caneta); }
 .bonus-trilha i { display: block; height: 100%; border-radius: 3px; background: var(--ed-caneta); transition: width 700ms var(--ed-curva); }
 .bonus-marcos { list-style: none; margin: 0; padding: 0; position: relative; height: 32px; }
 .bonus-marcos li { position: absolute; top: 0; transform: translateX(-50%); display: grid; justify-items: center; line-height: 1.25; white-space: nowrap; }

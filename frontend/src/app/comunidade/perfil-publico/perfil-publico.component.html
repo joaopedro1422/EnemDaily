@@ -37,6 +37,9 @@
       </dl>
 
       @if (perfil.relacao === 'EU') {
+        <div class="pp-acoes">
+          <button class="pp-pri" type="button" (click)="editando = true"><ed-icone nome="pen-line" [tamanho]="17" />Editar avatar e capa</button>
+        </div>
         <p class="pp-proprio"><ed-icone nome="circle-user" [tamanho]="16" />É assim que os outros veem o seu perfil.</p>
       } @else if (perfil.relacao === 'BLOQUEADO') {
         <div class="pp-acoes">
@@ -134,8 +137,34 @@
         </div>
       }
     </section>
+
+    @if (progresso) {
+      <section class="pp-estante" aria-labelledby="t-emblemas">
+        <header>
+          <h2 id="t-emblemas"><ed-icone nome="trophy" [tamanho]="16" />Emblemas</h2>
+          <span>{{ emblemas }}/{{ totalEmblemas }}</span>
+        </header>
+        <ul class="pp-emb-grade">
+          @for (t of estante; track t.e.codigo) {
+            <li>
+              <button type="button" class="pp-emb" [class.ganho]="t.ganho" [class.aberto]="emblemaAberto === t.e.codigo" (click)="abrirEmblema(t.e.codigo)"
+                      [attr.aria-label]="(t.ganho ? 'Conquistado: ' : 'Bloqueado: ') + nomeDoEmblema(t.e.codigo) + '. ' + t.e.desc">
+                <ed-emblema [codigo]="t.e.codigo" [animar]="t.ganho" />
+                <b>{{ t.ganho ? nomeDoEmblema(t.e.codigo) : '???' }}</b>
+                @if (emblemaAberto === t.e.codigo) { <small>{{ t.e.desc }}</small> }
+              </button>
+            </li>
+          }
+        </ul>
+        @if (!emblemas) { <p class="pp-emb-vazio">{{ perfil.relacao === 'EU' ? 'Responda o desafio diário para ganhar os primeiros emblemas.' : 'Nenhum emblema ainda.' }}</p> }
+      </section>
+    }
   }
 </main>
+
+@if (editando) {
+  <app-perfil (close)="aoFecharEdicao()" />
+}
 
 @if (desafiando) {
   <app-duelo-convite [alvo]="desafiando" (fechar)="desafiando = null" (enviado)="aoEnviar()" />

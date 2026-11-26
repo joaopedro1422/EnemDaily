@@ -114,7 +114,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   abrirPerfil() {
     this.fecharMenu();
-    this.mostrarModalUniversidade = true;
+    const u = this.usuarioLogado;
+    if (u && !u.demo && u.usuario) this.router.navigate(['/u', u.usuario]);
+    else this.mostrarModalUniversidade = true;
   }
 
   fecharUniversidade() {
