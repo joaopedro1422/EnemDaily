@@ -283,7 +283,7 @@ export function bibliotecaCobertura(b: Predio, n: number, P: Paleta): string {
   let o = box(b.x - .08, b.y - .08, z, b.w + .16, b.d + .16, .12, paredeBiblioteca(P), { r: shade(paredeBiblioteca(P), .82), t: P.telhado });
   o += box(b.x - .08, b.y - .08, z + .12, b.w + .16, b.d + .16, .34, P.lc, { t: shade(P.telhado, .92) });
   o += topo(b.x + .06, b.y + .06, b.x + b.w - .06, b.y + b.d - .06, z + .462, shade(P.telhado, .9));
-  o += textoY(xm, Y + .085, z + .29, 'BIBLIOTECA', '#FFFFFF', 8.2, 1.6);
+  o += textoY(xm, Y + .085, z + .29, 'BIBLIOTECA', '#FFFFFF', 7, 1.1);
   return o;
 }
 
@@ -373,7 +373,7 @@ export function cinemaMarquise(b: Predio, P: Paleta): string {
   if (P.noite) { const m = iso(xf, (y0 + y1) / 2, zm); o += `<ellipse cx="${f1(m[0])}" cy="${f1(m[1] + 20)}" rx="46" ry="22" fill="#FF6B7D" opacity=".16"/>`; }
   o += box(X, y0, zm, prof, y1 - y0, alt, fundo, { l: shade(fundo, .9), r: fundo, t: shade(fundo, 1.25) }) + topo(X, y0, xf, y0 + .04, zm + alt + .002, OURO) + topo(X, y1 - .04, xf, y1, zm + alt + .002, OURO) + topo(xf - .04, y0, xf, y1, zm + alt + .002, OURO);
   o += faceX(xf + .002, y0 + .05, y1 - .05, zm + .05, zm + alt - .05, 'none', ` stroke="${OURO}" stroke-width="1"`);
-  o += textoX(xf + .004, (y0 + y1) / 2, zm + alt / 2, 'CINEMA', letra, 9.4, .7);
+  o += textoX(xf + .004, (y0 + y1) / 2, zm + alt / 2, 'CINEMA', letra, 7.8, .5);
   const n = 16;
   for (let i = 0; i <= n; i++) {
     const y = y0 + .08 + (i * (y1 - y0 - .16)) / n;

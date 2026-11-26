@@ -67,6 +67,7 @@ export class CampusComponent implements OnChanges, OnInit, OnDestroy {
   @Input() extras: ExtrasCampus | null = null;
   @Input() intervalo = 520;
   @Input() passeio = true;
+  @Input() acesas: Partial<Record<Trilha, boolean>> | null = null;
   @Output() novas = new EventEmitter<Peca[]>();
   @ViewChild('cena', { static: true }) cenaRef!: ElementRef<HTMLDivElement>;
 
@@ -93,7 +94,7 @@ export class CampusComponent implements OnChanges, OnInit, OnDestroy {
 
   ngOnChanges(m: SimpleChanges): void {
     if (!this.iniciado) return;
-    if (m['progresso'] || m['modo'] || m['extras']) this.desenhar(!!m['progresso'] || !!m['extras']);
+    if (m['progresso'] || m['modo'] || m['extras'] || m['acesas']) this.desenhar(!!m['progresso'] || !!m['extras']);
     if (m['foco'] && !m['progresso']) this.aplicarFoco(true);
   }
 
@@ -134,7 +135,7 @@ export class CampusComponent implements OnChanges, OnInit, OnDestroy {
       this.ultimosExtras = { ...this.extras };
       if (this.chaveMemoria) { try { localStorage.setItem(this.chaveMemoria + ':extras', JSON.stringify(this.extras)); } catch { } }
     }
-    const cena = renderizarCampus(this.progresso, paletaDe(this.noite), { novasDesde: desde, extras: this.extras, extrasAntes, intervalo: this.intervalo, atrasoInicial: this.intervalo < 200 ? 120 : undefined });
+    const cena = renderizarCampus(this.progresso, paletaDe(this.noite), { novasDesde: desde, extras: this.extras, extrasAntes, acesas: this.acesas, intervalo: this.intervalo, atrasoInicial: this.intervalo < 200 ? 120 : undefined });
     this.ceu = cena.ceu;
     const anterior = this.vb;
     const terrenoAnterior = this.terreno;

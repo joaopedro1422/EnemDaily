@@ -1,7 +1,16 @@
 @if (usuario) {
   <main class="cp">
     <div class="cp-palco">
-      <ed-campus [progresso]="progresso" [memoria]="'campus-' + usuario.id" [modo]="modo" [interativo]="true" [foco]="foco" [extras]="extras" />
+      <ed-campus [progresso]="progresso" [memoria]="'campus-' + usuario.id" [modo]="modo" [interativo]="true" [foco]="foco" [extras]="extras" [acesas]="acesas" />
+      @if (evoluindo && quadro) {
+        <div class="cp-evolucao">
+          <ed-campus [progresso]="quadro" [modo]="modo" [extras]="extrasQuadro" [avisos]="false" [sons]="false" [passeio]="false" [intervalo]="90" />
+          <div class="cp-vidro cp-evolucao-barra" role="progressbar" aria-label="Evolução do campus" [attr.aria-valuenow]="passoEvolucao" aria-valuemin="0" [attr.aria-valuemax]="totalEvolucao">
+            <span>{{ passoEvolucao < totalEvolucao ? 'Construindo seu campus' : 'Seu campus hoje' }}</span>
+            <i><b [style.width.%]="passoEvolucao / totalEvolucao * 100"></b></i>
+          </div>
+        </div>
+      }
 
       <div class="cp-sobre">
         @if (foco) {
@@ -11,9 +20,14 @@
         } @else {
           <span class="cp-vidro cp-total"><ed-icone nome="school" [tamanho]="15" /><b>{{ total }}</b>/{{ totalCampus }}</span>
         }
-        <div class="cp-vidro cp-hora" role="group" aria-label="Hora do dia no campus">
-          <button type="button" [attr.aria-pressed]="modo === 'dia'" (click)="modo = 'dia'">Dia</button>
-          <button type="button" [attr.aria-pressed]="modo === 'noite'" (click)="modo = 'noite'">Noite</button>
+        <div class="cp-direita">
+          <div class="cp-vidro cp-hora" role="group" aria-label="Hora do dia no campus">
+            <button type="button" [attr.aria-pressed]="modo === 'dia'" (click)="modo = 'dia'">Dia</button>
+            <button type="button" [attr.aria-pressed]="modo === 'noite'" (click)="modo = 'noite'">Noite</button>
+          </div>
+          <button class="cp-vidro cp-evolucao-btn" type="button" [attr.aria-pressed]="evoluindo" (click)="verEvolucao()">
+            <ed-icone [nome]="evoluindo ? 'x' : 'activity'" [tamanho]="14" />{{ evoluindo ? 'Parar' : 'Evolução' }}
+          </button>
         </div>
       </div>
 

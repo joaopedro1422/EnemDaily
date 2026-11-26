@@ -1,13 +1,15 @@
 import {
   Paleta, Predio, P3, iso, f1, shade, mix, box, topo, faceY, poly, linha3, cilindro, elipseChao, cupula, sombraChao,
-  andar, fundacao, fachadaVidro, telhado, entrada, entradaLateral, faceX, arvore, banco, poste, canteiro, caminho, U, textoNoPlano
+  andar, fundacao, fachadaVidro, telhado, entrada, entradaLateral, faceX, arvore, banco, poste, canteiro, caminho, U, textoNoPlano, ponteDePedra, floresDosCaminhos
 } from './motor';
 import { Peca, TRILHAS } from './pecas';
 import { miniaturaPraca } from './alimentacao';
+import { complexoHospital, postoDeSaude } from './hospital';
+import { miniaturaMetro } from './metro';
 
 export interface ExtrasCampus { acertos?: number; simulados?: number; redacoes?: number; maiorSequencia?: number; diasAtivos?: number; xp?: number; }
 
-export type ChaveMarco = 'praca' | 'reitoria' | 'fonte' | 'portal' | 'campo' | 'quadras' | 'piscina' | 'hospital' | 'alimentacao';
+export type ChaveMarco = 'decoracao' | 'praca' | 'reitoria' | 'fonte' | 'portal' | 'campo' | 'quadras' | 'terra' | 'piscina' | 'trilha' | 'pista' | 'posto' | 'hospital' | 'odonto' | 'trem' | 'metro' | 'alimentacao';
 export type Metrica = 'acertos' | 'simulados' | 'redacoes' | 'estudos' | 'sequencia' | 'dias' | 'xp';
 
 export interface Marco {
@@ -22,14 +24,22 @@ export interface Marco {
 
 export const MARCOS: Marco[] = [
   { chave: 'praca', grupo: 'campus', nome: 'Praça das 4 cores', descricao: 'O piso da praça central vira um mosaico com as cores das quatro áreas.', metrica: 'acertos', meta: 20, icone: 'target' },
+  { chave: 'decoracao', grupo: 'campus', nome: 'Caminhos floridos', descricao: 'Um friso de flores acompanha todos os caminhos do campus e as pontes de madeira viram pontes de pedra em arco.', metrica: 'acertos', meta: 200, icone: 'sparkles' },
   { chave: 'reitoria', grupo: 'campus', nome: 'Reitoria Dourada', descricao: 'Pilastras, frisos e cúpula dourados no prédio principal.', metrica: 'acertos', meta: 100, icone: 'crown' },
   { chave: 'fonte', grupo: 'campus', nome: 'Fonte de Mármore', descricao: 'Borda de mármore, aro de ouro e luzes nas cores das áreas.', metrica: 'acertos', meta: 200, icone: 'sparkles' },
   { chave: 'portal', grupo: 'campus', nome: 'Portal Monumental', descricao: 'A entrada da universidade vira um portal de mármore com letreiro iluminado, lâmpadas e lanternas.', metrica: 'xp', meta: 4000, icone: 'crown' },
-  { chave: 'campo', grupo: 'distrito', nome: 'Campo de futebol', descricao: 'Abre a área de lazer do outro lado do rio: ponte, campo, arquibancada e árvores.', metrica: 'dias', meta: 30, icone: 'calendar-check' },
+  { chave: 'terra', grupo: 'distrito', nome: 'Campo de terra', descricao: 'Abre a área de lazer do outro lado do rio: uma ponte e um campinho de terra batida com traves de madeira.', metrica: 'dias', meta: 5, icone: 'calendar-check' },
+  { chave: 'campo', grupo: 'distrito', nome: 'Campo de futebol', descricao: 'O campinho de terra vira um campo gramado de verdade, com rede, arquibancada, árvores e refletores.', metrica: 'dias', meta: 25, icone: 'calendar-check' },
   { chave: 'quadras', grupo: 'distrito', nome: 'Quadras esportivas', descricao: 'Uma quadra de basquete e uma de vôlei, ao lado do campo.', metrica: 'dias', meta: 50, icone: 'calendar-check' },
   { chave: 'piscina', grupo: 'distrito', nome: 'Piscina do clube', descricao: 'Piscina com raias, deck, espreguiçadeiras e guarda-sóis.', metrica: 'dias', meta: 70, icone: 'calendar-check' },
-  { chave: 'hospital', grupo: 'distrito', nome: 'Hospital Universitário', descricao: 'O desafio final: um hospital de 4 andares com heliponto, em um terreno novo do outro lado do campus.', metrica: 'dias', meta: 100, icone: 'shield' },
-  { chave: 'alimentacao', grupo: 'distrito', nome: 'Praça de alimentação', descricao: 'Nos fundos do campus: abre com 30 acertos já com a pizzaria e ganha um negócio novo a cada 30 acertos, até 300.', metrica: 'acertos', meta: 30, icone: 'sparkles' },
+  { chave: 'trilha', grupo: 'distrito', nome: 'Trilha de corrida', descricao: 'Uma trilha de terra batida em volta de um gramado na área de lazer, com cones e um corredor treinando.', metrica: 'acertos', meta: 40, icone: 'target' },
+  { chave: 'pista', grupo: 'distrito', nome: 'Pista olímpica', descricao: 'A trilha de terra vira uma pista de atletismo de 6 raias, com caixa de areia para o salto e círculo de arremesso.', metrica: 'acertos', meta: 150, icone: 'target' },
+  { chave: 'posto', grupo: 'distrito', nome: 'Posto de saúde', descricao: 'Abre um terreno novo do outro lado do campus: um posto de saúde de 3 andares, com cruz vermelha e ambulância.', metrica: 'dias', meta: 70, icone: 'shield' },
+  { chave: 'hospital', grupo: 'distrito', nome: 'Hospital Universitário', descricao: 'O posto de saúde vira o Hospital Universitário: torre de vidro com heliponto, ala clínica e pavilhão de entrada.', metrica: 'dias', meta: 100, icone: 'shield' },
+  { chave: 'odonto', grupo: 'distrito', nome: 'Clínica de Odontologia', descricao: 'No fundo do hospital: uma clínica com dente gigante no telhado, escova de dente na esquina e o estacionamento com as duas fileiras de carros.', metrica: 'acertos', meta: 300, icone: 'sparkles' },
+  { chave: 'trem', grupo: 'distrito', nome: 'Estação de trem', descricao: 'Do outro lado da avenida: trilhos sobre dormentes de madeira, uma estaçãozinha de tijolos e uma maria-fumaça que para a cada volta.', metrica: 'dias', meta: 50, icone: 'calendar-check' },
+  { chave: 'metro', grupo: 'distrito', nome: 'Estação de metrô', descricao: 'A estação de trem vira metrô: trilho moderno, estação de vidro na frente do portal e um trem elétrico.', metrica: 'dias', meta: 120, icone: 'calendar-check' },
+  { chave: 'alimentacao', grupo: 'distrito', nome: 'Praça de alimentação', descricao: 'Nos fundos do campus: abre com 15 acertos já com a pizzaria e ganha um negócio novo a cada 25 acertos, até 240. Na 5ª loja chega o deque de madeira para as mesas.', metrica: 'acertos', meta: 15, icone: 'sparkles' },
 ];
 
 export const ROTULO_METRICA: Record<Metrica, string> = { acertos: 'acertos', simulados: 'simulados', redacoes: 'redações', estudos: 'simulados ou redações', sequencia: 'dias seguidos', dias: 'dias ativos', xp: 'XP' };
@@ -179,13 +189,17 @@ const RIO = 1.4;
 
 interface Area { x0: number; x1: number; y0: number; y1: number; }
 
-function dimensoes(xCampus: number, y0: number, y1: number): Area & { campo: Area; quadras: Area; piscina: Area; ponte: number } {
+function dimensoes(xCampus: number, y0: number, y1: number): Area & { campo: Area; quadras: Area; pista: Area; piscina: Area; ponte: number } {
   const alto = y1 - y0, larg = Math.max(6, Math.min(8.5, Math.round(alto * .45)));
   const x0 = xCampus + RIO, x1 = x0 + larg;
   const cx0 = x0 + .55, cx1 = x1 - .55, cy0 = y0 + .6;
   const cy1 = cy0 + Math.min((cx1 - cx0) * .62, alto * .5 - .6);
   const qy0 = cy1 + 1.1, qy1 = qy0 + 1.9;
-  return { x0, x1, y0, y1, campo: { x0: cx0, x1: cx1, y0: cy0, y1: cy1 }, quadras: { x0: x0 + .5, x1: x1 - .5, y0: qy0, y1: qy1 }, piscina: { x0: x0 + .5, x1: x1 - .7, y0: qy1 + .7, y1: y1 - .5 }, ponte: cy1 + .55 };
+  const resto = y1 - .5 - (qy1 + .7), fundo = Math.max(3.2, Math.min(5, resto * .32));
+  return {
+    x0, x1, y0, y1, campo: { x0: cx0, x1: cx1, y0: cy0, y1: cy1 }, quadras: { x0: x0 + .5, x1: x1 - .5, y0: qy0, y1: qy1 },
+    pista: { x0: x0 + .45, x1: x1 - .45, y0: qy1 + .7, y1: y1 - fundo - 1 }, piscina: { x0: x0 + .5, x1: x1 - .7, y0: y1 - .5 - fundo, y1: y1 - .5 }, ponte: cy1 + .55
+  };
 }
 
 function campoFutebol(c: Area, P: Paleta): string {
@@ -218,6 +232,37 @@ function campoFutebol(c: Area, P: Paleta): string {
 }
 
 type TipoQuadra = 'basquete' | 'volei' | 'tenis';
+function campoTerra(c: Area, P: Paleta): string {
+  const terra = P.noite ? '#5E4B3A' : '#CDAA7D', terra2 = P.noite ? '#544233' : '#B9966A', cal = P.noite ? '#CFC6B4' : '#F6EFE1', madeira = P.noite ? '#6E553F' : '#9C7450';
+  const L = c.x1 - c.x0, h = c.y1 - c.y0, xm = (c.x0 + c.x1) / 2, ym = (c.y0 + c.y1) / 2, z = .018;
+  let o = topo(c.x0, c.y0, c.x1, c.y1, .016, terra);
+  [[.2, .3, .9, .5], [.7, .7, 1.2, .6], [.45, .55, 1.6, .9], [.85, .25, .7, .4], [.15, .8, .8, .4]].forEach(([fx, fy, rx, ry]) => {
+    const g = iso(c.x0 + L * fx, c.y0 + h * fy, .017);
+    o += `<ellipse cx="${f1(g[0])}" cy="${f1(g[1])}" rx="${f1(rx * U)}" ry="${f1(ry * U * .5)}" fill="${terra2}" opacity=".55"/>`;
+  });
+  for (const [fx, fy] of [[.05, .1], [.95, .15], [.08, .9], [.92, .88], [.5, .04], [.5, .97], [.3, .95], [.7, .06]]) {
+    const g = iso(c.x0 + L * fx, c.y0 + h * fy, .02);
+    o += `<path d="M${f1(g[0] - 3)},${f1(g[1])} l1.5,-3 l1.5,3 l1.5,-3.5 l1.5,3.5" stroke="${P.arvore}" stroke-width="1" fill="none"/>`;
+  }
+  o += linha3([[xm, c.y0 + .15, z], [xm, c.y1 - .15, z]], cal, 1, ' stroke-dasharray="5 3" opacity=".85"');
+  const circ: P3[] = [];
+  for (let k = 0; k <= 28; k++) { const t = (k / 28) * Math.PI * 2; circ.push([xm + Math.cos(t) * h * .14, ym + Math.sin(t) * h * .14, z]); }
+  o += linha3(circ, cal, .9, ' stroke-dasharray="4 3" opacity=".85"');
+  const trave = (x: number) => {
+    const a = ym - h * .1, b = ym + h * .1, t = .4;
+    return box(x - .035, a - .035, 0, .07, .07, t, madeira) + box(x - .035, b - .035, 0, .07, .07, t, madeira) + linha3([[x, a, t], [x, b, t]], madeira, 2);
+  };
+  o += trave(c.x0 + .25) + trave(c.x1 - .25);
+  for (const [fx, fy] of [[0, 0], [1, 0], [0, 1], [1, 1]]) o += box(c.x0 + L * fx - .07, c.y0 + h * fy - .07, 0, .14, .14, .08, P.concreto);
+  const bola = iso(xm + .4, ym + .1, .06);
+  o += `<g class="cv-anda" style="--dx:16px;--dy:-5px;animation-duration:3.6s"><circle cx="${f1(bola[0])}" cy="${f1(bola[1])}" r="2.3" fill="#FFFFFF" stroke="#1B1B1B" stroke-width=".6"/></g>`;
+  ([[.38, .45, '#F2C14E'], [.62, .58, '#2836C6']] as [number, number, string][]).forEach(([fx, fy, cor], i) => {
+    const g = iso(c.x0 + L * fx, c.y0 + h * fy, 0);
+    o += `<g class="cv-anda" style="--dx:${i ? -9 : 11}px;--dy:${i ? 4 : -4}px;animation-duration:${3 + i * .6}s"><ellipse cx="${f1(g[0])}" cy="${f1(g[1])}" rx="3" ry="1.4" fill="rgba(0,0,0,.18)"/><rect x="${f1(g[0] - 2)}" y="${f1(g[1] - 9)}" width="4" height="7" rx="1.6" fill="${cor}"/><circle cx="${f1(g[0])}" cy="${f1(g[1] - 11)}" r="2" fill="#F2C9A0"/></g>`;
+  });
+  return o;
+}
+
 function quadra(x: number, y: number, w: number, d: number, tipo: TipoQuadra, P: Paleta): string {
   const piso = tipo === 'basquete' ? (P.noite ? '#8A4E2C' : '#D9834C') : tipo === 'volei' ? (P.noite ? '#2D4F92' : '#3E7BD6') : (P.noite ? '#2C6A4A' : '#3FA36B');
   const borda = tipo === 'basquete' ? (P.noite ? '#6E3D22' : '#B9693A') : tipo === 'volei' ? (P.noite ? '#24407A' : '#2F63B5') : (P.noite ? '#235A3E' : '#338A58');
@@ -255,12 +300,12 @@ function piscina(a: Area, P: Paleta): string {
   let o = topo(a.x0, a.y0, a.x1, a.y1, .02, deck);
   const m = .55, px0 = a.x0 + m, px1 = a.x1 - m - .9, py0 = a.y0 + m, py1 = a.y1 - m;
   o += topo(px0 - .14, py0 - .14, px1 + .14, py1 + .14, .03, borda) + topo(px0, py0, px1, py1, .031, shade(agua, .85)) + topo(px0 + .06, py0 + .06, px1, py1, .032, agua);
-  for (let i = 0; i < 4; i++) {
-    const y = py0 + .3 + i * ((py1 - py0 - .6) / 3);
+  for (let i = 0; i < 2; i++) {
+    const y = py0 + .3 + i * (py1 - py0 - .9);
     o += topo(px0 + .4, y, px0 + 1.1, y + .18, .033, agua2, ' class="cv-agua"');
     o += topo(px1 - 1.5, y + .4, px1 - .8, y + .58, .033, agua2, ' class="cv-agua"');
   }
-  const raias = 4;
+  const raias = 2;
   for (let r = 1; r < raias; r++) {
     const y = py0 + (r * (py1 - py0)) / raias;
     const pts: P3[] = [];
@@ -290,6 +335,66 @@ function piscina(a: Area, P: Paleta): string {
   return o;
 }
 
+function pistaOlimpica(a: Area, P: Paleta): string {
+  if (a.y1 - a.y0 < 2.5) return '';
+  const xc = (a.x0 + a.x1) / 2, R = Math.min((a.x1 - a.x0) / 2, (a.y1 - a.y0) / 2) - .1;
+  const ya = a.y0 + R + .1, yb = Math.max(ya, a.y1 - R - .1), ym = (ya + yb) / 2;
+  const forma = (r: number, z: number): P3[] => {
+    const pts: P3[] = [];
+    for (let k = 0; k <= 20; k++) { const t = Math.PI + (k / 20) * Math.PI; pts.push([xc + Math.cos(t) * r, ya + Math.sin(t) * r, z]); }
+    for (let k = 0; k <= 20; k++) { const t = (k / 20) * Math.PI; pts.push([xc + Math.cos(t) * r, yb + Math.sin(t) * r, z]); }
+    return pts;
+  };
+  const fechar = (p: P3[]) => [...p, p[0]];
+  const tw = Math.min(1.2, R * .39), ri = R - tw, branco = P.noite ? '#DDE7F5' : '#FFFFFF';
+  const tartan = P.noite ? '#7E3B31' : '#CF5B43', grama = P.noite ? '#2F6B45' : '#4FB36B', grama2 = P.noite ? '#2A603E' : '#46A762', areia = P.noite ? '#8A7A58' : '#EAD39C';
+  let o = poly(forma(R + .2, .012), P.concreto) + poly(forma(R, .016), tartan) + poly(forma(ri, .018), grama);
+  for (let k = 0; k < 6; k += 2) o += poly([[xc - ri * .75, ya + (yb - ya) * k / 6, .019], [xc + ri * .75, ya + (yb - ya) * k / 6, .019], [xc + ri * .75, ya + (yb - ya) * (k + 1) / 6, .019], [xc - ri * .75, ya + (yb - ya) * (k + 1) / 6, .019]], grama2);
+  for (let k = 1; k < 6; k++) o += linha3(fechar(forma(ri + (k * tw) / 6, .017)), branco, .55, ' opacity=".9"');
+  o += linha3(fechar(forma(ri, .02)), branco, 1.1) + linha3(fechar(forma(R, .02)), branco, .8);
+  o += linha3([[xc + ri, ym, .021], [xc + R, ym, .021]], branco, 2);
+  for (let k = 0; k < 6; k++) { const r = ri + ((k + .5) * tw) / 6, y = ym + .25 + k * .12; o += linha3([[xc - r - .04, y, .021], [xc - r + .04, y, .021]], branco, 1.2); }
+  // caixa de areia do salto e círculo de arremesso
+  const sx = xc + ri - .55;
+  o += topo(sx - .25, ym - .4, sx + .25, ym + .55, .02, areia) + linha3([[sx, ym + .55, .021], [sx, yb + .2, .021]], branco, .7);
+  const circ: P3[] = [];
+  for (let k = 0; k <= 20; k++) { const t = (k / 20) * Math.PI * 2; circ.push([xc - ri * .35 + Math.cos(t) * .22, ya + Math.sin(t) * .22, .021]); }
+  o += linha3(circ, branco, 1) + linha3([[xc - ri * .35, ya, .021], [xc - ri * .35 + .5, ya + 1.6, .021]], branco, .6) + linha3([[xc - ri * .35, ya, .021], [xc - ri * .35 - .5, ya + 1.6, .021]], branco, .6);
+  // dois corredores na reta da frente
+  const L = (yb - ya) * .8, d0 = iso(0, 0, 0), d1 = iso(0, -L, 0);
+  [[xc - ri - tw * .3, yb, '#2836C6', 3.2], [xc - ri - tw * .7, yb - .35, '#F0506E', 3.6]].forEach(([x, y, cor, dur], i) => {
+    const g = iso(x as number, y as number, 0);
+    o += `<g class="cv-anda" style="--dx:${f1(d1[0] - d0[0])}px;--dy:${f1(d1[1] - d0[1])}px;animation-duration:${dur}s;animation-delay:-${i * .8}s"><ellipse cx="${f1(g[0])}" cy="${f1(g[1])}" rx="3" ry="1.4" fill="rgba(0,0,0,.18)"/><rect x="${f1(g[0] - 2)}" y="${f1(g[1] - 9)}" width="4" height="7" rx="1.6" fill="${cor}"/><circle cx="${f1(g[0])}" cy="${f1(g[1] - 11)}" r="2" fill="#F2C9A0"/></g>`;
+  });
+  return o + poste(a.x0 - .1, a.y0 + .2, P, 2.2) + poste(a.x0 - .1, a.y1 - .2, P, 2.2);
+}
+
+function trilhaCorrida(a: Area, P: Paleta): string {
+  if (a.y1 - a.y0 < 2.5) return '';
+  const xc = (a.x0 + a.x1) / 2, R = Math.min((a.x1 - a.x0) / 2, (a.y1 - a.y0) / 2) - .1;
+  const ya = a.y0 + R + .1, yb = Math.max(ya, a.y1 - R - .1);
+  const forma = (r: number, z: number): P3[] => {
+    const pts: P3[] = [];
+    for (let k = 0; k <= 20; k++) { const t = Math.PI + (k / 20) * Math.PI; pts.push([xc + Math.cos(t) * r, ya + Math.sin(t) * r, z]); }
+    for (let k = 0; k <= 20; k++) { const t = (k / 20) * Math.PI; pts.push([xc + Math.cos(t) * r, yb + Math.sin(t) * r, z]); }
+    return pts;
+  };
+  const terra = P.noite ? '#5E4B3A' : '#C9A77C', terra2 = P.noite ? '#544233' : '#B8956A', tw = Math.min(.8, R * .26), ri = R - tw;
+  let o = poly(forma(R, .014), terra) + poly(forma(ri, .016), shade(P.grama, P.noite ? 1 : .97));
+  o += linha3([...forma(ri + tw * .5, .015), forma(ri + tw * .5, .015)[0]], terra2, 1.2, ' stroke-dasharray="6 5" opacity=".7"');
+  for (const [fx, fy] of [[-1, .2], [1, .55], [-1, .8], [1, .15]]) {
+    const g = iso(xc + fx * (ri + tw * .5), ya + (yb - ya) * fy, .02);
+    o += `<path d="M${f1(g[0] - 2.5)},${f1(g[1] + 1)} L${f1(g[0])},${f1(g[1] - 5)} L${f1(g[0] + 2.5)},${f1(g[1] + 1)} Z" fill="#F28C28"/><path d="M${f1(g[0] - 1.4)},${f1(g[1] - 2)} L${f1(g[0] + 1.4)},${f1(g[1] - 2)}" stroke="#FFFFFF" stroke-width="1"/>`;
+  }
+  for (const [fx, fy] of [[.3, .3], [-.4, .6], [.1, .75], [-.2, .2]]) {
+    const g = iso(xc + fx * ri, ya + (yb - ya) * fy, .02);
+    o += `<path d="M${f1(g[0] - 3)},${f1(g[1])} l1.5,-3 l1.5,3 l1.5,-3.5 l1.5,3.5" stroke="${P.arvore}" stroke-width="1" fill="none"/>`;
+  }
+  const L = (yb - ya) * .8, d0 = iso(0, 0, 0), d1 = iso(0, -L, 0), g = iso(xc - ri - tw * .5, yb, 0);
+  o += `<g class="cv-anda" style="--dx:${f1(d1[0] - d0[0])}px;--dy:${f1(d1[1] - d0[1])}px;animation-duration:4.2s"><ellipse cx="${f1(g[0])}" cy="${f1(g[1])}" rx="3" ry="1.4" fill="rgba(0,0,0,.18)"/><rect x="${f1(g[0] - 2)}" y="${f1(g[1] - 9)}" width="4" height="7" rx="1.6" fill="#36B37D"/><circle cx="${f1(g[0])}" cy="${f1(g[1] - 11)}" r="2" fill="#F2C9A0"/></g>`;
+  return o;
+}
+
 function lazerReservado(a: Area, P: Paleta): string {
   const pts = [iso(a.x0, a.y0, .02), iso(a.x1, a.y0, .02), iso(a.x1, a.y1, .02), iso(a.x0, a.y1, .02)];
   return `<polygon points="${pts.map(q => f1(q[0]) + ',' + f1(q[1])).join(' ')}" fill="${shade(P.grama, .95)}" stroke="${P.noite ? '#8EA0D8' : '#FFFFFF'}" stroke-width="1.6" stroke-dasharray="6 5" opacity=".9"/>`;
@@ -311,87 +416,45 @@ function arquibancadaEBosque(dm: ReturnType<typeof dimensoes>, P: Paleta, parte:
 export interface Distrito { svg: string; x0: number; x1: number; y0: number; y1: number; }
 
 export function desenharDistrito(xCampus: number, y0: number, y1: number, marcos: Set<ChaveMarco>, P: Paleta, novos: Set<ChaveMarco> = new Set(), atraso = 0, yPonte?: number): Distrito | null {
-  if (!marcos.has('campo')) return null;
+  if (!marcos.has('terra') && !marcos.has('campo')) return null;
   const dm = dimensoes(xCampus, y0, y1);
-  const loteNovo = novos.has('campo');
+  const loteNovo = novos.has('terra') || (novos.has('campo') && !marcos.has('terra'));
   const anim = (k: ChaveMarco, svg: string, tipo = 'cresce') => novos.has(k) ? `<g class="cv-peca cv-nova cv-nova-${tipo}" style="animation-delay:${atraso + (loteNovo ? 800 : 0)}ms">${svg}</g>` : svg;
 
   const agua = topo(xCampus + .1, y0 - .4, dm.x0 - .1, y1 + .4, -.25, P.agua) +
     [0, 1, 2, 3].map(i => topo(xCampus + .3 + (i % 2) * .4, y0 + .4 + i * ((y1 - y0) / 4), xCampus + .5 + (i % 2) * .4, y0 + 1.6 + i * ((y1 - y0) / 4), -.24, P.aguaLuz, ' class="cv-agua"')).join('');
   const yb = yPonte !== undefined && yPonte > y0 + .5 && yPonte < y1 - .5 ? yPonte : dm.ponte;
-  const ponte = box(xCampus - .1, yb - .3, 0, RIO + .2, .6, .1, P.madeira) +
+  const ponte = P.decorado ? ponteDePedra(xCampus - .15, dm.x0 + .15, yb, .72, 'x', P) : box(xCampus - .1, yb - .3, 0, RIO + .2, .6, .1, P.madeira) +
     linha3([[xCampus - .1, yb - .28, .45], [dm.x0 + .1, yb - .28, .45]], shade(P.madeira, .7), 1.6) + linha3([[xCampus - .1, yb + .28, .45], [dm.x0 + .1, yb + .28, .45]], shade(P.madeira, .7), 1.6) +
     [0, .5, 1].map(f => box(xCampus - .1 + f * (RIO + .1), yb - .32, 0, .08, .08, .48, shade(P.madeira, .8)) + box(xCampus - .1 + f * (RIO + .1), yb + .24, 0, .08, .08, .48, shade(P.madeira, .8))).join('');
   const terreno = box(dm.x0, y0, -.9, dm.x1 - dm.x0, y1 - y0, .9, P.grama, { l: P.placaL, r: P.placaR }) + caminho(dm.x0, dm.ponte - .25, dm.x1 - .3, dm.ponte + .25, P) +
     (yb !== dm.ponte ? caminho(dm.x0, Math.min(yb, dm.ponte) - .25, dm.x0 + .45, Math.max(yb, dm.ponte) + .25, P) : '');
 
   let svg = agua + terreno + ponte;
-  svg += anim('campo', arquibancadaEBosque(dm, P, 'fundo'), 'brota');
-  svg += anim('campo', campoFutebol(dm.campo, P), 'surge');
+  if (marcos.has('campo')) svg += anim('campo', arquibancadaEBosque(dm, P, 'fundo'), 'brota') + anim('campo', campoFutebol(dm.campo, P), 'surge');
+  else svg += anim('terra', campoTerra(dm.campo, P), 'surge');
   svg += marcos.has('quadras') ? anim('quadras', quadras(dm.quadras, P), 'surge') : lazerReservado(dm.quadras, P);
+  svg += marcos.has('pista') ? anim('pista', pistaOlimpica(dm.pista, P), 'surge') : marcos.has('trilha') ? anim('trilha', trilhaCorrida(dm.pista, P), 'surge') : dm.pista.y1 - dm.pista.y0 > 2.5 ? lazerReservado(dm.pista, P) : '';
   svg += marcos.has('piscina') ? anim('piscina', piscina(dm.piscina, P), 'surge') : lazerReservado(dm.piscina, P);
-  svg += anim('campo', arquibancadaEBosque(dm, P, 'frente'), 'brota');
+  svg += marcos.has('campo') ? anim('campo', arquibancadaEBosque(dm, P, 'frente'), 'brota') : anim('terra', [0, 1, 2].map(i => arvore(dm.x1 - .3, dm.y0 + 1.4 + i * 2.2, P, .65)).join(''), 'brota');
   if (loteNovo) svg = `<g class="cv-peca cv-nova cv-nova-lote" style="animation-delay:${atraso}ms">${svg}</g>`;
   return { svg, x0: xCampus, x1: dm.x1, y0: y0 - .4, y1: y1 + .4 };
 }
 
 
 const LARG_HOSP = 6.5;
-const VERMELHO = '#E5484D';
-
-function cruz(face: 'x' | 'y', plano: number, c: number, zc: number, t: number, cor: string): string {
-  const f = face === 'x' ? faceX : faceY, a = t * .36, b = t;
-  return f(plano, c - b, c + b, zc - b, zc + b, '#FFFFFF') + f(plano + .001, c - a, c + a, zc - b * .78, zc + b * .78, cor) + f(plano + .001, c - b * .78, c + b * .78, zc - a, zc + a, cor);
-}
-
-function predioHospital(b: Predio, P: Paleta): string {
-  const X = b.x + b.w, Y = b.y + b.d, yc = b.y + b.d / 2, zTopo = b.z0 + 4 * b.h;
-  let o = fundacao(b, P);
-  for (let i = 0; i < 4; i++) {
-    o += andar(b, i, P, { passo: .72, cor: P.noite ? P.janela : '#9CC7F2' });
-    o += box(b.x - .03, b.y - .03, b.z0 + i * b.h + b.h - .1, b.w + .06, b.d + .06, .1, i === 0 ? VERMELHO : shade(P.parede, .96));
-  }
-  o += entradaLateral(b, P, yc, VERMELHO);
-  o += box(X, yc - 1.1, b.z0 + 1.05, .9, 2.2, .1, VERMELHO) + box(X + .78, yc - 1.05, 0, .08, .08, b.z0 + 1.05, P.ferro) + box(X + .78, yc + .97, 0, .08, .08, b.z0 + 1.05, P.ferro);
-  o += cruz('x', X + .005, yc, b.z0 + 3.5 * b.h - .05, .48, VERMELHO) + cruz('y', Y + .005, b.x + b.w / 2, b.z0 + 3.5 * b.h - .05, .42, VERMELHO);
-  o += telhado(b, 4, P, VERMELHO, false);
-  const hx = b.x + b.w / 2, hy = b.y + b.d * .32, zr = zTopo + .23, r = Math.min(b.w, b.d) * .3;
-  o += box(hx - r - .1, hy - r - .1, zTopo + .22, 2 * r + .2, 2 * r + .2, .06, '#3A3F4F');
-  const anel: P3[] = [];
-  for (let k = 0; k <= 36; k++) { const t = (k / 36) * Math.PI * 2; anel.push([hx + Math.cos(t) * r * .82, hy + Math.sin(t) * r * .82, zr + .065]); }
-  o += linha3(anel, '#F2C94C', 2);
-  const h = r * .34;
-  o += linha3([[hx - h * .6, hy - h, zr + .066], [hx - h * .6, hy + h, zr + .066]], '#FFFFFF', 2.6) + linha3([[hx + h * .6, hy - h, zr + .066], [hx + h * .6, hy + h, zr + .066]], '#FFFFFF', 2.6) + linha3([[hx - h * .6, hy, zr + .066], [hx + h * .6, hy, zr + .066]], '#FFFFFF', 2.6);
-  for (const [dx, dy] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) {
-    const g = iso(hx + dx * r * .95, hy + dy * r * .95, zr + .08);
-    o += `<circle class="cv-pisca" style="animation-duration:1.6s" cx="${f1(g[0])}" cy="${f1(g[1])}" r="1.8" fill="#4ADE80"/>`;
-  }
-  const ax = hx - .55, ay = hy + r + .85, aw = 1.1, ad = 1.3, ah = 1.0, za = zTopo + .22;
-  o += box(ax, ay, za, aw, ad, ah, P.parede) + box(ax - .06, ay - .06, za + ah, aw + .12, ad + .12, .1, VERMELHO);
-  o += faceX(ax + aw + .004, ay + .35, ay + .95, za, za + .72, P.noite ? P.janela : '#5A6BB0', ` stroke="${P.moldura}" stroke-width=".8"`);
-  o += faceY(ay + ad + .004, ax + .25, ax + .85, za + .45, za + .75, P.noite ? P.janela : '#9CC7F2');
-  o += linha3([[ax + aw, ay + .2, za + .02], [hx + r * .2, hy + r * .6, zr + .07]], '#F2C94C', 1, ' stroke-dasharray="2 2"');
-  return o;
-}
-
-function ambulancia(x: number, y: number, P: Paleta): string {
-  const g = iso(x + .3, y + .55, .62);
-  return sombraChao(x + .35, y + .3, .5, .25, P) + box(x, y, .08, .7, 1.1, .5, '#FFFFFF') + box(x, y + .78, .08, .7, .32, .36, '#F4F6FA') +
-    box(x + .005, y, .3, .7, 1.1, .08, VERMELHO) + `<circle class="cv-pisca" style="animation-duration:.9s" cx="${f1(g[0])}" cy="${f1(g[1] - 2)}" r="2" fill="#4FA3FF"/>`;
-}
-
 export interface Hospital { svg: string; x0: number; }
 
-export function desenharHospital(xCampus: number, y0: number, y1: number, P: Paleta, novo = false, atraso = 0): Hospital {
+export function desenharHospital(xCampus: number, y0: number, y1: number, P: Paleta, novo = false, atraso = 0, odonto = false, odontoNovo = false, atrasoOdonto = 0, posto = false, evoluiu = false): Hospital {
   const xh1 = xCampus - RIO, xh0 = xh1 - LARG_HOSP;
   const agua = topo(xh1 + .1, y0 - .4, xCampus - .1, y1 + .4, -.25, P.agua) +
     [0, 1, 2, 3].map(i => topo(xh1 + .3 + (i % 2) * .4, y0 + .4 + i * ((y1 - y0) / 4), xh1 + .5 + (i % 2) * .4, y0 + 1.6 + i * ((y1 - y0) / 4), -.24, P.aguaLuz, ' class="cv-agua"')).join('');
   const yb = (y0 + y1) / 2;
-  const ponte = box(xh1 - .1, yb - .3, 0, RIO + .2, .6, .1, P.madeira) +
+  const ponte = P.decorado ? ponteDePedra(xh1 - .15, xCampus + .15, yb, .72, 'x', P) : box(xh1 - .1, yb - .3, 0, RIO + .2, .6, .1, P.madeira) +
     linha3([[xh1 - .1, yb - .28, .45], [xCampus + .1, yb - .28, .45]], shade(P.madeira, .7), 1.6) + linha3([[xh1 - .1, yb + .28, .45], [xCampus + .1, yb + .28, .45]], shade(P.madeira, .7), 1.6);
-  const terreno = box(xh0, y0, -.9, LARG_HOSP, y1 - y0, .9, P.grama, { l: P.placaL, r: P.placaR }) + topo(xh0 + .2, y0 + .2, xh1 - .2, y1 - .2, .01, P.concreto);
-  const b: Predio = { x: xh0 + .45, y: y0 + .55, w: LARG_HOSP - 1.9, d: y1 - y0 - 1.1, z0: .25, h: 1.25 };
-  let corpo = predioHospital(b, P) + ambulancia(xh1 - 1.05, yb + 1.3, P);
+  const terreno = box(xh0, y0, -.9, LARG_HOSP, y1 - y0, .9, P.grama, { l: P.placaL, r: P.placaR });
+  let corpo = posto ? postoDeSaude(xh0, xh1, y0, y1, yb, P) : complexoHospital(xh0, xh1, y0, y1, yb, P, odonto, odontoNovo && !novo, atrasoOdonto);
+  if (evoluiu && !novo) corpo = `<g class="cv-peca cv-nova cv-nova-surge" style="animation-delay:${atraso}ms">${corpo}</g>`;
   if (novo) corpo = `<g class="cv-peca cv-nova cv-nova-cresce" style="animation-delay:${atraso + 800}ms">${corpo}</g>`;
   let svg = terreno + corpo + agua + ponte;
   if (novo) svg = `<g class="cv-peca cv-nova cv-nova-lote" style="animation-delay:${atraso}ms">${svg}</g>`;
@@ -399,11 +462,10 @@ export function desenharHospital(xCampus: number, y0: number, y1: number, P: Pal
 }
 
 export function miniaturaHospital(P: Paleta): string {
-  const y0 = 0, y1 = 9, xh0 = 0;
-  const b: Predio = { x: xh0 + .45, y: y0 + .55, w: LARG_HOSP - 1.9, d: y1 - y0 - 1.1, z0: .25, h: 1.25 };
-  const chao = box(xh0, y0, -.5, LARG_HOSP, y1 - y0, .5, P.grama, { l: P.placaL, r: P.placaR }) + topo(xh0 + .2, y0 + .2, xh0 + LARG_HOSP - .2, y1 - .2, .01, P.concreto);
-  const c = iso(xh0 + LARG_HOSP / 2, 4.5, 2.6), w = 11 * 2 * .866 * U, h = w * .8;
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${f1(c[0] - w / 2)} ${f1(c[1] - h / 2)} ${f1(w)} ${f1(h)}" preserveAspectRatio="xMidYMid meet" role="img">${chao}${predioHospital(b, P)}</svg>`;
+  const y0 = 0, y1 = 20, xh0 = 0;
+  const chao = box(xh0, y0, -.5, LARG_HOSP, y1 - y0, .5, P.grama, { l: P.placaL, r: P.placaR });
+  const c = iso(xh0 + LARG_HOSP / 2, 11, 2.4), w = 15 * 2 * .866 * U, h = w * .8;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${f1(c[0] - w / 2)} ${f1(c[1] - h / 2)} ${f1(w)} ${f1(h)}" preserveAspectRatio="xMidYMid meet" role="img">${chao}${complexoHospital(xh0, xh0 + LARG_HOSP, y0, y1, 10, P, false)}</svg>`;
 }
 
 
@@ -417,9 +479,22 @@ const PECAS_DO_MARCO: Record<'praca' | 'reitoria' | 'fonte' | 'portal', string[]
 export function miniaturaMarco(chave: ChaveMarco, P: Paleta): string {
   if (chave === 'alimentacao') return miniaturaPraca(P);
   if (chave === 'hospital') return miniaturaHospital(P);
+  if (chave === 'posto') return miniaturaPosto(P);
+  if (chave === 'odonto') return miniaturaOdonto(P);
+  if (chave === 'metro') return miniaturaMetro(P);
+  if (chave === 'decoracao') return miniaturaDecoracao(P);
+  if (chave === 'trem') return miniaturaMetro(P, true);
   const todos = new Set(MARCOS.map(m => m.chave));
   let corpo = '', cx = 13, cy = 13, larg = 6, zc = 1;
-  if (chave === 'campo' || chave === 'quadras' || chave === 'piscina') {
+  if (chave === 'pista' || chave === 'trilha') {
+    const dm = dimensoes(-RIO, 0, 26), a = dm.pista;
+    corpo = box(dm.x0, a.y0 - .5, -.5, dm.x1 - dm.x0, a.y1 - a.y0 + 1, .5, P.grama, { l: P.placaL, r: P.placaR }) + (chave === 'pista' ? pistaOlimpica(a, P) : trilhaCorrida(a, P));
+    cx = (a.x0 + a.x1) / 2; cy = (a.y0 + a.y1) / 2; larg = 7.4; zc = .3;
+  } else if (chave === 'terra') {
+    const dm = dimensoes(-RIO, 0, 12);
+    corpo = box(dm.x0, 0, -.5, dm.x1 - dm.x0, 12, .5, P.grama, { l: P.placaL, r: P.placaR }) + campoTerra(dm.campo, P);
+    cx = (dm.campo.x0 + dm.campo.x1) / 2; cy = (dm.campo.y0 + dm.campo.y1) / 2; larg = 6.2; zc = .3;
+  } else if (chave === 'campo' || chave === 'quadras' || chave === 'piscina') {
     const dm = dimensoes(-RIO, 0, 12);
     const chao = box(dm.x0, 0, -.5, dm.x1 - dm.x0, 12, .5, P.grama, { l: P.placaL, r: P.placaR });
     if (chave === 'campo') { corpo = chao + arquibancadaEBosque(dm, P, 'fundo') + campoFutebol(dm.campo, P); cx = (dm.campo.x0 + dm.campo.x1) / 2; cy = (dm.campo.y0 + dm.campo.y1) / 2; larg = 6.2; zc = .3; }
@@ -437,4 +512,28 @@ export function miniaturaMarco(chave: ChaveMarco, P: Paleta): string {
   }
   const c = iso(cx, cy, zc), w = larg * 2 * .866 * U, h = w * .9;
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${f1(c[0] - w / 2)} ${f1(c[1] - h / 2)} ${f1(w)} ${f1(h)}" preserveAspectRatio="xMidYMid meet" role="img">${corpo}</svg>`;
+}
+
+export function miniaturaDecoracao(P: Paleta): string {
+  const Pd: Paleta = { ...P, decorado: true, registro: [] };
+  const chao = box(8, 8, -.5, 10, 10, .5, P.grama, { l: P.placaL, r: P.placaR });
+  const vias = caminho(8.6, 12.5, 18, 13.5, Pd) + caminho(12.5, 8.4, 13.5, 12.5, Pd) + caminho(12.5, 13.5, 13.5, 15.2, Pd);
+  const rio = topo(8, 15.2, 18, 16.6, -.25, P.agua);
+  const ponteP = ponteDePedra(15.1, 16.7, 12.95, .9, 'y', Pd);
+  const c = iso(13, 13, .4), w = 7 * 2 * .866 * U, h = w * .8;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${f1(c[0] - w / 2)} ${f1(c[1] - h / 2)} ${f1(w)} ${f1(h)}" preserveAspectRatio="xMidYMid meet" role="img">${chao}${vias}${floresDosCaminhos(Pd.registro!, Pd)}${rio}${ponteP}</svg>`;
+}
+
+export function miniaturaOdonto(P: Paleta): string {
+  const y0 = 0, y1 = 20, xh0 = 0;
+  const chao = box(xh0, y0, -.5, LARG_HOSP, y1 - y0, .5, P.grama, { l: P.placaL, r: P.placaR });
+  const c = iso(xh0 + 2.8, 4.4, 1.2), w = 6.4 * 2 * .866 * U, h = w * .8;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${f1(c[0] - w / 2)} ${f1(c[1] - h / 2)} ${f1(w)} ${f1(h)}" preserveAspectRatio="xMidYMid meet" role="img">${chao}${complexoHospital(xh0, xh0 + LARG_HOSP, y0, y1, 10, P)}</svg>`;
+}
+
+export function miniaturaPosto(P: Paleta): string {
+  const y0 = 0, y1 = 20, xh0 = 0;
+  const chao = box(xh0, y0, -.5, LARG_HOSP, y1 - y0, .5, P.grama, { l: P.placaL, r: P.placaR });
+  const c = iso(xh0 + 3, 9.6, 1.6), w = 7.5 * 2 * .866 * U, h = w * .8;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${f1(c[0] - w / 2)} ${f1(c[1] - h / 2)} ${f1(w)} ${f1(h)}" preserveAspectRatio="xMidYMid meet" role="img">${chao}${postoDeSaude(xh0, xh0 + LARG_HOSP, y0, y1, 10, P)}</svg>`;
 }

@@ -10,7 +10,7 @@ const PREDIOS: Record<Area, PredioAcab[]> = {
   linguagens: [
     { x: 5.7, y: 7.0, w: 3.6, d: 3.0, z0: .25, h: 1.5, sem: ['toldos', 'brasao', 'pintura', 'floreiras'] }, { x: 2.6, y: 3.9, w: 1.9, d: 1.4, z0: .2, h: 1.25 }, { x: 7.8, y: 2.8, w: 1.9, d: 2.2, z0: .25, h: 1.15 }
   ],
-  humanas: [{ x: 2.3, y: 16.7, w: 2.7, d: 2.3, z0: .25, h: 1.25, sem: ['toldos', 'brasao', 'pintura'] }, { x: 3.9, y: 24.3, w: 3.9, d: 1.4, z0: .2, h: 1.3, sem: ['brasao', 'pintura', 'toldos'] }],
+  humanas: [{ x: .55, y: 23.6, w: 2.7, d: 1.75, z0: .25, h: 1.25, sem: ['toldos', 'brasao', 'pintura'] }, { x: 3.9, y: 24.3, w: 3.9, d: 1.4, z0: .2, h: 1.3, sem: ['brasao', 'pintura', 'toldos'] }],
   naturezas: [{ x: 20.6, y: 23.6, w: 2.6, d: 2.0, z0: .25, h: 1.25, sem: ['toldos', 'brasao', 'pintura', 'floreiras'] }, { x: 16.6, y: 23.5, w: 3.0, d: 1.9, z0: .25, h: 1.4 }],
   exatas: [{ x: 21.3, y: 7.9, w: 2.8, d: 3.1, z0: .25, h: 1.2, sem: ['toldos', 'brasao', 'pintura', 'floreiras'] }, { x: 16.4, y: 2.85, w: 4.2, d: 2.0, z0: .25, h: 1.25, sem: ['toldos', 'brasao'] }]
 };
@@ -19,7 +19,7 @@ const LOTE: Record<Area, [number, number, number, number]> = {
   linguagens: [0, 2.4, 10, 12.4], humanas: [0, 16, 10, 26], naturezas: [16, 16, 26, 26], exatas: [16, 2.4, 26, 12.4]
 };
 
-const LIVRE: Partial<Record<Area, [number, number]>> = { humanas: [7.9, 10], naturezas: [20.4, 23.4] };
+const LIVRE: Partial<Record<Area, [number, number]>> = { humanas: [0, 10], naturezas: [20.4, 23.4], linguagens: [8, 10] };
 const livre = (t: Area, x: number) => { const l = LIVRE[t]; return !!l && x >= l[0] && x <= l[1]; };
 
 export type Efeito = 'floreiras' | 'toldos' | 'friso' | 'luzes' | 'vasos' | 'brasao' | 'sebe' | 'postes' | 'arvores' | 'bandeiras' | 'pintura';
@@ -102,7 +102,7 @@ function efeitoNaRegiao(e: Efeito, g: number, t: Area, P: Paleta, cor: string): 
     }
     case 'postes': {
       const n = g === 1 ? 3 : 5, lista: Peca[] = [];
-      for (let k = 0; k < n; k++) { const x = x0 + .4 + (k * (x1 - x0 - .8)) / (n - 1); if (livre(t, x) || t === 'humanas' || (t === 'exatas' && k < n - 1)) continue; lista.push(p('poste', x, y1 - .25, P2 => poste(x, y1 - .25, P2, g === 1 ? 1.5 : 1.9))); }
+      for (let k = 0; k < n; k++) { const x = x0 + .4 + (k * (x1 - x0 - .8)) / (n - 1); if (livre(t, x) || t === 'humanas' || (t === 'exatas' && k < n - 1) || t === 'linguagens') continue; lista.push(p('poste', x, y1 - .25, P2 => poste(x, y1 - .25, P2, g === 1 ? 1.5 : 1.9))); }
       return lista;
     }
     case 'arvores': {

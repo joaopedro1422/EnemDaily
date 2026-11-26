@@ -62,6 +62,9 @@ export interface Paleta {
   cn: string;
   mt: string;
   branco: string;
+  decorado?: boolean;
+  registro?: number[][];
+  desloc?: number;
 }
 
 export const DIA: Paleta = {
@@ -309,6 +312,7 @@ export function simboloFaceY(Y: number, xc: number, zc: number, s: number, P: Pa
 }
 
 export function caminho(x0: number, y0: number, x1: number, y1: number, P: Paleta): string {
+  if (P.registro) { const d = P.desloc ?? 0; P.registro.push([Math.min(x0, x1), Math.min(y0, y1) + d, Math.max(x0, x1), Math.max(y0, y1) + d]); }
   return topo(x0, y0, x1, y1, .012, P.caminho) + topo(x0, y0, x0 + .06, y1, .013, P.caminho2) + topo(x1 - .06, y0, x1, y1, .013, P.caminho2) +
     topo(x0, y0, x1, y0 + .06, .013, P.caminho2) + topo(x0, y1 - .06, x1, y1, .013, P.caminho2);
 }
@@ -413,4 +417,71 @@ export function grama(x0: number, y0: number, x1: number, y1: number, P: Paleta)
     o += `<path d="M${f1(p[0] - 2)},${f1(p[1])} l1,-3 l1,3 l1,-2.4 l1,2.4" fill="none" stroke="${P.gramaEscura}" stroke-width=".9" stroke-linecap="round"/>`;
   }
   return o;
+}
+
+// ───── pacote de decoração: flores nos caminhos e pontes de pedra ─────
+
+// Ponte de pedra em arco: o tabuleiro sobe no meio, tem guarda-corpo dos dois lados
+// e um vão em arco aparecendo na face voltada para quem olha.
+export function ponteDePedra(a: number, b: number, c: number, w: number, eixo: 'x' | 'y', P: Paleta): string {
+  const pedra = P.noite ? '#70748C' : '#D2CABA', escura = shade(pedra, .78), clara = shade(pedra, 1.07), agua = shade(P.agua, .62);
+  const N = 16, zAgua = -.25, z0 = .1, sobe = Math.max(.25, Math.min(.45, Math.abs(b - a) * .16)), muro = .2;
+  const pt = (t: number, lado: number, z: number): P3 => (eixo === 'x' ? [a + (b - a) * t, c + (lado * w) / 2, z] : [c + (lado * w) / 2, a + (b - a) * t, z]);
+  const zt = (t: number) => z0 + sobe * Math.sin(Math.PI * t);
+  const ts = Array.from({ length: N + 1 }, (_, i) => i / N);
+  const face = eixo === 'x' ? pedra : shade(pedra, .84);
+  let o = '';
+  // guarda-corpo do fundo
+  o += poly([...ts.map(t => pt(t, -1, zt(t))), ...ts.slice().reverse().map(t => pt(t, -1, zt(t) + muro))], shade(face, .92));
+  o += poly([...ts.map(t => pt(t, -1, zt(t) + muro)), ...ts.slice().reverse().map(t => pt(t, -.8, zt(t) + muro))], clara);
+  // tabuleiro de pedra
+  o += poly([...ts.map(t => pt(t, -.8, zt(t))), ...ts.slice().reverse().map(t => pt(t, .8, zt(t)))], P.noite ? '#8A8EA6' : '#E6DFD0');
+  for (let i = 1; i < N; i++) o += linha3([pt(i / N, -.8, zt(i / N) + .002), pt(i / N, .8, zt(i / N) + .002)], shade(pedra, .9), .5);
+  // face da frente, da água até o topo do guarda-corpo, com o vão em arco
+  o += poly([...ts.map(t => pt(t, 1, zAgua)), ...ts.slice().reverse().map(t => pt(t, 1, zt(t) + muro))], face);
+  const vao: P3[] = [];
+  for (let k = 0; k <= 14; k++) { const t = .2 + (.6 * k) / 14; vao.push(pt(t, 1.001, zAgua + (zt(.5) - .16 - zAgua) * Math.sin(Math.PI * (k / 14)))); }
+  o += poly(vao, agua);
+  for (let k = 1; k < 8; k++) {
+    const u = k / 8, t = .2 + .6 * u, ang = Math.PI * u, z = zAgua + (zt(.5) - .16 - zAgua) * Math.sin(ang);
+    const dt = -Math.cos(ang) * .04, dz = Math.sin(ang) * .1;
+    o += linha3([pt(t, 1.002, z), pt(t + dt, 1.002, z + dz)], escura, .8);
+  }
+  for (const f of [.35, .65]) o += linha3(ts.map(t => pt(t, 1.002, zAgua + (zt(t) - zAgua) * f)), shade(face, .9), .5, ' stroke-dasharray="3 2"');
+  o += linha3(ts.map(t => pt(t, 1.003, zt(t))), escura, .9);
+  o += poly([...ts.map(t => pt(t, 1, zt(t) + muro)), ...ts.slice().reverse().map(t => pt(t, .8, zt(t) + muro))], clara);
+  // pilaretes nas cabeceiras
+  for (const t of [0, 1]) for (const lado of [-1, 1]) { const p = pt(t, lado, 0); o += box(p[0] - .07, p[1] - .07, 0, .14, .14, z0 + muro + .12, pedra, { t: clara, r: escura }); }
+  return o;
+}
+
+// Friso de flores dos dois lados de cada caminho, cortado onde encontra outro caminho.
+export function floresDosCaminhos(reg: number[][], P: Paleta, excluir: number[][] = []): string {
+  const verde = P.noite ? '#2F6F52' : '#58B87A', [c1, c2] = P.noite ? ['#C77D9C', '#C9A24A'] : ['#F28AB2', '#F5C84C'];
+  const off = .1, passo = .06, margem = .06;
+  const cobre = (x: number, y: number, ignora: number) =>
+    reg.some((r, i) => i !== ignora && x > r[0] - margem && x < r[2] + margem && y > r[1] - margem && y < r[3] + margem) ||
+    excluir.some(r => x > r[0] && x < r[2] && y > r[1] && y < r[3]);
+  const trechos: P3[][] = [];
+  reg.forEach((r, i) => {
+    const [x0, y0, x1, y1] = r;
+    if (x1 - x0 < .2 || y1 - y0 < .2) return;
+    const lados: [number, number, number, number][] = [[x0 - off, y0 - off, x1 + off, y0 - off], [x0 - off, y1 + off, x1 + off, y1 + off], [x0 - off, y0 - off, x0 - off, y1 + off], [x1 + off, y0 - off, x1 + off, y1 + off]];
+    for (const [ax, ay, bx, by] of lados) {
+      const n = Math.max(1, Math.round(Math.hypot(bx - ax, by - ay) / passo));
+      let atual: P3[] = [];
+      for (let k = 0; k <= n; k++) {
+        const t = k / n, x = ax + (bx - ax) * t, y = ay + (by - ay) * t;
+        if (!cobre(x, y, i)) atual.push([x, y, .02]);
+        else { if (atual.length > 2) trechos.push(atual); atual = []; }
+      }
+      if (atual.length > 2) trechos.push(atual);
+    }
+  });
+  const d = (pts: P3[]) => { const a = iso(pts[0][0], pts[0][1], .02), b = iso(pts[pts.length - 1][0], pts[pts.length - 1][1], .02); return `M${f1(a[0])},${f1(a[1])} L${f1(b[0])},${f1(b[1])}`; };
+  const caminhos = trechos.map(d).join(' ');
+  if (!caminhos) return '';
+  return `<path d="${caminhos}" stroke="${verde}" stroke-width="3" stroke-linecap="round" fill="none"/>` +
+    `<path d="${caminhos}" stroke="${c1}" stroke-width="2.2" stroke-linecap="round" stroke-dasharray="0 6" fill="none"/>` +
+    `<path d="${caminhos}" stroke="${c2}" stroke-width="2" stroke-linecap="round" stroke-dasharray="0 6" stroke-dashoffset="3" fill="none"/>`;
 }

@@ -27,6 +27,8 @@
 .cv-nova-lote { animation: cv-lote 950ms cubic-bezier(.2, 1.25, .4, 1) both; }
 @keyframes cv-lote { from { transform: translateY(54px); opacity: 0; } 40% { opacity: 1; } to { transform: none; } }
 @keyframes cv-surge { from { opacity: 0; } }
+.cv-sai { animation: cv-sair 520ms ease-in both; }
+@keyframes cv-sair { to { opacity: 0; } }
 .cv-marca { transform-box: fill-box; transform-origin: center; opacity: 0; animation: cv-marca 820ms ease-out both; }
 @keyframes cv-marca { from { transform: scale(.3); opacity: 1; } to { transform: scale(1.7); opacity: 0; } }
 .cv-anda { animation: cv-andar ease-in-out infinite alternate; }
@@ -59,6 +61,17 @@
 .cv-modal-chip i { width: 9px; height: 9px; border-radius: 50%; }
 .cv-modal-botao { background: var(--ed-caneta) !important; color: var(--ed-sobre-caneta) !important; border-radius: 12px !important; font: 700 15px var(--ed-fonte) !important; padding: 12px 22px !important; margin: 4px 0 18px !important; }
 
+.cv-metro { animation: cv-metro 18s linear infinite; }
+@keyframes cv-metro {
+  0% { transform: translate(0, 0); opacity: 0; animation-timing-function: linear; }
+  3% { transform: translate(0, 0); opacity: 1; animation-timing-function: cubic-bezier(.25, .6, .35, 1); }
+  38% { transform: translate(var(--ex), var(--ey)); opacity: 1; animation-timing-function: linear; }
+  60% { transform: translate(var(--ex), var(--ey)); opacity: 1; animation-timing-function: cubic-bezier(.6, 0, .75, .4); }
+  94% { transform: translate(var(--fx), var(--fy)); opacity: 1; }
+  97%, 100% { transform: translate(var(--fx), var(--fy)); opacity: 0; }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .cv-nova, .cv-marca, .cv-anda, .cv-passo, .cv-gota, .cv-jato, .cv-bandeira, .cv-pisca, .cv-gira, .cv-fumaca, .cv-agua, .cv-nuvem, .cv-passaros { animation-duration: 1ms !important; animation-iteration-count: 1 !important; }
+  .cv-metro { animation: none !important; transform: translate(var(--ex), var(--ey)); }
+  .cv-nova, .cv-sai, .cv-marca, .cv-anda, .cv-passo, .cv-gota, .cv-jato, .cv-bandeira, .cv-pisca, .cv-gira, .cv-fumaca, .cv-agua, .cv-nuvem, .cv-passaros { animation-duration: 1ms !important; animation-iteration-count: 1 !important; }
 }

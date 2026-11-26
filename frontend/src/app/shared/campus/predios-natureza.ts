@@ -1,4 +1,4 @@
-import { Paleta, Predio, P3, iso, f1, shade, box, topo, faceX, faceY, poly, linha3, sombraChao, cupula, U } from './motor';
+import { Paleta, Predio, P3, iso, f1, shade, box, topo, faceX, faceY, poly, linha3, sombraChao, cupula, cilindro, banco, U } from './motor';
 
 const OURO = '#E8B931';
 const vidroEstufa = (P: Paleta) => (P.noite ? '#7FD6AE' : '#A9E3C8');
@@ -167,7 +167,7 @@ export function quimicaCobertura(b: Predio, n: number, P: Paleta): string {
   let o = box(b.x - .08, b.y - .08, z, b.w + .16, b.d + .16, .12, par, { r: shade(par, .84), t: P.telhado });
   o += box(b.x - .08, b.y - .08, z + .12, b.w + .16, b.d + .16, .34, P.cn, { t: shade(P.telhado, .92) });
   o += topo(b.x + .06, b.y + .06, b.x + b.w - .06, Y - .06, z + .462, shade(P.telhado, .9));
-  o += textoY(xm, Y + .085, z + .29, 'QUÍMICA', '#FFFFFF', 8.4, 2);
+  o += textoY(xm, Y + .085, z + .29, 'QUÍMICA', '#FFFFFF', 7, 1.4);
   return o;
 }
 
@@ -210,5 +210,70 @@ export function deque(x: number, y: number, P: Paleta): string {
   for (let k = 1; k < 5; k++) o += linha3([[x + (k * w) / 5, y, .365], [x + (k * w) / 5, y + d, .365]], shade(mad, .8), .6);
   o += linha3([[x, y + d, .7], [x + w, y + d, .7], [x + w, y, .7]], shade(mad, .6), 1.3);
   for (const [a, b] of [[0, d], [w / 2, d], [w, d], [w, d / 2], [w, 0]]) o += linha3([[x + a, y + b, .36], [x + a, y + b, .7]], shade(mad, .6), 1);
+  return o;
+}
+
+// ───── estruturas do jardim experimental ─────
+
+export function galpao(x: number, y: number, P: Paleta, telhadoVerde = false): string {
+  const w = 1.0, d = .85, h = .62, ym = y + d / 2, zr = h + .34, mad = P.noite ? '#6E553F' : '#B98A5E';
+  let o = sombraChao(x + w / 2, y + d / 2, .75, .36, P) + box(x, y, 0, w, d, h, mad, { r: shade(mad, .8), l: shade(mad, .95) });
+  for (let k = 1; k < 6; k++) o += linha3([[x + (k * w) / 6, y + d + .002, .02], [x + (k * w) / 6, y + d + .002, h - .02]], shade(mad, .76), .6);
+  o += faceY(y + d + .003, x + .36, x + .64, 0, .5, P.noite ? '#2A1F18' : '#5A3E2A') + faceX(x + w + .003, ym - .17, ym + .17, .3, .52, P.noite ? P.janela : '#BFE3F2', ` stroke="${shade(mad, .7)}" stroke-width=".6"`);
+  const teto = telhadoVerde ? (P.noite ? '#2F5A46' : '#6CBF7F') : (P.noite ? '#7A3B30' : '#C8553D');
+  o += poly([[x - .07, y - .07, h], [x + w + .07, y - .07, h], [x + w + .07, ym, zr], [x - .07, ym, zr]], shade(teto, .8));
+  o += poly([[x - .07, ym, zr], [x + w + .07, ym, zr], [x + w + .07, y + d + .07, h], [x - .07, y + d + .07, h]], teto);
+  o += poly([[x + w, y, h], [x + w, y + d, h], [x + w, ym, zr]], shade(mad, .86));
+  if (telhadoVerde) [[.2, .55], [.45, .7], [.7, .5], [.85, .75], [.32, .82]].forEach(([fx, fy], i) => {
+    const c = iso(x + w * fx, ym + (d / 2 + .07) * (fy - .5) * 2 * .5 + .1, zr - (zr - h) * fy * .8);
+    o += `<circle cx="${f1(c[0])}" cy="${f1(c[1])}" r="${i % 2 ? 2 : 2.6}" fill="${i % 3 ? P.arvoreLuz : '#F4A6C0'}"/>`;
+  });
+  // ancinho e pá encostados na parede
+  o += linha3([[x + w + .06, y + .12, 0], [x + w + .06, y + .2, .62]], P.tronco, 1.1) + linha3([[x + w + .06, y + .16, .62], [x + w + .06, y + .3, .62]], P.ferro, 1.4);
+  o += linha3([[x + w + .06, y + d - .15, 0], [x + w + .06, y + d - .25, .55]], P.tronco, 1.1) + poly([[x + w + .06, y + d - .1, 0], [x + w + .06, y + d - .2, 0], [x + w + .06, y + d - .17, .16], [x + w + .06, y + d - .08, .14]], P.ferro);
+  return o;
+}
+
+export function cisterna(x: number, y: number, P: Paleta, destino: P3): string {
+  const cor = P.noite ? '#3E6E8E' : '#6FB3DA';
+  let o = sombraChao(x, y, .42, .21, P) + box(x - .32, y - .32, 0, .64, .64, .1, P.concreto) + cilindro(x, y, .1, .85, .28, cor);
+  for (const z of [.36, .66]) o += cilindro(x, y, z, .035, .29, shade(cor, .78));
+  o += cilindro(x, y, .95, .05, .31, shade(cor, .86));
+  o += linha3([[x - .1, y - .05, 1.0], [x - .1, y - .05, 1.22], destino], P.ferro, 1.5);
+  o += box(x + .22, y + .05, .2, .1, .08, .06, P.ferro);
+  const g = iso(x + .3, y + .09, .2);
+  return o + `<circle class="cv-gota" cx="${f1(g[0])}" cy="${f1(g[1] + 3)}" r="1.1" fill="#4FA3FF"/>`;
+}
+
+export function pergola(x0: number, y0: number, w: number, d: number, P: Paleta): string {
+  const mad = P.noite ? '#6E553F' : '#C0916A', z = 1.15;
+  let o = sombraChao(x0 + w / 2, y0 + d / 2, w * .55, d * .45, P) + banco(x0 + w / 2 - .45, y0 + d / 2 - .14, P, 'x');
+  for (const [x, y] of [[x0, y0], [x0 + w, y0], [x0, y0 + d], [x0 + w, y0 + d]] as [number, number][]) o += box(x - .04, y - .04, 0, .08, .08, z, mad, { r: shade(mad, .78) });
+  o += box(x0 - .1, y0 - .04, z, w + .2, .08, .07, mad) + box(x0 - .1, y0 + d - .04, z, w + .2, .08, .07, mad);
+  for (let k = 0; k <= 5; k++) { const x = x0 + (k * w) / 5; o += box(x - .025, y0 - .15, z + .07, .05, d + .3, .05, shade(mad, 1.08)); }
+  const flores = ['#F4A6C0', '#C77DFF', '#FFFFFF', '#F4A6C0'];
+  for (let k = 0; k < 9; k++) {
+    const t = k / 8, c = iso(x0 + w * t, (k % 2 ? y0 + d : y0) + (k % 3 - 1) * .06, z + .05);
+    o += `<circle cx="${f1(c[0])}" cy="${f1(c[1] + 1)}" r="3.4" fill="${shade(P.arvore, .9)}"/><circle cx="${f1(c[0] + 1.6)}" cy="${f1(c[1] - .6)}" r="1.4" fill="${flores[k % 4]}"/>`;
+  }
+  for (const [x, y] of [[x0, y0 + d], [x0 + w, y0 + d]] as [number, number][]) {
+    const a = iso(x, y, .1), b = iso(x, y, z);
+    o += `<path d="M${f1(a[0])},${f1(a[1])} Q${f1(a[0] + 3)},${f1((a[1] + b[1]) / 2)} ${f1(b[0])},${f1(b[1])}" stroke="${shade(P.arvore, .85)}" stroke-width="2" fill="none"/>`;
+  }
+  return o;
+}
+
+export function hortaIrrigacao(P: Paleta): string {
+  const cano = P.noite ? '#6A7090' : '#3A4366';
+  let o = box(16.32, 19.42, 0, .12, .12, .4, cano);
+  for (let i = 0; i < 3; i++) {
+    const y = 19.61 + i * .5;
+    o += linha3([[16.38, y - .2, .17], [16.5, y, .17], [19.3, y, .17]], cano, .8);
+    for (const x of [17.3, 18.6]) {
+      const c = iso(x, y, .32);
+      o += linha3([[x, y, .17], [x, y, .3]], cano, .9) +
+        `<path class="cv-pisca" style="animation-delay:-${(i * .4 + x * .1).toFixed(2)}s" d="M${f1(c[0] - 6)},${f1(c[1] + 3)} Q${f1(c[0])},${f1(c[1] - 7)} ${f1(c[0] + 6)},${f1(c[1] + 3)}" stroke="${P.aguaLuz}" stroke-width="1.1" fill="none" stroke-dasharray="1.6 1.6"/>`;
+    }
+  }
   return o;
 }

@@ -12,6 +12,17 @@
 .cp-hora { display: flex; padding: 3px; }
 .cp-hora button { border: 0; background: transparent; border-radius: 999px; padding: 6px 12px; font: 700 13px var(--ed-fonte); color: #5A6380; cursor: pointer; }
 .cp-hora button[aria-pressed="true"] { background: #121A33; color: #FFFFFF; }
+.cp-direita { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+.cp-evolucao-btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; font: 700 13px var(--ed-fonte); color: #121A33; cursor: pointer; }
+.cp-evolucao-btn ed-icone { color: #2836C6; }
+.cp-evolucao-btn[aria-pressed="true"] { background: #121A33; color: #FFFFFF; }
+.cp-evolucao-btn[aria-pressed="true"] ed-icone { color: #FFFFFF; }
+.cp-evolucao { position: absolute; inset: 0; z-index: 3; animation: cp-entra 320ms var(--ed-curva) both; }
+.cp-evolucao ed-campus { position: absolute; inset: 0; }
+.cp-evolucao-barra { position: absolute; z-index: 4; left: 50%; bottom: 62px; transform: translateX(-50%); display: grid; gap: 6px; width: min(300px, calc(100% - 32px)); padding: 10px 14px; border-radius: 16px; font-size: 13px; font-weight: 700; text-align: center; }
+.cp-evolucao-barra i { display: block; height: 6px; border-radius: 3px; background: rgba(18, 26, 51, .12); overflow: hidden; }
+.cp-evolucao-barra b { display: block; height: 100%; border-radius: 3px; background: #2836C6; transition: width 700ms var(--ed-curva); }
+@keyframes cp-entra { from { opacity: 0; } }
 .cp-descer { position: absolute; z-index: 4; left: 50%; bottom: 14px; transform: translateX(-50%); display: inline-flex; align-items: center; gap: 4px; padding: 8px 12px 8px 14px; font-size: 13px; font-weight: 700; cursor: pointer; }
 .cp-descer ed-icone { transform: rotate(90deg); }
 .cp-palco ed-campus ::ng-deep .ed-campus-aviso { bottom: 62px; }

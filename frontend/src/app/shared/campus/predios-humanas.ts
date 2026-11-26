@@ -1,4 +1,4 @@
-import { Paleta, Predio, P3, iso, f1, shade, box, topo, faceX, faceY, poly, linha3, sombraChao, cilindro, elipseChao, U } from './motor';
+import { Paleta, Predio, P3, iso, f1, shade, box, topo, faceX, faceY, poly, linha3, sombraChao, cilindro, cupula, elipseChao, U } from './motor';
 
 const OURO = '#E8B931';
 const marmore = (P: Paleta) => (P.noite ? '#A9AECF' : '#F7F3EA');
@@ -59,7 +59,8 @@ function coluna(x: number, y: number, P: Paleta): string {
 
 export function temploColunata(t: Templo, P: Paleta): string {
   const xf = t.x + t.w - .45, ys = t.y + t.d - .45, pts: [number, number][] = [];
-  for (let i = 0; i < 6; i++) pts.push([xf, t.y + .45 + (i * (t.d - .9)) / 5]);
+  const nf = Math.round((t.d - .9) / .6) + 1;
+  for (let i = 0; i < nf; i++) pts.push([xf, t.y + .45 + (i * (t.d - .9)) / (nf - 1)]);
   for (let i = 0; i < 7; i++) pts.push([t.x + .45 + (i * (t.w - .9)) / 7, ys]);
   pts.sort((a, b) => a[0] + a[1] - (b[0] + b[1]));
   let o = '';
@@ -114,8 +115,9 @@ export function temploLuzes(t: Templo, P: Paleta): string {
   }
   const X = t.x + t.w - .12, ym = t.y + t.d / 2, c = iso(X, ym, zCap + .9);
   let o = `<ellipse cx="${f1(c[0])}" cy="${f1(c[1])}" rx="34" ry="26" fill="#FFE9A8" opacity=".14"/>`;
-  for (let i = 0; i < 6; i++) {
-    const y = t.y + .45 + (i * (t.d - .9)) / 5, g = iso(t.x + t.w + .05, y, .36);
+  const nf = Math.round((t.d - .9) / .6) + 1;
+  for (let i = 0; i < nf; i++) {
+    const y = t.y + .45 + (i * (t.d - .9)) / (nf - 1), g = iso(t.x + t.w + .05, y, .36);
     o += `<circle cx="${f1(g[0])}" cy="${f1(g[1])}" r="1.4" fill="#FFE9A8"/>`;
   }
   return o;
@@ -195,4 +197,117 @@ export function anfora(x: number, y: number, P: Paleta): string {
 export function emEscala(x: number, y: number, s: number, svg: string): string {
   const g = iso(x, y, 0);
   return `<g transform="translate(${f1(g[0])} ${f1(g[1])}) scale(${s}) translate(${f1(-g[0])} ${f1(-g[1])})">${svg}</g>`;
+}
+
+export function estatuaLiberdade(x: number, y: number, P: Paleta): string {
+  const m = marmore(P), ms = marmoreSombra(P), cobre = P.noite ? '#4F9C88' : '#6DB8A2', cobreS = shade(cobre, .78);
+  let o = sombraChao(x, y, 1.1, .55, P);
+  o += box(x - .75, y - .75, 0, 1.5, 1.5, .22, ms, { t: m }) + box(x - .58, y - .58, .22, 1.16, 1.16, .2, m, { r: ms });
+  o += box(x - .4, y - .4, .42, .8, .8, 1.3, m, { r: ms, l: shade(m, .93) });
+  o += box(x - .48, y - .48, 1.72, .96, .96, .12, ms, { t: m });
+  const g = iso(x, y, 1.84);
+  if (P.noite) o += `<ellipse cx="${f1(g[0] + 9)}" cy="${f1(g[1] - 66)}" rx="14" ry="14" fill="#FFD66B" opacity=".35"/>`;
+  o += `<g transform="translate(${f1(g[0])} ${f1(g[1])})">` +
+    `<path d="M-9,0 L-7,-30 Q-6,-40 0,-41 Q6,-40 7,-30 L9,0 Z" fill="${cobre}"/>` +
+    `<path d="M0,-41 Q6,-40 7,-30 L9,0 L2,0 Z" fill="${cobreS}"/>` +
+    `<path d="M-6,-8 l12,0 M-6.5,-16 l13,0 M-7,-24 l14,0" stroke="${cobreS}" stroke-width=".8"/>` +
+    `<path d="M4,-36 L9,-56" stroke="${cobre}" stroke-width="4" stroke-linecap="round"/>` +
+    `<rect x="7" y="-61" width="4" height="5" fill="${OURO}"/><path d="M9,-72 q-4,5 -2,9 l4,0 q2,-4 -2,-9 z" fill="${P.noite ? '#FFE27A' : '#F5B930'}"/>` +
+    `<rect x="-10" y="-30" width="5" height="8" rx=".6" fill="${cobreS}" transform="rotate(-12 -7 -26)"/>` +
+    `<circle cx="0" cy="-45" r="4.2" fill="${cobre}"/>` +
+    [-60, -30, 0, 30, 60].map(a => `<path d="M0,-48 l${f1(Math.sin(a * Math.PI / 180) * 7)},${f1(-Math.cos(a * Math.PI / 180) * 7)}" stroke="${cobre}" stroke-width="1.6" stroke-linecap="round"/>`).join('') +
+    `</g>`;
+  return o;
+}
+
+export function cavaloDeTroia(x: number, y: number, P: Paleta): string {
+  const mad = P.noite ? '#8A5E36' : '#B98250', madS = shade(mad, .75), madC = shade(mad, 1.12), escuro = shade(mad, .55);
+  let o = sombraChao(x, y, 1.2, .5, P);
+  o += box(x - .85, y - .35, .14, 1.7, .7, .14, madS, { t: mad });
+  for (const dx of [-.6, .6]) {
+    const r = iso(x + dx, y + .36, .14);
+    o += `<circle cx="${f1(r[0])}" cy="${f1(r[1])}" r="4.6" fill="${madS}" stroke="${escuro}" stroke-width="1.2"/><circle cx="${f1(r[0])}" cy="${f1(r[1])}" r="1.2" fill="${escuro}"/>`;
+  }
+  const g = iso(x, y, .28);
+  o += `<g transform="translate(${f1(g[0])} ${f1(g[1])}) skewY(30)">` +
+    `<path d="M-16,0 l0,-17 l4,0 l0,17 Z M-8,0 l0,-17 l4,0 l0,17 Z M7,0 l0,-17 l4,0 l0,17 Z M14,0 l0,-17 l4,0 l0,17 Z" fill="${madS}"/>` +
+    `<path d="M-20,-15 Q-20,-30 -6,-30 L12,-30 Q20,-30 21,-22 L21,-15 Q21,-12 17,-12 L-16,-12 Q-20,-12 -20,-15 Z" fill="${mad}"/>` +
+    `<path d="M-18,-22 l37,0 M-18,-17 l38,0" stroke="${madS}" stroke-width=".8"/>` +
+    `<path d="M10,-28 L17,-50 L25,-50 L20,-24 Z" fill="${mad}"/>` +
+    `<path d="M15,-48 L30,-48 Q33,-48 33,-44 L33,-41 Q33,-39 30,-39 L21,-39 L19,-36 Z" fill="${madC}"/>` +
+    `<path d="M15,-48 L17,-55 L20,-50 M20,-50 L22,-56 L24,-50" fill="${madS}" stroke="${madS}" stroke-width="1"/>` +
+    `<path d="M14,-44 L10,-26" stroke="${escuro}" stroke-width="2.4"/>` +
+    `<circle cx="25" cy="-45" r="1.3" fill="#2A1B14"/>` +
+    `<path d="M-20,-24 q-6,4 -4,14" stroke="${madS}" stroke-width="2.6" fill="none" stroke-linecap="round"/>` +
+    `<rect x="-6" y="-27" width="8" height="6" fill="none" stroke="${escuro}" stroke-width=".8"/>` +
+    `</g>`;
+  return o;
+}
+
+export function arcoHistoria(x: number, y0: number, y1: number, P: Paleta): string {
+  const m = marmore(P), ms = marmoreSombra(P), h = 2.3, azul = azulTelha(P);
+  let o = box(x - .2, y0 - .2, 0, .4, .4, h, m, { r: ms }) + box(x - .2, y1 - .2, 0, .4, .4, h, m, { r: ms });
+  o += box(x - .26, y0 - .3, h, .52, y1 - y0 + .6, .42, azul, { r: shade(azul, .8), t: m });
+  o += box(x - .32, y0 - .36, h + .42, .64, y1 - y0 + .72, .1, m, { r: ms });
+  return o + textoX(x + .262, (y0 + y1) / 2, h + .21, 'HISTÓRIA', '#FFFFFF', 7, 1.2);
+}
+
+// ───── detalhes que o prédio de História e o de Geografia ganham depois de prontos ─────
+
+const geoTeto = (b: Predio, n: number, frente: 'x' | 'y') => {
+  const z = b.z0 + n * b.h, x0 = b.x - .1, y0 = b.y - .1, X = b.x + b.w + .1, Y = b.y + b.d + .1, ze = z + .14;
+  const alt = frente === 'y' ? Math.min(.9, (X - x0) * .3) : Math.min(.9, (Y - y0) * .3);
+  return { x0, y0, X, Y, ze, alt, za: ze + alt, xm: (x0 + X) / 2, ym: (y0 + Y) / 2 };
+};
+
+export function escadariaMarmore(b: Predio, P: Paleta): string {
+  const Y = b.y + b.d, m = marmore(P), ms = marmoreSombra(P);
+  return box(b.x + .15, Y, 0, b.w - .3, .62, .08, ms, { t: m }) + box(b.x + .3, Y, .08, b.w - .6, .42, .08, ms, { t: m }) + box(b.x + .45, Y, .16, b.w - .9, .22, .08, ms, { t: m });
+}
+
+export function estandartes(b: Predio, n: number, P: Paleta): string {
+  const Y = b.y + b.d + .07, z1 = b.z0 + n * b.h - .45, z0 = z1 - 1.1;
+  let o = '';
+  for (const x of [b.x + .32, b.x + b.w - .62]) {
+    o += box(x - .04, Y - .03, z1, .38, .05, .05, OURO) + faceY(Y, x, x + .3, z0, z1, P.ch);
+    o += poly([[x, Y + .001, z0], [x + .3, Y + .001, z0], [x + .15, Y + .001, z0 + .14]], P.noite ? '#2A3352' : '#F6F1E8');
+    const c = iso(x + .15, Y + .002, z1 - .35);
+    o += `<g transform="translate(${f1(c[0])} ${f1(c[1])}) skewY(30)"><circle r="2.6" fill="none" stroke="${OURO}" stroke-width="1"/><path d="M0,-1.6 L1.4,1.2 L-1.4,1.2 Z" fill="${OURO}"/></g>`;
+  }
+  return o;
+}
+
+export function relogioFrontao(b: Predio, n: number, P: Paleta): string {
+  const t = geoTeto(b, n, 'y'), c = iso(t.xm, t.Y + .004, t.ze + t.alt * .4);
+  return `<g transform="translate(${f1(c[0])} ${f1(c[1])}) skewY(30)"><circle r="6" fill="${P.noite ? '#FFF3C4' : '#FFFFFF'}" stroke="${OURO}" stroke-width="1.6"/>` +
+    [0, 1, 2, 3].map(k => `<circle cx="${f1(Math.cos(k * Math.PI / 2) * 4.5)}" cy="${f1(Math.sin(k * Math.PI / 2) * 4.5)}" r=".6" fill="#1E2A5A"/>`).join('') +
+    `<path d="M0,0 L0,-4 M0,0 L2.8,1" stroke="#1E2A5A" stroke-width="1.1" stroke-linecap="round"/></g>` + (P.noite ? `<circle cx="${f1(c[0])}" cy="${f1(c[1])}" r="11" fill="#FFE9A8" opacity=".25"/>` : '');
+}
+
+export function lanternaCobre(b: Predio, n: number, P: Paleta): string {
+  const t = geoTeto(b, n, 'y'), cobre = P.noite ? '#2F7A6A' : '#3FA38A', m = marmore(P);
+  const z = t.za - .08, g = iso(t.xm, t.ym, z + .62);
+  return box(t.xm - .26, t.ym - .26, z, .52, .52, .1, marmoreSombra(P), { t: m }) + cilindro(t.xm, t.ym, z + .1, .34, .2, m) + cupula(t.xm, t.ym, z + .44, .24, cobre) +
+    `<circle cx="${f1(g[0])}" cy="${f1(g[1] - 6)}" r="1.7" fill="${OURO}"/>`;
+}
+
+export function estacaoMeteorologica(b: Predio, n: number, P: Paleta): string {
+  const t = geoTeto(b, n, 'x'), x = t.X - .45, y = t.ym, z = t.za - (t.alt * .45 / ((t.X - t.x0) / 2)) * 0, top = iso(x, y, z + 1.0), seta = iso(x, y, z + .72);
+  let o = box(x - .04, y - .04, z - .1, .08, .08, 1.1, P.ferro);
+  o += `<g class="cv-gira" style="transform-origin:${f1(top[0])}px ${f1(top[1])}px">${[0, 90, 180, 270].map(a => `<line x1="${f1(top[0])}" y1="${f1(top[1])}" x2="${f1(top[0] + Math.cos(a * Math.PI / 180) * 6)}" y2="${f1(top[1] + Math.sin(a * Math.PI / 180) * 2)}" stroke="${P.ferro}" stroke-width=".8"/><circle cx="${f1(top[0] + Math.cos(a * Math.PI / 180) * 6)}" cy="${f1(top[1] + Math.sin(a * Math.PI / 180) * 2)}" r="1.8" fill="${P.ch}"/>`).join('')}</g>`;
+  o += `<path d="M${f1(seta[0] - 7)},${f1(seta[1] + 1)} L${f1(seta[0] + 6)},${f1(seta[1] - 2)} M${f1(seta[0] + 6)},${f1(seta[1] - 2)} l-3,-1.6 M${f1(seta[0] + 6)},${f1(seta[1] - 2)} l-2,2.2" stroke="${OURO}" stroke-width="1.3" stroke-linecap="round" fill="none"/>`;
+  return o;
+}
+
+export function rosaFrontao(b: Predio, n: number, P: Paleta): string {
+  const t = geoTeto(b, n, 'x'), c = iso(t.X + .006, t.ym, t.ze + t.alt * .36);
+  const pts = Array.from({ length: 16 }, (_, k) => { const a = (k / 16) * Math.PI * 2 - Math.PI / 2, r = k % 2 ? 1.6 : k % 4 ? 3.6 : 6; return `${f1(Math.cos(a) * r)},${f1(Math.sin(a) * r)}`; }).join(' ');
+  return `<g transform="translate(${f1(c[0])} ${f1(c[1])}) skewY(-30)"><circle r="6.6" fill="none" stroke="${OURO}" stroke-width=".9"/><polygon points="${pts}" fill="${OURO}"/><circle r="1.2" fill="#FFFFFF"/></g>`;
+}
+
+export function antenaSatelite(b: Predio, n: number, P: Paleta): string {
+  const t = geoTeto(b, n, 'x'), x = t.x0 + .7, y = t.ym, z = t.za - .1, c = iso(x, y, z + .55);
+  return box(x - .04, y - .04, z - .15, .08, .08, .55, P.ferro) +
+    `<ellipse cx="${f1(c[0])}" cy="${f1(c[1])}" rx="8" ry="5" fill="${P.noite ? '#C9CEE0' : '#F4F6FA'}" stroke="${P.ferro}" stroke-width=".8" transform="rotate(-28 ${f1(c[0])} ${f1(c[1])})"/>` +
+    `<path d="M${f1(c[0])},${f1(c[1])} L${f1(c[0] + 5)},${f1(c[1] - 7)}" stroke="${P.ferro}" stroke-width="1"/><circle cx="${f1(c[0] + 5)}" cy="${f1(c[1] - 7)}" r="1.4" fill="${P.ch}"/>`;
 }

@@ -14,11 +14,14 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.TextStyle;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -96,6 +99,38 @@ public class LembreteService {
         int ok = 0;
         for (PushInscricao p : inscricoes.findAllByUsuario(u)) if (entregar(p, corpo)) ok++;
         return ok;
+    }
+
+
+    /** Push para quem foi desafiado: "Ana te desafiou! ⚔️" / "Você recebeu um convite para duelar amanhã." */
+    @Transactional
+    public int avisarConvite(UUID dueloId) {
+        Duelo d = dueloRepository.findById(dueloId).orElse(null);
+        if (d == null || d.getStatus() != StatusDuelo.PENDENTE) return 0;
+        List<PushInscricao> aparelhos = inscricoes.findAllByUsuario(d.getDesafiado());
+        if (aparelhos.isEmpty()) return 0;
+        String corpo = payload(nomeCurto(d.getDesafiante()) + " te desafiou! ⚔️",
+                "Você recebeu um convite para duelar " + quando(d.getDia()) + ". Toque para aceitar ou recusar.",
+                "convite-duelo-" + d.getId(), "/amigos");
+        long ate = Duration.between(LocalDateTime.now(), d.getDia().plusDays(1).atStartOfDay()).getSeconds();
+        int validade = (int) Math.max(600, Math.min(ate, 8L * 24 * 3600));
+        int enviados = 0;
+        for (PushInscricao p : aparelhos) if (entregar(p, corpo, validade)) enviados++;
+        return enviados;
+    }
+
+    private static String nomeCurto(Usuario u) {
+        String nome = u.getNome() == null ? "" : u.getNome().trim();
+        return nome.isEmpty() ? "@" + u.getUsuario() : nome.split("\\s+")[0];
+    }
+
+    static String quando(LocalDate dia) {
+        LocalDate hoje = LocalDate.now();
+        if (dia.equals(hoje)) return "hoje";
+        if (dia.equals(hoje.plusDays(1))) return "amanhã";
+        String semana = dia.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.forLanguageTag("pt-BR"));
+        boolean fimDeSemana = dia.getDayOfWeek() == DayOfWeek.SATURDAY || dia.getDayOfWeek() == DayOfWeek.SUNDAY;
+        return (fimDeSemana ? "no " : "na ") + semana + " (" + dia.format(DateTimeFormatter.ofPattern("dd/MM")) + ")";
     }
 
     private String mensagemDoDia(Usuario u, int feitas, LocalDate hoje) {

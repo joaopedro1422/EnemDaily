@@ -57,6 +57,13 @@ export class UniversityComponent implements OnInit, OnDestroy {
   extras: ExtrasCampus | null = null;
   upgrades: CartaoPremium[] = [];
   distrito: CartaoPremium[] = [];
+  acesas: Partial<Record<Trilha, boolean>> | null = null;
+  evoluindo = false;
+  quadro: Progresso | null = null;
+  extrasQuadro: ExtrasCampus | null = null;
+  passoEvolucao = 0;
+  totalEvolucao = 1;
+  private timerEvolucao?: ReturnType<typeof setTimeout>;
 
   constructor(private authService: AuthServiceService, private router: Router, private premiumService: EstruturasPremiumService, private sanitizer: DomSanitizer) {}
 
@@ -66,6 +73,7 @@ export class UniversityComponent implements OnInit, OnDestroy {
       this.usuario = usuario;
       if (!usuario) { this.router.navigate(['/Home']); return; }
       this.progresso = progressoDoUsuario(usuario);
+      this.acesas = { linguagens: !!usuario.lingRespHj, humanas: !!usuario.humRespHj, naturezas: !!usuario.natRespHj, exatas: !!usuario.exatRespHj };
       this.total = totalDePecas(this.progresso);
       this.cartoes = REGIOES.map(r => {
         const feitas = this.progresso[r.trilha], total = TOTAL_POR_TRILHA[r.trilha];
@@ -80,6 +88,7 @@ export class UniversityComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    clearTimeout(this.timerEvolucao);
     this.sub?.unsubscribe();
     this.subPremium?.unsubscribe();
   }
@@ -99,7 +108,7 @@ export class UniversityComponent implements OnInit, OnDestroy {
           return {
             grupo: m.grupo, nome: m.nome, icone: m.icone, liberada: true,
             descricao: `${abertos} de ${NEGOCIOS.length} negócios abertos.` + (prox ? ` Próximo: ${prox.nome}, em ${prox.faltam} ${prox.faltam === 1 ? 'acerto' : 'acertos'}.` : ' Todos abertos!'),
-            requisito: 'Um negócio a cada 30 acertos', feitas: abertos, meta: NEGOCIOS.length,
+            requisito: 'Um negócio a cada 25 acertos', feitas: abertos, meta: NEGOCIOS.length,
             svg: this.sanitizer.bypassSecurityTrustHtml(miniaturaMarco(m.chave, P)), rota, acao: 'Responder o desafio'
           };
         }
@@ -128,6 +137,42 @@ export class UniversityComponent implements OnInit, OnDestroy {
   focar(t: Trilha) {
     this.foco = this.foco === t || t === 'geral' ? null : t;
     if (this.foco) window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // Replay do campus do zero até o estágio atual, em quadros, como o "rever" do resumo da semana.
+  verEvolucao() {
+    if (this.evoluindo) { this.pararEvolucao(); return; }
+    const alvo = this.progresso, e = this.extras;
+    const n = Math.max(8, Math.min(28, Math.ceil(totalDePecas(alvo) / 6)));
+    const trilhas = Object.keys(alvo) as Trilha[];
+    const quadros: Progresso[] = [], extras: (ExtrasCampus | null)[] = [];
+    for (let k = 0; k <= n; k++) {
+      const f = k / n;
+      quadros.push(Object.fromEntries(trilhas.map(t => [t, Math.round(alvo[t] * f)])) as Progresso);
+      extras.push(e ? Object.fromEntries(Object.entries(e).map(([c, v]) => [c, typeof v === 'number' ? Math.floor(v * f) : v])) as ExtrasCampus : null);
+    }
+    this.foco = null;
+    this.evoluindo = true;
+    this.totalEvolucao = n;
+    this.passoEvolucao = 0;
+    this.quadro = quadros[0];
+    this.extrasQuadro = extras[0];
+    let k = 0;
+    const avancar = () => {
+      k++;
+      if (k > n) { this.timerEvolucao = setTimeout(() => this.pararEvolucao(), 2200); return; }
+      this.quadro = quadros[k];
+      this.extrasQuadro = extras[k];
+      this.passoEvolucao = k;
+      this.timerEvolucao = setTimeout(avancar, 820);
+    };
+    this.timerEvolucao = setTimeout(avancar, 700);
+  }
+
+  pararEvolucao() {
+    clearTimeout(this.timerEvolucao);
+    this.evoluindo = false;
+    this.quadro = null;
   }
 
   verRegioes() {

@@ -193,7 +193,7 @@ export function computacaoCobertura(b: Predio, n: number, P: Paleta): string {
   o += box(b.x - .08, b.y - .08, z + .12, b.w + .16, b.d + .16, .34, marinho(P), { t: shade(P.telhado, .92) });
   o += faceY(Y + .081, b.x - .08, b.x + b.w + .08, z + .42, z + .46, P.mt) + faceX(b.x + b.w + .081, b.y - .08, Y + .08, z + .42, z + .46, shade(P.mt, .85));
   o += topo(b.x + .06, b.y + .06, b.x + b.w - .06, Y - .06, z + .462, shade(P.telhado, .9));
-  o += textoY(xm, Y + .085, z + .29, 'COMPUTAÇÃO', '#FFFFFF', 7.4, 1.2);
+  o += textoY(xm, Y + .085, z + .29, 'COMPUTAÇÃO', '#FFFFFF', 6.2, .8);
   return o;
 }
 
@@ -242,7 +242,7 @@ export function institutoCobertura(b: Predio, n: number, P: Paleta): string {
   let o = box(b.x - .08, b.y - .08, z, b.w + .16, b.d + .16, .12, paredeIM(P), { r: shade(paredeIM(P), .84), t: P.telhado });
   o += box(b.x - .08, b.y - .08, z + .12, b.w + .16, b.d + .16, .36, P.mt, { t: shade(P.telhado, .92) });
   o += topo(b.x + .06, b.y + .06, b.x + b.w - .06, Y - .06, z + .482, shade(P.telhado, .9));
-  o += textoY(xm, Y + .085, z + .3, 'MATEMÁTICA', '#FFFFFF', 8.6, 1.8);
+  o += textoY(xm, Y + .085, z + .3, 'MATEMÁTICA', '#FFFFFF', 7, 1.1);
   return o;
 }
 

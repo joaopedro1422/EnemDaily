@@ -15,6 +15,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -24,6 +26,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 public class DueloService {
@@ -36,14 +39,16 @@ public class DueloService {
     private final UsuarioRepository usuarioRepository;
     private final AmizadeRepository amizadeRepository;
     private final BloqueioRepository bloqueioRepository;
+    private final LembreteService lembretes;
 
     public DueloService(DueloRepository dueloRepository, EventRepository eventRepository, UsuarioRepository usuarioRepository,
-                        AmizadeRepository amizadeRepository, BloqueioRepository bloqueioRepository) {
+                        AmizadeRepository amizadeRepository, BloqueioRepository bloqueioRepository, LembreteService lembretes) {
         this.dueloRepository = dueloRepository;
         this.eventRepository = eventRepository;
         this.usuarioRepository = usuarioRepository;
         this.amizadeRepository = amizadeRepository;
         this.bloqueioRepository = bloqueioRepository;
+        this.lembretes = lembretes;
     }
 
     private LocalDate hoje() { return LocalDate.now(); }
@@ -106,7 +111,17 @@ public class DueloService {
             throw new RegraException(HttpStatus.TOO_MANY_REQUESTS, "Você já tem " + MAX_CONVITES_PENDENTES + " convites esperando resposta. Espere alguém responder.");
 
         Duelo d = dueloRepository.save(new Duelo(eu, outro, dia));
+        avisarDepoisDoCommit(d.getId());
         return paraDto(d, eu);
+    }
+
+    // O push sai só depois que o convite foi gravado, e em segundo plano: quem desafia não espera o celular do outro responder.
+    private void avisarDepoisDoCommit(UUID dueloId) {
+        Runnable enviar = () -> CompletableFuture.runAsync(() -> lembretes.avisarConvite(dueloId));
+        if (!TransactionSynchronizationManager.isSynchronizationActive()) { enviar.run(); return; }
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override public void afterCommit() { enviar.run(); }
+        });
     }
 
     private Duelo carregar(UUID id, Usuario eu) {
