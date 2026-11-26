@@ -15,10 +15,10 @@ export const TOTAL_PECAS = ORDEM_TRILHAS.reduce((s, t) => s + TOTAL_POR_TRILHA[t
 
 export interface InfoRegiao { trilha: Trilha; nome: string; destaque: string; regra: string; cor: string; lote: Caixa; }
 export const REGIOES: InfoRegiao[] = [
-  { trilha: 'linguagens', nome: 'Linguagens', destaque: 'Biblioteca, auditório e rádio', regra: 'Cada acerto em Linguagens constrói uma peça aqui.', cor: 'var(--ed-lc)', lote: [0, 0, 10, 12.4] },
-  { trilha: 'humanas', nome: 'Humanas', destaque: 'Museu, arquivo e sítio arqueológico', regra: 'Cada acerto em Humanas constrói uma peça aqui.', cor: 'var(--ed-ch)', lote: [0, 16, 10, 26] },
-  { trilha: 'naturezas', nome: 'Naturezas', destaque: 'Estufa, lago e laboratórios', regra: 'Cada acerto em Naturezas constrói uma peça aqui.', cor: 'var(--ed-cn)', lote: [16, 16, 26, 26] },
-  { trilha: 'exatas', nome: 'Matemática', destaque: 'Observatório, institutos, pirâmide e labirinto', regra: 'Cada acerto em Matemática constrói uma peça aqui.', cor: 'var(--ed-mt)', lote: [16, 0, 26, 12.4] },
+  { trilha: 'linguagens', nome: 'Linguagens', destaque: 'Teatro, biblioteca e rádio', regra: 'Cada acerto em Linguagens constrói uma peça aqui.', cor: 'var(--ed-lc)', lote: [0, 0, 10, 12.4] },
+  { trilha: 'humanas', nome: 'Humanas', destaque: 'Templo grego, globo e sítio arqueológico', regra: 'Cada acerto em Humanas constrói uma peça aqui.', cor: 'var(--ed-ch)', lote: [0, 16, 10, 26] },
+  { trilha: 'naturezas', nome: 'Naturezas', destaque: 'Estufa, lago e Instituto de Química', regra: 'Cada acerto em Naturezas constrói uma peça aqui.', cor: 'var(--ed-cn)', lote: [16, 16, 26, 26] },
+  { trilha: 'exatas', nome: 'Matemática', destaque: 'Observatório, computação, instituto e labirinto', regra: 'Cada acerto em Matemática constrói uma peça aqui.', cor: 'var(--ed-mt)', lote: [16, 0, 26, 12.4] },
   { trilha: 'geral', nome: 'Universidade', destaque: 'Entrada, praça, reitoria e mata', regra: 'Cada dia em que você responde melhora a estrutura.', cor: 'var(--ed-caneta)', lote: [0, 0, 26, 26] },
 ];
 export const regiao = (t: Trilha) => REGIOES.find(r => r.trilha === t)!;
@@ -219,7 +219,7 @@ export function renderizarCampus(prog: Progresso, P: Paleta, o: OpcoesCena = {})
     topo(x0, y1 - .08, x1, y1, .001, shade(P.grama, .95)) + topo(x1 - .08, y0, x1, y1, .001, shade(P.grama, .9)) + grama(x0, y0, x1, y1, P);
   const hospital = marcos.has('hospital') ? desenharHospital(x0, y0, y1, P, novosMarcos.has('hospital'), aHospital) : null;
   const praca = desenharPraca(x0, x1, y0, o.extras?.acertos ?? 0, P, o.extrasAntes ? o.extrasAntes.acertos ?? 0 : null, aPraca);
-  const ligaLetras = visiveis.some(p => p.nome === 'Terreno de Linguagens') ? caminho(6.75, 10.6, 7.25, 12.5, Pc) + caminho(6.75, 12.5, 10, 13.5, Pc) : '';
+  const ligaLetras = visiveis.some(p => p.nome === 'Terreno de Linguagens') ? caminho(7.25, 11.55, 7.75, 12.5, Pc) + caminho(7.25, 12.5, 10, 13.5, Pc) : '';
   const ligaPraca = praca && y0 < 6.3 ? caminho(12.5, y0, 13.5, 6.3, Pc) : '';
   const xIni = Math.min(hospital ? hospital.x0 : x0, praca?.x0 ?? x0);
   const xFim = Math.max(distrito ? distrito.x1 : x1, praca?.x1 ?? x1);

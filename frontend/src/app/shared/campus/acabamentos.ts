@@ -4,21 +4,25 @@ import { Peca, Trilha } from './pecas';
 
 type Area = Exclude<Trilha, 'geral'>;
 
-const PREDIOS: Record<Area, Predio[]> = {
+type PredioAcab = Predio & { sem?: Efeito[] };
+
+const PREDIOS: Record<Area, PredioAcab[]> = {
   linguagens: [
-    { x: 5.5, y: 8, w: 3.0, d: 2.6, z0: .25, h: 1.6 }, { x: 2.3, y: 4.9, w: 3.0, d: 3.0, z0: .3, h: 2.2 },
-    { x: 7.4, y: 4.8, w: 2.0, d: 1.6, z0: .2, h: 1.2 }, { x: .3, y: 5.4, w: 1.8, d: 3.6, z0: .25, h: 1.2 }, { x: .4, y: 2.8, w: 1.9, d: 1.9, z0: .2, h: 1.6 }
+    { x: 5.7, y: 7.0, w: 3.6, d: 3.0, z0: .25, h: 1.5, sem: ['toldos', 'brasao', 'pintura', 'floreiras'] }, { x: 2.6, y: 3.9, w: 1.9, d: 1.4, z0: .2, h: 1.25 }, { x: 7.8, y: 2.8, w: 1.9, d: 2.2, z0: .25, h: 1.15 }
   ],
-  humanas: [{ x: 5.6, y: 16.6, w: 3.2, d: 2.8, z0: .4, h: 1.8 }, { x: 2.4, y: 16.6, w: 2.6, d: 2.4, z0: .25, h: 1.25 }, { x: 4.4, y: 24.3, w: 4.8, d: 1.4, z0: .2, h: 1.3 }],
-  naturezas: [{ x: 21.0, y: 16.8, w: 2.6, d: 2.3, z0: .2, h: 1.3 }, { x: 16.6, y: 23.5, w: 3.0, d: 1.9, z0: .25, h: 1.4 }],
-  exatas: [{ x: 21.2, y: 7.6, w: 2.5, d: 3.3, z0: .25, h: 1.3 }, { x: 16.6, y: 2.8, w: 3.2, d: 1.5, z0: .2, h: 1.2 }, { x: 16.4, y: .2, w: 4.2, d: 2.1, z0: .25, h: 1.3 }, { x: 21.0, y: .2, w: 3.4, d: 2.0, z0: .25, h: 1.25 }]
+  humanas: [{ x: 2.3, y: 16.7, w: 2.7, d: 2.3, z0: .25, h: 1.25, sem: ['toldos', 'brasao', 'pintura'] }, { x: 3.9, y: 24.3, w: 3.9, d: 1.4, z0: .2, h: 1.3, sem: ['brasao', 'pintura', 'toldos'] }],
+  naturezas: [{ x: 20.6, y: 23.6, w: 2.6, d: 2.0, z0: .25, h: 1.25, sem: ['toldos', 'brasao', 'pintura', 'floreiras'] }, { x: 16.6, y: 23.5, w: 3.0, d: 1.9, z0: .25, h: 1.4 }],
+  exatas: [{ x: 21.3, y: 7.9, w: 2.8, d: 3.1, z0: .25, h: 1.2, sem: ['toldos', 'brasao', 'pintura', 'floreiras'] }, { x: 16.4, y: 2.85, w: 4.2, d: 2.0, z0: .25, h: 1.25, sem: ['toldos', 'brasao'] }]
 };
 
 const LOTE: Record<Area, [number, number, number, number]> = {
-  linguagens: [2, 4.4, 10, 12.4], humanas: [2, 16, 10, 24], naturezas: [16, 16, 24, 24], exatas: [16, 4.4, 24, 12.4]
+  linguagens: [0, 2.4, 10, 12.4], humanas: [0, 16, 10, 26], naturezas: [16, 16, 26, 26], exatas: [16, 2.4, 26, 12.4]
 };
 
-type Efeito = 'floreiras' | 'toldos' | 'friso' | 'luzes' | 'vasos' | 'brasao' | 'sebe' | 'postes' | 'arvores' | 'bandeiras' | 'pintura';
+const LIVRE: Partial<Record<Area, [number, number]>> = { humanas: [7.9, 10], naturezas: [20.4, 23.4] };
+const livre = (t: Area, x: number) => { const l = LIVRE[t]; return !!l && x >= l[0] && x <= l[1]; };
+
+export type Efeito = 'floreiras' | 'toldos' | 'friso' | 'luzes' | 'vasos' | 'brasao' | 'sebe' | 'postes' | 'arvores' | 'bandeiras' | 'pintura';
 
 export const NIVEIS_ACABAMENTO: [Efeito, number][] = [
   ['floreiras', 1], ['sebe', 1], ['toldos', 1], ['friso', 1], ['arvores', 1], ['vasos', 1], ['luzes', 1], ['postes', 1], ['brasao', 1], ['bandeiras', 1], ['pintura', 1],
@@ -57,6 +61,7 @@ function efeitoNoPredio(e: Efeito, g: number, b: Predio, P: Paleta, cor: string)
       return faixa(z + b.h - .16, .14) + (g === 3 ? faixa(z + .02, .08) : '');
     }
     case 'luzes': {
+      if (!P.noite) return '';
       const zl = z + b.h * .92, cores = g === 3 ? [OURO] : g === 2 ? [cor, '#F2C94C', P.branco] : ['#FFE9A8'];
       let o = linha3([[b.x, Y + .02, zl], [X, Y + .02, zl], [X + .02, b.y, zl]], P.ferro, .5, ' opacity=".7"');
       const passos = Math.round((b.w + b.d) / .35);
@@ -97,7 +102,7 @@ function efeitoNaRegiao(e: Efeito, g: number, t: Area, P: Paleta, cor: string): 
     }
     case 'postes': {
       const n = g === 1 ? 3 : 5, lista: Peca[] = [];
-      for (let k = 0; k < n; k++) { const x = x0 + .4 + (k * (x1 - x0 - .8)) / (n - 1); lista.push(p('poste', x, y1 - .25, P2 => poste(x, y1 - .25, P2, g === 1 ? 1.5 : 1.9))); }
+      for (let k = 0; k < n; k++) { const x = x0 + .4 + (k * (x1 - x0 - .8)) / (n - 1); if (livre(t, x) || t === 'humanas' || (t === 'exatas' && k < n - 1)) continue; lista.push(p('poste', x, y1 - .25, P2 => poste(x, y1 - .25, P2, g === 1 ? 1.5 : 1.9))); }
       return lista;
     }
     case 'arvores': {
@@ -113,6 +118,7 @@ function efeitoNaRegiao(e: Efeito, g: number, t: Area, P: Paleta, cor: string): 
       const n = g === 1 ? 2 : 4;
       for (let k = 0; k < n; k++) {
         const x = x0 + 1 + (k * (x1 - x0 - 2)) / Math.max(1, n - 1), y = y1 - .5;
+        if (livre(t, x)) continue;
         lista.push(p('bandeira', x, y, P2 => {
           const t2 = iso(x, y, 2.2);
           return box(x - .03, y - .03, 0, .06, .06, 2.2, P2.ferro) + `<path class="cv-bandeira" style="animation-delay:-${k * .4}s" d="M${f1(t2[0])},${f1(t2[1])} l13,1.5 l0,9 l-13,-1.5 Z" fill="${k % 2 && g === 2 ? OURO : cor}"/>`;
@@ -136,7 +142,7 @@ export function pecasDeAcabamento(t: Trilha, nivel: number, nivelAntes: number |
   for (const [e, { g, nivel: n }] of grau) {
     const nova = nivelAntes !== null && n > nivelAntes;
     const lote = ['sebe', 'postes', 'arvores', 'bandeiras'].includes(e);
-    const lista = lote ? efeitoNaRegiao(e, g, area, P, cor) : PREDIOS[area].map(b => ({
+    const lista = lote ? efeitoNaRegiao(e, g, area, P, cor) : PREDIOS[area].filter(b => !b.sem?.includes(e)).map(b => ({
       trilha: t, ordem: 9999, nome: e, ax: b.x + b.w / 2, ay: b.y + b.d / 2, chave: chaveDe(b) + (e === 'vasos' ? .4 : .06), camada: 1, anim: 'brota' as const,
       desenho: (P2: Paleta) => efeitoNoPredio(e, g, b, P2, corDe(P2, area))
     }));
