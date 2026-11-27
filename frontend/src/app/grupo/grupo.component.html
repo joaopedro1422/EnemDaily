@@ -108,18 +108,10 @@
                     </div>
                   </div>
                 } @else {
-                  @if (d.rival; as r) {
-                    <div class="slide-duo">
-                      <span class="av grande"><ed-avatar [valor]="d.avatar" [nome]="d.nome" [tamanho]="84" [encher]="true" /></span>
-                      <span class="av grande rival"><ed-avatar [valor]="r.avatar" [nome]="r.nome" [tamanho]="84" [encher]="true" /></span>
-                      <span class="slide-vs">VS</span>
-                    </div>
-                  } @else {
-                    <div class="slide-av">
-                      <span class="av grande"><ed-avatar [valor]="d.avatar" [nome]="d.nome" [tamanho]="84" [encher]="true" /></span>
-                      <span class="slide-ico"><ed-icone [nome]="d.icone" [tamanho]="15" /></span>
-                    </div>
-                  }
+                  <div class="slide-av">
+                    <span class="av grande"><ed-avatar [valor]="d.avatar" [nome]="d.nome" [tamanho]="84" [encher]="true" /></span>
+                    <span class="slide-ico"><ed-icone [nome]="d.icone" [tamanho]="15" /></span>
+                  </div>
                   <div class="slide-txt">
                     <span class="slide-rot">{{ d.rotulo }}</span>
                     <b class="slide-nome">{{ d.nome }}</b>

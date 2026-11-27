@@ -4,7 +4,7 @@
   <section class="bv-caixa">
     <header class="bv-topo">
       <div class="bv-pontos" aria-hidden="true">
-        @for (p of passos; track $index) { <i [class.ativo]="$index === atual" [class.feito]="$index < atual"></i> }
+        @for (p of passos; track p.visual) { <i [class.ativo]="$index === atual" [class.feito]="$index < atual"></i> }
       </div>
       <button class="bv-pular" type="button" (click)="pular()">Pular</button>
     </header>
@@ -18,20 +18,108 @@
                 <div class="vis-area" [style.--c]="a.cor" [style.--i]="i">
                   <span class="vis-area-ico"><ed-icone [nome]="a.icone" [tamanho]="20" /></span>
                   <b>{{ a.nome }}</b>
-                  <small>1 questão</small>
+                  <small>1 questão inédita</small>
                   <span class="vis-check"><ed-icone nome="check" [tamanho]="12" [traco]="3" /></span>
                 </div>
               }
-              <div class="vis-total"><b>4</b> questões por dia · até <b>70 XP</b> cada</div>
+              <div class="vis-total"><b>4</b> questões novas por dia · até <b>70 XP</b> cada</div>
             </div>
           }
+
           @case ('campus') {
-            <div class="vis-campus cv-palco" [innerHTML]="cenaCampus"></div>
-            <span class="vis-chip"><ed-icone nome="sparkles" [tamanho]="14" />1 acerto = 1 peça</span>
+            <div class="vis-campus vis-completo cv-palco" [innerHTML]="cenaCompleta"></div>
+            <span class="vis-selo"><b>100%</b> concluído</span>
+            <span class="vis-chip"><ed-icone nome="sparkles" [tamanho]="14" />Cada acerto, uma nova construção</span>
           }
-          @case ('obras') {
-            <div class="vis-campus cv-palco" [innerHTML]="cenaObras"></div>
-            <span class="vis-chip obra"><ed-icone nome="school" [tamanho]="14" />Reitoria em obras</span>
+
+          @case ('voltar') {
+            <div class="vo-cena cv-palco cv-noite">
+              <div class="vo-camada" [innerHTML]="cenaApagada"></div>
+              <div class="vo-camada vo-acesa" [innerHTML]="cenaAcesa"></div>
+            </div>
+            <ol class="vo-marcos">
+              @for (m of marcos; track m.dias; let i = $index) {
+                <li [style.--i]="i">
+                  <span class="vo-ico"><ed-icone [nome]="m.icone" [tamanho]="13" /></span>
+                  <span class="vo-txt"><b>{{ m.dias }} dias</b><small>{{ m.nome }}</small></span>
+                </li>
+              }
+            </ol>
+            <div class="vo-areas">
+              <span class="vo-legenda">Luzes de hoje</span>
+              @for (a of areas; track a.chave; let i = $index) {
+                <span class="vo-area" [class.on]="i < 3" [style.--c]="a.cor" [style.--i]="i">
+                  <ed-icone [nome]="i < 3 ? 'check' : 'x'" [tamanho]="11" [traco]="3" />{{ a.sigla }}
+                </span>
+              }
+            </div>
+          }
+
+          @case ('grupos') {
+            <div class="gr-card">
+              <header class="gr-cab">
+                <span class="gr-selo"><ed-icone nome="trophy" [tamanho]="15" /></span>
+                <div class="gr-tit"><b>Turma do 3º B</b><small>Ranking do grupo</small></div>
+                <span class="gr-convite"><ed-icone nome="link" [tamanho]="12" />Convidar</span>
+              </header>
+              <div class="gr-tabela">
+                <ol class="gr-posicoes" aria-hidden="true">
+                  @for (n of [1, 2, 3, 4]; track n) {
+                    <li [class]="'gr-p gr-p' + n">@if (n === 1) { <ed-icone nome="crown" [tamanho]="13" /> } @else { {{ n }} }</li>
+                  }
+                </ol>
+                <ol class="gr-linhas">
+                  @for (m of ranking; track m.nome) {
+                    <li class="gr-l" [class.eu]="m.eu" [style.--de]="m.de" [style.--para]="m.para">
+                      <ed-avatar [valor]="m.avatar" [nome]="m.nome" [tamanho]="26" />
+                      <b class="gr-nome">{{ m.eu ? 'Você' : m.nome }}</b>
+                      @if (m.eu) { <span class="gr-ganho">+{{ m.xpDepois - m.xp }}</span> }
+                      <span class="gr-xp">
+                        @if (m.xp !== m.xpDepois) { <span class="gr-num"><i class="antes">{{ m.xp }}</i><i class="depois">{{ m.xpDepois }}</i></span> } @else { <span class="gr-num"><i>{{ m.xp }}</i></span> }
+                        XP
+                      </span>
+                    </li>
+                  }
+                </ol>
+              </div>
+              <footer class="gr-duelo">
+                <span class="gr-duelo-ico"><ed-icone nome="swords" [tamanho]="13" /></span>
+                <span>Duelo marcado: <b>você × Caio</b></span>
+                <small>amanhã</small>
+              </footer>
+            </div>
+          }
+
+          @case ('lembrete') {
+            <div class="le-celular">
+              <div class="le-hora"><b>10:00</b><small>{{ hojeExtenso }}</small></div>
+              @if (lembrete === 'ativo') {
+                <div class="le-noti le-ok">
+                  <img class="le-app" src="icons/icon-128x128.png" alt="" />
+                  <div class="le-txt">
+                    <span class="le-de"><b>enem.daily</b><small>agora</small></span>
+                    <b><ed-icone nome="check" [tamanho]="13" [traco]="3" />Lembretes ativados</b>
+                    <p>Todo dia às 10h a gente avisa quando o desafio do dia estiver te esperando.</p>
+                  </div>
+                </div>
+              } @else {
+                <div class="le-noti">
+                  <img class="le-app" src="icons/icon-128x128.png" alt="" />
+                  <div class="le-txt">
+                    <span class="le-de"><b>enem.daily</b><small>agora</small></span>
+                    <b>O desafio de hoje está no ar</b>
+                    <p>São só 4 questões. Responda e continue construindo seu campus.</p>
+                  </div>
+                </div>
+              }
+              <div class="le-noti le-velha">
+                <img class="le-app" src="icons/icon-128x128.png" alt="" />
+                <div class="le-txt">
+                  <span class="le-de"><b>enem.daily</b><small>ontem</small></span>
+                  <b>Falta pouco para fechar o dia</b>
+                </div>
+              </div>
+            </div>
           }
         }
       </div>
@@ -39,14 +127,24 @@
 
     <div class="balao">
       @if (passo.titulo) { <h2 class="balao-titulo">{{ passo.titulo }}</h2> }
-      <p id="bv-fala">{{ texto }}<i class="cursor" [class.oculto]="!falando"></i></p>
+      <p id="bv-fala" class="balao-fala">
+        <span class="fantasma" aria-hidden="true">{{ fala }}</span>
+        <span class="vivo">{{ texto }}<i class="cursor" [class.oculto]="!falando"></i></span>
+      </p>
     </div>
 
     <footer class="bv-acoes">
-      @if (atual > 0) { <button class="btn-sec" type="button" (click)="voltar()">Voltar</button> }
-      <button class="btn-pri" type="button" (click)="avancar()">
-        {{ ultimo ? 'Começar meu primeiro desafio' : 'Continuar' }}<ed-icone nome="arrow-right" [tamanho]="18" />
-      </button>
+      @if (pedeLembrete) {
+        <button class="btn-sec" type="button" (click)="agoraNao()">Agora não</button>
+        <button class="btn-pri" type="button" [disabled]="lembrete === 'carregando'" (click)="ativarLembrete()">
+          @if (lembrete === 'carregando') { <ed-carregando [mini]="true" />Ativando } @else { <ed-icone nome="bell" [tamanho]="18" />Ativar lembrete }
+        </button>
+      } @else {
+        @if (atual > 0) { <button class="btn-sec" type="button" (click)="voltar()">Voltar</button> }
+        <button class="btn-pri" type="button" (click)="avancar()">
+          {{ ultimo ? 'Começar o desafio' : 'Continuar' }}<ed-icone nome="arrow-right" [tamanho]="18" />
+        </button>
+      }
     </footer>
   </section>
 </div>

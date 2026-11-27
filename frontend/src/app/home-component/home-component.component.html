@@ -380,7 +380,7 @@
 
   </main>
   @if (mostrarBoasVindas && usuarioLogado) {
-    <app-boas-vindas [nome]="usuarioLogado.nome" [progresso]="progressoCampus" (fechar)="fecharBoasVindas($event)" />
+    <app-boas-vindas [nome]="usuarioLogado.nome" [avatar]="usuarioLogado.avatar" (fechar)="fecharBoasVindas($event)" />
   }
   @if (mostrarResumo && usuarioLogado) {
     <app-resumo-semanal (fechar)="fecharResumo()" />

@@ -109,12 +109,18 @@ export class PwaService {
     if (Notification.permission === 'granted' && localStorage.getItem('tokenUser')) { this.ativarLembrete(); return; }
     this.aguardandoToque = true;
     const aoTocar = () => {
-      if (!localStorage.getItem('tokenUser')) return;
+      if (!localStorage.getItem('tokenUser') || this.pedidoSegurado) return;
       document.removeEventListener('pointerdown', aoTocar, true);
       this.aguardandoToque = false;
       if (this.lembrete$.value === 'inativo' && !this.desligadoPeloUsuario) this.ativarLembrete();
     };
     document.addEventListener('pointerdown', aoTocar, true);
+  }
+
+  /** Enquanto o onboarding está aberto o pedido automático espera: o próprio onboarding pergunta, no último passo. */
+  private pedidoSegurado = false;
+  segurarPedido(segurar: boolean) {
+    this.pedidoSegurado = segurar;
   }
 
   private get desligadoPeloUsuario(): boolean {

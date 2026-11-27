@@ -378,12 +378,6 @@ export class DesafioComponent implements OnInit, OnDestroy {
   }
 
   private aoResponder(res: Usuario, emblemasAntes: string[]) {
-    if (this.bonus) {
-      this.aguardandoServidor = false;
-      this.proxima = null;
-      this.conquistas = this.resultado === 'acerto' ? [{ icone: 'sparkles', texto: 'Erro corrigido' }] : [];
-      return;
-    }
     this.acertosDepois = acertosTotais(res);
     this.aguardandoServidor = false;
     const depois = progressoDoUsuario(res);
@@ -409,11 +403,12 @@ export class DesafioComponent implements OnInit, OnDestroy {
     if (res.streakDiasAtivos > 1) conquistas.push({ icone: 'calendar-check', texto: `${res.streakDiasAtivos} dias seguidos` });
     const hoje = hojeISO();
     if (AREAS.every(a => res[a.chave]?.ultimaResposta === hoje)) conquistas.push({ icone: 'sparkles', texto: `Dia completo · ${res.xpHoje} XP hoje` });
+    if (this.bonus && this.resultado === 'acerto') conquistas.unshift({ icone: 'sparkles', texto: 'Erro corrigido' });
     this.conquistas = conquistas;
 
-    this.proxima = AREAS.find(a => a.chave !== this.area && res[a.chave]?.ultimaResposta !== hoje) ?? null;
+    this.proxima = this.bonus ? null : AREAS.find(a => a.chave !== this.area && res[a.chave]?.ultimaResposta !== hoje) ?? null;
 
-    if (AREAS.every(a => res[a.chave]?.ultimaResposta === hoje)) {
+    if (!this.bonus && AREAS.every(a => res[a.chave]?.ultimaResposta === hoje)) {
       const resumo = {
         resultados: AREAS.map(a => ({ nome: a.nome, cor: a.cor, acertou: !!res[a.chave]?.acertoHoje })),
         sequencia: res.streakDiasAtivos ?? 0,

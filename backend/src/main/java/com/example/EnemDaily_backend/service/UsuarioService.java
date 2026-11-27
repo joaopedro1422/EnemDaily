@@ -174,16 +174,19 @@ public class UsuarioService {
     }
     /** Questão bônus: soma o XP ao aluno, à área e aos grupos, sem contar como questão do dia. */
     public UsuarioResponseDTO registraBonus(Usuario usuario, AreaEnum area, Long questaoId, boolean acerto, int xp, int tempo, Integer alternativa, java.time.LocalDate erradaEm) {
-        if (xp > 0) {
-            usuario.setXpTotal(usuario.getXpTotal() + xp);
-            Area dados = switch (area) {
-                case NATUREZAS -> usuario.getNaturezas();
-                case HUMANAS -> usuario.getHumanas();
-                case EXATAS -> usuario.getExatas();
-                case LINGUAGENS -> usuario.getLinguagens();
-            };
-            dados.setXp(dados.getXp() + xp);
-        }
+        // Vale como uma resposta normal (XP, acertos, sequência de acertos, campus e emblemas),
+        // só não marca a área como respondida hoje: a questão do dia continua liberada.
+        Area dados = switch (area) {
+            case NATUREZAS -> usuario.getNaturezas();
+            case HUMANAS -> usuario.getHumanas();
+            case EXATAS -> usuario.getExatas();
+            case LINGUAGENS -> usuario.getLinguagens();
+        };
+        dados.setXp(dados.getXp() + xp);
+        dados.setTempoGasto(dados.getTempoGasto() + tempo);
+        dados.setQuestoesRespondidas(dados.getQuestoesRespondidas() + 1);
+        if (acerto) { dados.setAcertos(dados.getAcertos() + 1); dados.setStreak(dados.getStreak() + 1); } else dados.setStreak(0);
+        usuario.registraDadosUsuario(xp, tempo, acerto);
         Map<String, Object> context = new HashMap<>();
         context.put("xp", xp);
         context.put("area", area);
@@ -198,6 +201,7 @@ public class UsuarioService {
         event.setData(LocalDateTime.now());
         event.setJsonContext(context);
         eventRepository.save(event);
+        if (!usuario.isDemo()) usuario = this.verificaEmblemas(usuario, new RespostaDTO(xp, tempo, acerto, null, area, xp, alternativa, questaoId));
         usuarioRepository.save(usuario);
         if (acerto && xp > 0) {
             for (GrupoUsuario gu : grupoUsuarioRepository.findAllByUsuario(usuario)) {

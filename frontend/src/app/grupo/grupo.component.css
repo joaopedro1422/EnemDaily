@@ -86,15 +86,6 @@
 @keyframes saltar { from { transform: scale(.6); opacity: 0; } to { transform: none; opacity: 1; } }
 @keyframes girar-in { from { transform: scale(0) rotate(-120deg); } to { transform: none; } }
 @keyframes pulsar-num { 0% { transform: scale(.7); opacity: 0; } 55% { transform: scale(1.12); opacity: 1; } 100% { transform: none; } }
-.slide-duo { position: relative; flex-shrink: 0; display: flex; }
-.slide-duo .av.grande { width: 64px; height: 64px; font-size: 24px; }
-.slide-duo .rival { margin-left: -14px; box-shadow: 0 0 0 3px var(--noite), 0 0 0 6px rgba(255, 255, 255, .55); }
-.slide-vs { position: absolute; left: 50%; bottom: -8px; transform: translateX(-50%); padding: 3px 8px; border-radius: 999px; background: var(--c); color: #FFFFFF; font-size: 11px; font-weight: 900; letter-spacing: .06em; box-shadow: 0 0 0 3px var(--noite); }
-.slide.ativo .slide-duo .av.grande:first-child { animation: duelo-esq 700ms cubic-bezier(.2, 1.5, .5, 1) 100ms both; }
-.slide.ativo .slide-duo .rival { animation: duelo-dir 700ms cubic-bezier(.2, 1.5, .5, 1) 100ms both; }
-.slide.ativo .slide-vs { animation: girar-in 600ms cubic-bezier(.2, 1.5, .5, 1) 520ms both; }
-@keyframes duelo-esq { from { transform: translateX(-26px); opacity: 0; } }
-@keyframes duelo-dir { from { transform: translateX(26px); opacity: 0; } }
 .slide-vazio { display: flex; gap: 16px; align-items: center; }
 .slide-vazio b { font-size: 18px; font-weight: 800; }
 .slide-vazio p { margin-top: 4px; font-size: 14px; color: rgba(255, 255, 255, .75); line-height: 1.45; }

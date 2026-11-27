@@ -29,7 +29,6 @@ export interface Destaque {
   valor: string;
   unidade: string;
   frase: string;
-  rival?: { nome: string; avatar: string };
 }
 
 const TEMPO_DESTAQUE = 6500;
@@ -330,23 +329,6 @@ export class GrupoComponent implements OnInit, OnDestroy {
 
       const campus = membros.map(u => ({ u, p: totalDePecas(progressoDeColega(u)) })).sort((a, b) => b.p - a.p)[0];
       if (campus && campus.p > 1 && campus.u.acertosLinguagens !== undefined) lista.push({ chave: 'campus', rotulo: 'Maior campus', icone: 'school', cor: '#8C7BFF', nome: campus.u.usuario, avatar: campus.u.avatar, valor: String(campus.p), unidade: 'peças construídas', frase: 'O campus mais completo entre os membros.' });
-
-      const geral = [...membros].filter(u => (u.xpGrupo ?? 0) > 0).sort((a, b) => b.xpGrupo - a.xpGrupo);
-      let duelo: [UsuarioGrupo, UsuarioGrupo] | null = null;
-      for (let i = 0; i < geral.length - 1; i++) {
-        const gap = geral[i].xpGrupo - geral[i + 1].xpGrupo;
-        if (gap < 100 && (!duelo || gap < duelo[0].xpGrupo - duelo[1].xpGrupo)) duelo = [geral[i], geral[i + 1]];
-      }
-      if (duelo) {
-        const gap = duelo[0].xpGrupo - duelo[1].xpGrupo;
-        const pos = geral.indexOf(duelo[0]) + 1;
-        lista.splice(Math.min(1, lista.length), 0, {
-          chave: 'duelo', rotulo: pos === 1 ? 'Briga pela liderança' : 'Duelo acirrado', icone: 'target', cor: '#F0506E',
-          nome: `${duelo[0].usuario} × ${duelo[1].usuario}`, avatar: duelo[0].avatar, rival: { nome: duelo[1].usuario, avatar: duelo[1].avatar },
-          valor: formatarNumero(gap), unidade: gap === 1 ? 'XP de diferença' : 'XP de diferença',
-          frase: gap === 0 ? `Empatados em ${pos}º no ranking geral!` : `Lado a lado em ${pos}º e ${pos + 1}º no geral. Quem passa primeiro?`
-        });
-      }
 
       if (dias > 30) {
         const revelacao = membros
