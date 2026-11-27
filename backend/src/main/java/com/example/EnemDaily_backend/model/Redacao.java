@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -29,6 +31,12 @@ public class Redacao {
     private int c4;
     private int c5;
     private int dif;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "tb_redacao_anexo", joinColumns = @JoinColumn(name = "redacao_id"))
+    @OrderColumn(name = "ordem")
+    private List<RedacaoAnexo> anexos = new ArrayList<>();
+
     public Redacao(String tema, UUID idUsuario,LocalDate data, int c1, int c2, int c3, int c4, int c5, int dif){
         this.tema = tema;
         this.data = data;

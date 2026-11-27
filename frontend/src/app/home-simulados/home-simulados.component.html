@@ -101,11 +101,13 @@
           </div>
         </div>
         <ul class="legenda">
-          @for (l of legenda; track l.nome) {
-            <li><i [style.background]="l.cor"></i>{{ l.nome }}@if (l.valor !== null) { <b>{{ l.valor }}</b> }</li>
+          @for (l of legenda; track l.nome; let i = $index) {
+            <li><button type="button" [class.off]="ocultas.has(l.nome)" [attr.aria-pressed]="!ocultas.has(l.nome)" (click)="alternarSerie(i, l.nome)"><i [style.background]="l.cor"></i>{{ l.nome }}@if (l.valor !== null) { <b>{{ l.valor }}</b> }</button></li>
           }
         </ul>
-        <div class="grafico"><canvas #grafico aria-label="Gráfico de acertos por simulado" role="img"></canvas></div>
+        <div class="grafico-rolagem" #rolagem>
+          <div class="grafico" [style.min-width.px]="larguraGrafico"><canvas #grafico aria-label="Gráfico de acertos por simulado" role="img"></canvas></div>
+        </div>
         <p class="grafico-nota">Acertos por simulado, de {{ visao === 'dias' ? '90 questões por dia' : '45 questões por área' }}.</p>
       </section>
 

@@ -113,6 +113,9 @@ public class AdminService {
         removidos.put("inscricoesPush", jdbc.update("delete from push_inscricao where usuario_id = ?", id));
         removidos.put("eventos", jdbc.update("delete from event where id_usuario = ?", id));
         removidos.put("simulados", jdbc.update("delete from tb_simulados where id_usuario = ?", id));
+        // os arquivos ficam no Firebase Storage: o painel apaga pelos caminhos devolvidos aqui
+        removidos.put("caminhosAnexos", jdbc.queryForList("select a.caminho from tb_redacao_anexo a join tb_redacao r on r.id = a.redacao_id where r.id_usuario = ?", String.class, id));
+        jdbc.update("delete from tb_redacao_anexo where redacao_id in (select r.id from tb_redacao r where r.id_usuario = ?)", id);
         removidos.put("redacoes", jdbc.update("delete from tb_redacao where id_usuario = ?", id));
         removidos.put("usuario", jdbc.update("delete from tb_usuarios where id = ?", id));
         log.warn("[Admin] Usuário {} ({}) excluído: {}", login, id, removidos);

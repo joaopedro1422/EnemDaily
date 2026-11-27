@@ -9,6 +9,8 @@ import { Usuario } from '../models/usuario';
 import { AuthServiceService } from '../services/auth-service.service';
 import { RedacaoService } from '../services/redacao.service';
 import { UsuarioService } from '../services/usuario.service';
+import { AnexosRedacaoComponent } from '../modal/anexos-redacao/anexos-redacao.component';
+import { FirebaseServiceService } from '../services/firebase-service.service';
 import { NovaRedacaoModalComponent } from '../modal/nova-redacao-modal/nova-redacao-modal.component';
 import { EstruturasPremiumService } from '../services/estruturas-premium.service';
 import { IconeComponent } from '../shared/icone/icone.component';
@@ -45,7 +47,7 @@ const MESES = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'o
 
 @Component({
   selector: 'app-home-redacoes',
-  imports: [NovaRedacaoModalComponent, IconeComponent, CarregandoComponent],
+  imports: [NovaRedacaoModalComponent, AnexosRedacaoComponent, IconeComponent, CarregandoComponent],
   templateUrl: './home-redacoes.component.html',
   styleUrl: './home-redacoes.component.css'
 })
@@ -68,7 +70,6 @@ export class HomeRedacoesComponent implements OnInit, AfterViewInit, OnDestroy {
   visao: 'nota' | 'comp' = 'nota';
   analise: 'fechada' | 'gerando' | 'pronta' = 'fechada';
   etapaAnalise = '';
-  abertas = new Set<number>();
   excluindo: number | null = null;
   detalhe: ResumoC | null = null;
   fechandoDetalhe = false;
@@ -78,16 +79,47 @@ export class HomeRedacoesComponent implements OnInit, AfterViewInit, OnDestroy {
   ultima: { nota: number; delta: number | null } | null = null;
   resumoC: ResumoC[] = [];
   foco: ResumoC | null = null;
+  /** Base pessoal: a média das médias das competências do aluno. */
+  base = 0;
+  atencao = new Set<ResumoC>();
+
+  /**
+   * Uma competência pede atenção quando fica meio nível (20 pontos) ou mais abaixo da base do aluno,
+   * ou quando está abaixo de 160 e não acima da base. Com 180 ou mais nunca entra: já é nota alta.
+   */
+  private precisaAtencao(media: number): boolean {
+    if (media >= 180) return false;
+    return media <= this.base - 20 || (media < 160 && media <= this.base);
+  }
   insights: Insight[] = [];
   historico: GrupoMes[] = [];
   legenda: { nome: string; cor: string; valor: number | null }[] = [];
 
   private ordenadas: Redacao[] = [];
   private chart?: Chart;
+  /** Linhas escondidas pela legenda (pela sigla), mantidas ao redesenhar. */
+  ocultas = new Set<string>();
+  @ViewChild('rolagem') rolagem?: ElementRef<HTMLDivElement>;
+
+  /** Cada redação ganha pelo menos 56px: com muitas, o gráfico rola para o lado em vez de espremer. */
+  get larguraGrafico(): number {
+    return this.ordenadas.length * 56 + 56;
+  }
+
+  alternarSerie(i: number, nome: string) {
+    this.ocultas.has(nome) ? this.ocultas.delete(nome) : this.ocultas.add(nome);
+    if (!this.chart) return;
+    this.chart.setDatasetVisibility(i, !this.ocultas.has(nome));
+    this.chart.update();
+  }
+
+  private rolarParaOFim() {
+    setTimeout(() => { const r = this.rolagem?.nativeElement; if (r) r.scrollLeft = r.scrollWidth; });
+  }
   private sub?: Subscription;
   private vistaPronta = false;
 
-  constructor(private authService: AuthServiceService, private premium: EstruturasPremiumService, private redacaoService: RedacaoService, private usuarioService: UsuarioService, private router: Router) {}
+  constructor(private authService: AuthServiceService, private premium: EstruturasPremiumService, private redacaoService: RedacaoService, private usuarioService: UsuarioService, private router: Router, private firebase: FirebaseServiceService) {}
 
   ngOnInit(): void {
     this.sub = this.authService.usuario$.subscribe(u => {
@@ -152,8 +184,9 @@ export class HomeRedacoesComponent implements OnInit, AfterViewInit, OnDestroy {
       return { info, media, melhor: v.length ? Math.max(...v) : 0, qtd: v.length, delta: v.length > 1 ? v[v.length - 1] - v[v.length - 2] : null, nivel: Math.round(media / 40) };
     });
     const comDados = this.resumoC.filter(c => c.qtd);
-    const piores = [...comDados].sort((a, b) => a.media - b.media);
-    this.foco = piores.length && piores[0].media < 200 && piores[0].media < (piores[piores.length - 1]?.media ?? 0) ? piores[0] : null;
+    this.base = comDados.length ? Math.round(comDados.reduce((s, c) => s + c.media, 0) / comDados.length) : 0;
+    this.atencao = new Set(comDados.filter(c => this.precisaAtencao(c.media)));
+    this.foco = [...this.atencao].sort((a, b) => a.media - b.media)[0] ?? null;
 
     this.montarHistorico();
     this.montarInsights();
@@ -195,7 +228,7 @@ export class HomeRedacoesComponent implements OnInit, AfterViewInit, OnDestroy {
       else if (dif <= -40) lista.push({ icone: 'activity', tom: 'alerta', titulo: `Suas últimas notas caíram ${-dif} pontos`, texto: 'Vale revisar as correções das últimas redações para entender o que mudou.' });
     }
 
-    if (this.foco) lista.push({ icone: 'target', tom: 'alerta', titulo: `Foco em ${this.foco.info.sigla} · ${this.foco.info.nome}`, texto: `É a sua menor média (${this.foco.media}/200). ${this.foco.info.dica}` });
+    if (this.foco) lista.push({ icone: 'target', tom: 'alerta', titulo: `Foco em ${this.foco.info.sigla} · ${this.foco.info.nome}`, texto: `Média ${this.foco.media}/200, ${this.base - this.foco.media} pontos abaixo da sua base (${this.base}).${this.atencao.size > 1 ? ` Também pedem atenção: ${[...this.atencao].filter(c => c !== this.foco).map(c => c.info.sigla).join(', ')}.` : ''} ${this.foco.info.dica}` });
 
     const maximas = this.resumoC.filter(c => c.qtd >= 2 && c.media === 200);
     if (maximas.length) lista.push({ icone: 'trophy', tom: 'bom', titulo: `200 em ${maximas.map(c => c.info.sigla).join(', ')} em todas as redações`, texto: 'Aproveitamento total. Mantenha a mesma estratégia nessas competências.' });
@@ -263,6 +296,7 @@ export class HomeRedacoesComponent implements OnInit, AfterViewInit, OnDestroy {
       datasets = COMPETENCIAS.map(c => ({
         label: `${c.sigla} · ${c.nome}`,
         data: this.ordenadas.map(r => (this.temComp(r) ? r[c.chave] : null)),
+        hidden: this.ocultas.has(c.sigla),
         borderColor: c.cor, backgroundColor: c.cor, borderWidth: 2, tension: .3, spanGaps: true,
         pointRadius: 3.5, pointHoverRadius: 6, pointBackgroundColor: c.cor, pointBorderColor: superficie, pointBorderWidth: 2, pointHitRadius: 12
       }));
@@ -313,6 +347,7 @@ export class HomeRedacoesComponent implements OnInit, AfterViewInit, OnDestroy {
         } as any
       }
     });
+    this.rolarParaOFim();
   }
 
   abrirDetalhe(c: ResumoC) {
@@ -339,9 +374,6 @@ export class HomeRedacoesComponent implements OnInit, AfterViewInit, OnDestroy {
     if (lista) this.aplicar(lista);
   }
 
-  alternar(id: number) {
-    this.abertas.has(id) ? this.abertas.delete(id) : this.abertas.add(id);
-  }
 
   pedirExclusao(id: number) {
     if (this.usuario?.demo) {
@@ -351,10 +383,15 @@ export class HomeRedacoesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.excluindo = id;
   }
 
+  /** Redação cujos uploads estão abertos no modal. */
+  vendoAnexos: { titulo: string; r: Redacao } | null = null;
+
   excluir(id: number) {
+    const caminhos = (this.redacoes.find(r => r.id === id)?.anexos ?? []).map(a => a.caminho);
     this.redacaoService.deletaRedacao(id).subscribe({
       next: res => {
         this.excluindo = null;
+        if (caminhos.length) this.firebase.apagaAnexosRedacao(caminhos);
         this.aplicar(Array.isArray(res) ? res : this.redacoes.filter(r => r.id !== id));
       },
       error: () => (this.excluindo = null)

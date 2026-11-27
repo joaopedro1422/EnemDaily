@@ -82,17 +82,36 @@
           </div>
         </div>
         <h3>Questões inéditas, criadas por IA</h3>
-        <p>Nossa inteligência artificial cria questões novas todos os dias com base em mais de 3.000 questões oficiais disponibilizadas pelo INEP, no mesmo estilo e nível do ENEM. Toda questão vem com explicação e link para estudar.</p>
+        <p>Nossa inteligência artificial especializada cria questões novas todos os dias com base em mais de 3.000 questões oficiais disponibilizadas pelo INEP, no estilo e nível do ENEM.</p>
       </article>
 
       <article class="ld-bloco ld-amigos">
         <div class="ld-bloco-arte ld-arte-amigos" aria-hidden="true">
-          <div class="ld-vs">
-            <span class="ld-vs-av"><ed-avatar valor="ed1|caneta|orbita|bronze|engenharia||" nome="Rafael Costa" [tamanho]="52" [encher]="true" /></span>
-            <ed-espadas [tamanho]="86" />
-            <span class="ld-vs-av"><ed-avatar valor="ed1|ameixa|arcos|prata|medicina||" nome="Marina Lopes" [tamanho]="52" [encher]="true" /></span>
+          <div class="ld-slides">
+            <div class="ld-slide">
+              <span class="ld-rank-tit"><ed-icone nome="trophy" [tamanho]="13" />Ranking do grupo</span>
+              <ol class="ld-rank">
+                @for (r of rankingDemo; track r.nome; let i = $index) {
+                  <li [style.--i]="i">
+                    <span class="ld-rank-pos">@if (i === 0) { <ed-icone nome="crown" [tamanho]="13" /> } @else { {{ i + 1 }} }</span>
+                    <span class="ld-rank-av"><ed-avatar [valor]="r.avatar" [nome]="r.nome" [tamanho]="24" [encher]="true" /></span>
+                    <b>{{ r.nome }}</b>
+                    <span class="ld-rank-barra"><i [style.width.%]="r.pct"></i></span>
+                    <span class="ld-rank-xp">{{ r.xp }}</span>
+                  </li>
+                }
+              </ol>
+            </div>
+            <div class="ld-slide">
+              <div class="ld-vs">
+                <span class="ld-vs-av"><ed-avatar valor="ed1|caneta|orbita|bronze|engenharia||" nome="Rafael Costa" [tamanho]="52" [encher]="true" /></span>
+                <ed-espadas [tamanho]="86" />
+                <span class="ld-vs-av"><ed-avatar valor="ed1|ameixa|arcos|prata|medicina||" nome="Marina Lopes" [tamanho]="52" [encher]="true" /></span>
+              </div>
+              <div class="ld-placar"><b>186</b><span>×</span><b>171</b></div>
+            </div>
           </div>
-          <div class="ld-placar"><b>186</b><span>×</span><b>171</b></div>
+          <span class="ld-slides-pontos"><i></i><i></i></span>
         </div>
         <h3>Mais forte com os amigos</h3>
         <p>Participe de grupos de competição entre amigos, veja o campus dos colegas e marque duelos: no dia combinado, vence quem fizer mais XP no desafio.</p>
@@ -150,7 +169,7 @@
         </div>
       </article>
     </div>
-    <a class="ld-btn ld-btn-sec ld-saiba" routerLink="/estudos">Saiba mais sobre a gestão de estudos<ed-icone nome="arrow-right" [tamanho]="18" /></a>
+    <a class="ld-btn ld-btn-sec ld-saiba" routerLink="/estudos">Saiba mais<ed-icone nome="arrow-right" [tamanho]="18" /></a>
   </section>
 
   <section class="ld-final" aria-labelledby="t-final">

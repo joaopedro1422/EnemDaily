@@ -23,13 +23,14 @@
 .ld-erro { margin-top: 10px !important; padding: 10px 12px; border-radius: 12px; background: var(--ed-erro-suave); color: var(--ed-erro); font-size: 14px; font-weight: 600; }
 
 .ld-hero { position: relative; max-width: var(--ed-largura); margin: 0 auto; padding: 18px 16px 40px; display: grid; gap: 28px; }
-.ld-hero::before { content: ''; position: absolute; inset: -80px -40vw 0; z-index: -1; background-image: radial-gradient(circle, color-mix(in srgb, var(--ed-caneta) 14%, transparent) 0 1.6px, transparent 2px); background-size: 22px 22px; -webkit-mask-image: radial-gradient(60% 60% at 70% 30%, #000, transparent); mask-image: radial-gradient(60% 60% at 70% 30%, #000, transparent); }
+
 .ld-hero-texto { display: grid; gap: 16px; align-content: start; animation: ld-sobe 600ms var(--ed-curva) both; }
 .ld-contagem { justify-self: start; display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: 999px; background: var(--ed-caneta-suave); color: var(--ed-caneta-texto); font-size: 13.5px; font-weight: 600; }
 .ld-contagem b { font-weight: 800; }
 .ld-hero h1 { font-size: clamp(38px, 9vw, 64px); font-weight: 800; letter-spacing: -.045em; line-height: 1; text-wrap: balance; }
-.ld-sub-h1 { position: relative; display: inline-block; color: var(--ed-caneta); padding-bottom: 6px; white-space: nowrap; }
-.ld-sub-h1::after { content: ''; position: absolute; left: -2%; right: -3%; bottom: -6px; height: 16px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 16' preserveAspectRatio='none'%3E%3Cpath d='M3 11 C 60 4, 120 3, 180 6 S 270 12, 297 5' fill='none' stroke='%23FFD66B' stroke-width='6' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat center / 100% 100%; z-index: -1; transform-origin: left; animation: ld-risco 900ms cubic-bezier(.6, 0, .2, 1) 500ms both; }
+.ld-sub-h1 { position: relative; isolation: isolate; display: inline-block; color: var(--ed-caneta); white-space: nowrap; padding-bottom: .06em; }
+/* marca-texto embaixo da palavra: ponta chanfrada e duas passadas sobrepostas, que deixam a tinta irregular como na vida real */
+.ld-sub-h1::after { content: ''; position: absolute; z-index: -1; left: -.08em; right: -.1em; bottom: -.1em; height: .36em; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 60' preserveAspectRatio='none'%3E%3Cpath d='M16 12 C120 9 262 6 386 4 L397 36 C268 40 132 44 4 50 Z' fill='%23FFD35A' fill-opacity='.78'/%3E%3Cpath d='M40 27 C150 23 268 21 370 20 L377 42 C262 44 150 48 32 53 Z' fill='%23FFC23D' fill-opacity='.45'/%3E%3Cpath d='M30 15 C140 12 250 10 330 9' stroke='%23FFF3C4' stroke-opacity='.55' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat center / 100% 100%; transform: rotate(-1.5deg); transform-origin: left bottom; animation: ld-risco 650ms cubic-bezier(.6, 0, .2, 1) 450ms both; }
 @keyframes ld-risco { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
 .ld-lead { max-width: 44ch; font-size: 18px; line-height: 1.5; color: var(--ed-tinta-2); }
 .ld-hero .ld-ctas .ld-btn-pri { flex: 1 1 260px; }
@@ -112,7 +113,29 @@
 .ld-q-alts i { height: 14px; border-radius: 7px; border: 1.5px solid var(--ed-pauta); }
 .ld-q-alts i.certa { border-color: var(--ed-ok); background: var(--ed-ok-suave); }
 
-.ld-arte-amigos { background: radial-gradient(120% 120% at 50% 0%, #3442D8 0%, #1C2590 55%, #0F1550 100%); color: #FFFFFF; gap: 6px; }
+.ld-arte-amigos { position: relative; display: block; padding: 0; background: radial-gradient(120% 120% at 50% 0%, #3442D8 0%, #1C2590 55%, #0F1550 100%); color: #FFFFFF; }
+/* slide entre o ranking do grupo e o duelo: cada um fica ~4s e desliza para o lado */
+.ld-slides { width: 100%; min-height: 170px; display: flex; animation: ld-slides 9s cubic-bezier(.65, 0, .35, 1) infinite; }
+@keyframes ld-slides { 0%, 44% { transform: translateX(0); } 50%, 94% { transform: translateX(-100%); } 100% { transform: translateX(0); } }
+.ld-slide { flex: 0 0 100%; min-width: 0; display: grid; place-items: center; align-content: center; gap: 6px; padding: 16px 18px 26px; }
+.ld-slides-pontos { position: absolute; left: 50%; bottom: 10px; transform: translateX(-50%); display: flex; gap: 5px; }
+.ld-slides-pontos i { width: 6px; height: 6px; border-radius: 3px; background: rgba(255, 255, 255, .35); }
+.ld-slides-pontos i:first-child { animation: ld-ponto-a 9s infinite; }
+.ld-slides-pontos i:last-child { animation: ld-ponto-b 9s infinite; }
+@keyframes ld-ponto-a { 0%, 46% { width: 16px; background: #FFFFFF; } 50%, 96% { width: 6px; background: rgba(255, 255, 255, .35); } 100% { width: 16px; background: #FFFFFF; } }
+@keyframes ld-ponto-b { 0%, 46% { width: 6px; background: rgba(255, 255, 255, .35); } 50%, 96% { width: 16px; background: #FFFFFF; } 100% { width: 6px; background: rgba(255, 255, 255, .35); } }
+.ld-rank-tit { justify-self: start; display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: rgba(255, 255, 255, .72); }
+.ld-rank-tit ed-icone { color: #FFD66B; }
+.ld-rank { list-style: none; margin: 0; padding: 0; width: 100%; display: grid; gap: 4px; }
+.ld-rank li { display: grid; grid-template-columns: 16px 24px minmax(0, 54px) minmax(0, 1fr) auto; align-items: center; gap: 8px; padding: 4px 8px 4px 6px; border-radius: 10px; background: rgba(255, 255, 255, .08); font-size: 13px; }
+.ld-rank li:first-child { background: rgba(255, 255, 255, .16); box-shadow: inset 0 0 0 1px rgba(255, 214, 107, .55); }
+.ld-rank-pos { display: grid; place-items: center; font-size: 12px; font-weight: 800; color: rgba(255, 255, 255, .7); }
+.ld-rank li:first-child .ld-rank-pos { color: #FFD66B; }
+.ld-rank-av { width: 24px; height: 24px; border-radius: 50%; box-shadow: 0 0 0 1.5px rgba(255, 255, 255, .8); }
+.ld-rank b { font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ld-rank-barra { height: 6px; border-radius: 3px; background: rgba(255, 255, 255, .14); overflow: hidden; }
+.ld-rank-barra i { display: block; height: 100%; border-radius: 3px; background: linear-gradient(90deg, #8FA2FF, #FFFFFF); }
+.ld-rank-xp { font-size: 12px; font-weight: 800; font-variant-numeric: tabular-nums; }
 .ld-vs { display: flex; align-items: center; justify-content: center; }
 .ld-vs-av { width: 52px; height: 52px; border-radius: 50%; box-shadow: 0 0 0 3px rgba(255, 255, 255, .9); }
 .ld-vs ed-espadas { margin: 0 -8px; }
@@ -193,4 +216,5 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .ld-hero-texto, .ld-desafio, .ld-sub-h1::after { animation: none; }
+  .ld-slides { animation-duration: 18s; }
 }

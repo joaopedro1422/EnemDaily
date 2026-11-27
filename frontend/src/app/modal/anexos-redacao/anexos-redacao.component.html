@@ -1,0 +1,34 @@
+<div class="ax" [class.fechando]="fechando" role="dialog" aria-modal="true" aria-labelledby="ax-titulo">
+  <div class="ax-fundo" (click)="fechar()"></div>
+
+  <section class="ax-folha">
+    <span class="ax-alca" aria-hidden="true"></span>
+    <header class="ax-cab">
+      <div>
+        <h2 id="ax-titulo">Uploads · {{ titulo }}</h2>
+        @if (tema) { <p>“{{ tema }}”</p> }
+      </div>
+      <button class="ax-fechar" type="button" (click)="fechar()" aria-label="Fechar"><ed-icone nome="x" [tamanho]="20" /></button>
+    </header>
+
+    <ul class="ax-lista">
+      @for (a of anexos; track a.caminho; let i = $index) {
+        <li class="ax-item" [style.--i]="i">
+          <a class="ax-previa" [class.pdf]="!ehFoto(a)" [href]="a.url" target="_blank" rel="noopener" [attr.aria-label]="'Abrir ' + a.nome">
+            @if (ehFoto(a)) { <img [src]="a.url" alt="" loading="lazy" /> } @else { <ed-icone nome="file-text" [tamanho]="30" [traco]="1.6" /><b>PDF</b> }
+          </a>
+          <div class="ax-info">
+            <b>{{ a.nome }}</b>
+            <small>{{ ehFoto(a) ? 'Foto' : 'PDF' }} · {{ tamanho(a.tamanho) }}</small>
+            <div class="ax-botoes">
+              <a class="ax-btn" [href]="a.url" target="_blank" rel="noopener"><ed-icone nome="external-link" [tamanho]="15" />Abrir</a>
+              <button class="ax-btn" type="button" (click)="baixar(a)" [disabled]="baixando === a.caminho">
+                @if (baixando === a.caminho) { <ed-carregando [mini]="true" /> } @else { <ed-icone nome="download" [tamanho]="15" /> }Baixar
+              </button>
+            </div>
+          </div>
+        </li>
+      }
+    </ul>
+  </section>
+</div>

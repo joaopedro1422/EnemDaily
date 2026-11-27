@@ -58,6 +58,30 @@
 .campo input:focus { border-color: var(--ed-caneta); box-shadow: 0 0 0 4px var(--ed-caneta-suave); }
 .nr-erro { padding: 10px 12px; border-radius: 12px; background: var(--ed-erro-suave); color: var(--ed-erro); font-size: 14px; font-weight: 600; }
 
+.anexos { display: grid; gap: 8px; }
+.anexos-cab { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.anexos-cab span { font-size: 13px; font-weight: 700; color: var(--ed-tinta-2); }
+.anexos-cab i { font-style: normal; font-weight: 500; color: var(--ed-tinta-3); }
+.anexos-cab small { font-size: 12px; color: var(--ed-tinta-3); }
+.anexos-lista { list-style: none; display: grid; gap: 6px; }
+.anexo { display: flex; align-items: center; gap: 10px; padding: 6px 6px 6px 6px; border-radius: 12px; border: 1px solid var(--ed-pauta-forte); background: var(--ed-folha); animation: ed-surgir 280ms var(--ed-curva) both; }
+.anexo-mini { width: 44px; height: 44px; flex: none; border-radius: 8px; object-fit: cover; background: var(--ed-fundo-2); }
+.anexo-mini.pdf { display: grid; place-items: center; background: var(--ed-erro-suave); color: var(--ed-erro); font-size: 11px; font-weight: 800; letter-spacing: .04em; }
+.anexo-info { display: grid; min-width: 0; flex: 1; line-height: 1.25; }
+.anexo-info b { font-size: 13.5px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.anexo-info small { font-size: 12px; color: var(--ed-tinta-3); }
+.anexo-tirar { width: 34px; height: 34px; flex: none; border: 0; border-radius: 10px; display: grid; place-items: center; background: none; color: var(--ed-tinta-3); cursor: pointer; }
+.anexo-tirar:hover { background: var(--ed-fundo-2); color: var(--ed-tinta); }
+.anexos-zona { position: relative; display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 14px; border: 1.5px dashed color-mix(in srgb, var(--ed-caneta) 40%, var(--ed-pauta-forte)); background: color-mix(in srgb, var(--ed-caneta) 4%, var(--ed-folha)); cursor: pointer; transition: border-color var(--ed-t-rapido), background var(--ed-t-rapido); }
+.anexos-zona:hover, .anexos-zona:focus-within { border-color: var(--ed-caneta); background: color-mix(in srgb, var(--ed-caneta) 8%, var(--ed-folha)); }
+.anexos-zona.ocupada { cursor: progress; }
+.anexos-zona input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: inherit; }
+.anexos-ico { width: 40px; height: 40px; flex: none; border-radius: 12px; display: grid; place-items: center; background: var(--ed-caneta); color: var(--ed-sobre-caneta); }
+.anexos-txt { display: grid; line-height: 1.3; }
+.anexos-txt b { font-size: 14px; font-weight: 700; color: var(--ed-tinta); }
+.anexos-txt small { font-size: 12.5px; color: var(--ed-tinta-3); }
+.anexos-erro { font-size: 13px; font-weight: 600; color: var(--ed-erro); }
+
 .nr-salvar { height: 54px; border: 0; border-radius: 16px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: var(--ed-caneta); color: var(--ed-sobre-caneta); font: 700 16px var(--ed-fonte); cursor: pointer; box-shadow: 0 12px 24px -14px rgba(40, 54, 198, .8); }
 .nr-salvar:hover { background: var(--ed-caneta-hover); }
 .nr-salvar:disabled { opacity: .8; cursor: default; }

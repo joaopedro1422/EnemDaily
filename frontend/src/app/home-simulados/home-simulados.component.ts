@@ -107,6 +107,25 @@ export class HomeSimuladosComponent implements OnInit, AfterViewInit, OnDestroy 
   legenda: { nome: string; cor: string; valor: number | null }[] = [];
 
   private chart?: Chart;
+  /** Linhas escondidas pela legenda (pelo nome), mantidas ao redesenhar. */
+  ocultas = new Set<string>();
+  @ViewChild('rolagem') rolagem?: ElementRef<HTMLDivElement>;
+
+  /** Cada simulado ganha pelo menos 56px: com muitos, o gráfico rola para o lado em vez de espremer. */
+  get larguraGrafico(): number {
+    return new Set(this.simulados.map(s => s.numeracao)).size * 56 + 56;
+  }
+
+  alternarSerie(i: number, nome: string) {
+    this.ocultas.has(nome) ? this.ocultas.delete(nome) : this.ocultas.add(nome);
+    if (!this.chart) return;
+    this.chart.setDatasetVisibility(i, !this.ocultas.has(nome));
+    this.chart.update();
+  }
+
+  private rolarParaOFim() {
+    setTimeout(() => { const r = this.rolagem?.nativeElement; if (r) r.scrollLeft = r.scrollWidth; });
+  }
   private sub?: Subscription;
   private vistaPronta = false;
 
@@ -370,6 +389,7 @@ export class HomeSimuladosComponent implements OnInit, AfterViewInit, OnDestroy 
         datasets: series.map(s => ({
           label: s.nome,
           data: s.dados,
+          hidden: this.ocultas.has(s.nome),
           borderColor: s.cor,
           backgroundColor: s.cor,
           borderWidth: 2,
@@ -418,6 +438,7 @@ export class HomeSimuladosComponent implements OnInit, AfterViewInit, OnDestroy 
         } as any
       }
     });
+    this.rolarParaOFim();
   }
 
   abrirModal() {

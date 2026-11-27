@@ -56,6 +56,23 @@ export class FirebaseServiceService {
     return apagadas;
   }
 
+  /** Anexo de redação: cada aluno tem a própria pasta e o nome do arquivo é aleatório, então o link só existe para quem o tem. */
+  async salvaAnexoRedacao(arquivo: Blob, tipo: string, idUsuario: string): Promise<{ caminho: string; url: string }> {
+    const aleatorio = typeof crypto !== 'undefined' && 'randomUUID' in crypto ? crypto.randomUUID() : Math.random().toString(36).slice(2) + Date.now().toString(36);
+    const caminho = `redacoes/${idUsuario}/${aleatorio}.${tipo === 'application/pdf' ? 'pdf' : 'jpg'}`;
+    const storageRef = ref(getStorage(), caminho);
+    await uploadBytes(storageRef, arquivo, { contentType: tipo, cacheControl: 'private,max-age=31536000' });
+    return { caminho, url: await getDownloadURL(storageRef) };
+  }
+
+  async apagaAnexosRedacao(caminhos: string[]): Promise<void> {
+    await Promise.all(caminhos.filter(c => c.startsWith('redacoes/')).map(async c => {
+      try { await deleteObject(ref(getStorage(), c)); } catch (e: any) {
+        if (e?.code !== 'storage/object-not-found') console.warn('Não deu para apagar o anexo', c, e);
+      }
+    }));
+  }
+
   async getImagemUniversidadeUrl(estagio: string): Promise<string>{
       const storage = getStorage();
       const path = `estagio-progresso/${estagio}.png`;

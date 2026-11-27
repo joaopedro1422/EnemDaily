@@ -21,7 +21,11 @@ public class RedacaoController {
     public ResponseEntity<?> salvaRedacao(@RequestBody RedacaoRequestDTO dto, Authentication authentication) {
         Usuario usuario = (Usuario) authentication.getPrincipal();
         if (usuario != null) {
-            return ResponseEntity.ok(redacaoService.salvaRedacao(dto, usuario.getId()));
+            try {
+                return ResponseEntity.ok(redacaoService.salvaRedacao(dto, usuario.getId()));
+            } catch (RedacaoService.AnexoInvalido e) {
+                return ResponseEntity.badRequest().body(java.util.Map.of("erro", e.getMessage()));
+            }
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -41,7 +45,7 @@ public class RedacaoController {
     public ResponseEntity<?> deletaRedacao(@PathVariable("id") Long id, Authentication authentication){
         Usuario usuario = (Usuario) authentication.getPrincipal();
         if (usuario != null) {
-            return ResponseEntity.ok(redacaoService.deletaRedacao(id));
+            return redacaoService.deletaRedacao(id, usuario.getId()) ? ResponseEntity.ok(true) : ResponseEntity.notFound().build();
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }

@@ -148,9 +148,15 @@ export class AdminComponent implements OnInit, OnDestroy {
     if (!u || !this.podeExcluir) return;
     this.apagando = true;
     this.api.excluir(u.id).subscribe({
-      next: async r => {
+      next: async resposta => {
+        const { caminhosAnexos = [], ...contagem } = resposta;
+        let r: Record<string, number> = contagem as Record<string, number>;
         const fotos = await this.firebase.apagaFotosDoUsuario(u.id, lerAvatar(u.avatar, u.nome).fotoCaminho);
         if (fotos) r = { ...r, fotosFirebase: fotos };
+        if (caminhosAnexos.length) {
+          await this.firebase.apagaAnexosRedacao(caminhosAnexos);
+          r = { ...r, anexosRedacao: caminhosAnexos.length };
+        }
         this.apagando = false;
         this.excluindo = null;
         const rotulos: Record<string, string> = {
@@ -158,7 +164,7 @@ export class AdminComponent implements OnInit, OnDestroy {
           duelos: 'Duelos', bloqueios: 'Bloqueios', inscricoesPush: 'Inscrições de notificação',
           participacoesEmGrupos: 'Participações em grupos', atividadesEmGrupos: 'Atividades em grupos',
           gruposTransferidos: 'Grupos com admin transferido', gruposApagados: 'Grupos apagados (sem outros membros)',
-          fotosFirebase: 'Fotos de perfil no Firebase'
+          fotosFirebase: 'Fotos de perfil no Firebase', anexosRedacao: 'Fotos e PDFs de redações'
         };
         this.resultadoExclusao = {
           nome: u.nome || u.usuario,

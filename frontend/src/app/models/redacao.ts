@@ -10,6 +10,15 @@ export interface Redacao {
     c5: number;
     dif: number;
     showDetails: boolean;
+    anexos?: AnexoRedacao[];
+}
+/** Foto ou PDF guardado no Firebase Storage, em redacoes/{idUsuario}/. */
+export interface AnexoRedacao {
+    caminho: string;
+    url: string;
+    nome: string;
+    tipo: string;
+    tamanho: number;
 }
 export interface RedacaoRequest{
     tema: string;
@@ -20,6 +29,7 @@ export interface RedacaoRequest{
     c3: number;
     c4: number;
     c5: number;
+    anexos?: AnexoRedacao[];
 }
 export const mockRedacoes: Redacao[] = [
   {

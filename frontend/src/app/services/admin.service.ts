@@ -56,8 +56,8 @@ export class AdminService {
     return this.http.get<PaginaUsuarios>(`${this.base}/usuarios`, { headers: this.headers, params: { busca, pagina, tamanho } });
   }
 
-  excluir(id: string): Observable<Record<string, number>> {
-    return this.http.delete<Record<string, number>>(`${this.base}/usuarios/${id}`, { headers: this.headers });
+  excluir(id: string): Observable<Record<string, number> & { caminhosAnexos?: string[] }> {
+    return this.http.delete<Record<string, number> & { caminhosAnexos?: string[] }>(`${this.base}/usuarios/${id}`, { headers: this.headers });
   }
 
   atividadeDoMes(mes: string): Observable<DiaAtividade[]> {

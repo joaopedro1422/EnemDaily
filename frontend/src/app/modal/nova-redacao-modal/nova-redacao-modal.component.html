@@ -64,10 +64,39 @@
       </label>
     </div>
 
+    <div class="anexos">
+      <div class="anexos-cab">
+        <span>Fotos ou PDF da redação <i>(opcional)</i></span>
+        <small>Até 3 fotos ou 1 PDF</small>
+      </div>
+      @if (arquivos.length) {
+        <ul class="anexos-lista">
+          @for (a of arquivos; track a; let i = $index) {
+            <li class="anexo" [style.--i]="i">
+              @if (a.previa) { <img class="anexo-mini" [src]="a.previa" alt="" /> } @else { <span class="anexo-mini pdf">PDF</span> }
+              <span class="anexo-info"><b>{{ a.nome }}</b><small>{{ tamanho(a.tamanho) }}</small></span>
+              <button type="button" class="anexo-tirar" (click)="removerArquivo(i)" [disabled]="enviando" [attr.aria-label]="'Remover ' + a.nome"><ed-icone nome="x" [tamanho]="16" /></button>
+            </li>
+          }
+        </ul>
+      }
+      @if (podeAdicionar) {
+        <label class="anexos-zona" [class.ocupada]="preparando">
+          <input type="file" accept="image/*,application/pdf" multiple (change)="escolherArquivos($event)" [disabled]="preparando || enviando" />
+          <span class="anexos-ico">@if (preparando) { <ed-carregando [mini]="true" [claro]="true" /> } @else { <ed-icone nome="plus" [tamanho]="20" /> }</span>
+          <span class="anexos-txt">
+            <b>{{ preparando ? 'Preparando…' : arquivos.length ? 'Adicionar outra foto' : 'Anexar fotos ou PDF' }}</b>
+            <small>Fica guardado só para você consultar depois.</small>
+          </span>
+        </label>
+      }
+      @if (erroArquivo) { <p class="anexos-erro">{{ erroArquivo }}</p> }
+    </div>
+
     @if (erro) { <p class="nr-erro">{{ erro }}</p> }
 
-    <button class="nr-salvar" type="submit" [disabled]="enviando">
-      @if (enviando) { <ed-carregando [mini]="true" [claro]="true" />Salvando } @else { <ed-icone nome="check" [tamanho]="18" />Salvar redação }
+    <button class="nr-salvar" type="submit" [disabled]="enviando || preparando">
+      @if (enviando) { <ed-carregando [mini]="true" [claro]="true" />{{ etapa || 'Salvando' }} } @else { <ed-icone nome="check" [tamanho]="18" />Salvar redação }
     </button>
   </form>
 </div>
