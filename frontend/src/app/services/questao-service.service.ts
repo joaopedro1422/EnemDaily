@@ -4,7 +4,7 @@ import { RespostaRequest } from '../models/dtos';
 import { Observable, tap } from 'rxjs';
 import { Usuario } from '../models/usuario';
 import { AuthServiceService } from './auth-service.service';
-import { Correcao, Questao, Revisao } from '../models/questao';
+import { BonusStatus, Correcao, Questao, Revisao } from '../models/questao';
 import { APIURL } from '../models/Environment';
 
 @Injectable({
@@ -18,6 +18,16 @@ export class QuestaoServiceService {
   enviarResposta(dados: RespostaRequest): Observable<Correcao> {
     const headers = new HttpHeaders({ Authorization: `Bearer ${localStorage.getItem('tokenUser')}` });
     return this.http.post<Correcao>(`${this.apiUrl}/resposta`, dados, { headers }).pipe(
+      tap(res => this.authService.atualizarUsuario(res.usuario))
+    );
+  }
+  getBonus(): Observable<BonusStatus> {
+    const headers = new HttpHeaders({ Authorization: `Bearer ${localStorage.getItem('tokenUser')}` });
+    return this.http.get<BonusStatus>(`${this.apiUrlQuestoes}/bonus`, { headers });
+  }
+  enviarBonus(dados: RespostaRequest): Observable<Correcao> {
+    const headers = new HttpHeaders({ Authorization: `Bearer ${localStorage.getItem('tokenUser')}` });
+    return this.http.post<Correcao>(`${this.apiUrlQuestoes}/bonus/resposta`, dados, { headers }).pipe(
       tap(res => this.authService.atualizarUsuario(res.usuario))
     );
   }

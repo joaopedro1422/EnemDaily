@@ -193,3 +193,18 @@
 .folha.entrando { animation: folha-entra 560ms cubic-bezier(.2, .9, .25, 1) both; }
 @keyframes folha-entra { from { transform: translateX(48px) rotate(1.2deg); opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .folha.entrando { animation: none; } }
+
+/* questão bônus */
+.capa-bonus { background: radial-gradient(120% 80% at 80% 100%, #B07BFF 0%, #6A2BD8 42%, #24104F 100%); overflow: hidden; }
+.capa-bonus::before { border-color: rgba(220, 200, 255, .25); }
+.capa-bonus .capa-num b { font-weight: 800; }
+.bonus-presente { display: block; width: 132px; height: 124px; margin: 0 0 6px -8px; filter: drop-shadow(0 16px 22px rgba(30, 8, 80, .5)); animation: bonus-chega 700ms cubic-bezier(.2, 1.4, .5, 1) both; }
+.bonus-tampa { transform-box: fill-box; transform-origin: 50% 100%; animation: bonus-tampa 2.6s ease-in-out 900ms infinite; }
+@keyframes bonus-chega { from { transform: translateY(24px) scale(.7); opacity: 0; } }
+@keyframes bonus-tampa { 0%, 70%, 100% { transform: none; } 78% { transform: translateY(-6px) rotate(-4deg); } 86% { transform: translateY(-3px) rotate(3deg); } }
+.bonus-brilhos { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+.bonus-brilhos i { position: absolute; left: calc(var(--k) * 8%); top: calc(10% + var(--k) * 5.5%); width: 6px; height: 6px; border-radius: 50%; background: #F2E6FF; opacity: 0; animation: bonus-brilho 3.2s ease-in-out calc(var(--k) * -270ms) infinite; }
+.bonus-brilhos i:nth-child(3n) { width: 4px; height: 4px; }
+@keyframes bonus-brilho { 50% { opacity: .85; transform: scale(1.5); } }
+.capa-bonus > *:not(.bonus-brilhos) { position: relative; z-index: 1; }
+@media (prefers-reduced-motion: reduce) { .bonus-presente, .bonus-tampa, .bonus-brilhos i { animation: none !important; } .bonus-brilhos i { opacity: .5; } }

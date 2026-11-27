@@ -32,6 +32,8 @@ public class Usuario {
     private String tokenSessao;
     private int xpTotal;
     private int streak;
+    @Column(columnDefinition = "integer default 0")
+    private Integer maiorSequenciaAcertos = 0;
     private int diasAtivosStreak;
     private boolean demo;
     @Column(name = "pag_favorita", columnDefinition = "varchar(255) default 'nenhuma'")
@@ -153,10 +155,16 @@ public class Usuario {
         if(correta){
             this.questoesAcertadasTotal ++;
             this.streak ++;
+            if (this.streak > recordeDeAcertos()) this.maiorSequenciaAcertos = this.streak;
         }
         else{
             this.streak = 0;
         }
+    }
+
+    /** Maior sequência de acertos seguidos já feita (contas antigas começam pela sequência atual). */
+    public int recordeDeAcertos() {
+        return Math.max(this.maiorSequenciaAcertos == null ? 0 : this.maiorSequenciaAcertos, this.streak);
     }
 
     public String adicionaEmblema(String emblema){

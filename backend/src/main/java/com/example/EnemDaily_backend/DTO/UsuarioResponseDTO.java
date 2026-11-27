@@ -32,5 +32,6 @@ public record UsuarioResponseDTO(UUID id,
                                  List<GrupoResumidoResponseDTO> grupos,
                                  int maiorSequencia,
                                  boolean onboardingVisto,
-                                 String email) {
+                                 String email,
+                                 int maiorSequenciaAcertos) {
 }

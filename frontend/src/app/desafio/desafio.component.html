@@ -1,7 +1,53 @@
 @if (info) {
 <div class="prova" [style.--a]="info.cor" [style.--at]="info.corTexto">
 
-  @if (fase === 'capa' && !direto && !revisao) {
+  @if (fase === 'capa' && !direto && !revisao && bonus) {
+    <section class="capa capa-bonus" aria-live="polite">
+      <button class="capa-sair" type="button" (click)="sair()" aria-label="Voltar ao painel"><ed-icone nome="x" [tamanho]="20" /></button>
+      <div class="bonus-brilhos" aria-hidden="true">@for (k of [1,2,3,4,5,6,7,8,9,10,11,12]; track k) { <i [style.--k]="k"></i> }</div>
+      <div class="capa-miolo">
+        <svg class="bonus-presente" viewBox="0 0 160 150" aria-hidden="true">
+          <ellipse cx="80" cy="142" rx="54" ry="6" fill="rgba(0,0,0,.18)"/>
+          <rect x="26" y="70" width="108" height="70" rx="8" fill="#FFFFFF"/>
+          <rect x="26" y="70" width="108" height="70" rx="8" fill="url(#bp-lado)"/>
+          <rect x="70" y="70" width="20" height="70" fill="#F2C14E"/>
+          <g class="bonus-tampa">
+            <rect x="18" y="50" width="124" height="24" rx="6" fill="#FFFFFF"/>
+            <rect x="70" y="50" width="20" height="24" fill="#F2C14E"/>
+            <path d="M80,50 C60,22 34,30 44,44 C50,52 70,50 80,50 Z M80,50 C100,22 126,30 116,44 C110,52 90,50 80,50 Z" fill="#F2C14E"/>
+            <circle cx="80" cy="49" r="7" fill="#C9971A"/>
+          </g>
+          <defs><linearGradient id="bp-lado" x1="0" y1="0" x2="1" y2="0"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".08"/></linearGradient></defs>
+        </svg>
+        <span class="capa-selo">enem<span class="pt"></span>daily · {{ dataCurta }} · surpresa da semana</span>
+        <p class="capa-rotulo">Revisão de erro</p>
+        <h1>Questão bônus</h1>
+        <p class="capa-num">
+          @if (erradaEm) { Você errou esta questão de <b>{{ info.nome }}</b> em {{ erradaEm }}. Hora da revanche. }
+          @else { Uma questão de <b>{{ info.nome }}</b> que você errou. Hora da revanche. }
+        </p>
+        <ul class="capa-regras">
+          <li><ed-icone nome="trophy" [tamanho]="17" /><span><b>Até {{ xpMaxBonus }} XP</b> se acertar nos primeiros 40s.</span></li>
+          <li><ed-icone nome="clock" [tamanho]="17" /><span><b>3min30 para responder.</b> O tempo começa ao abrir.</span></li>
+          <li><ed-icone nome="sparkles" [tamanho]="17" /><span>É um extra: não conta no desafio do dia.</span></li>
+          <li><ed-icone nome="hourglass" [tamanho]="17" /><span>Só hoje. Amanhã ela some.</span></li>
+        </ul>
+      </div>
+      <div class="capa-acoes">
+        @if (falhouCarregar) {
+          <p class="capa-erro">Não foi possível abrir a questão bônus.</p>
+          <button class="btn-claro" type="button" (click)="irPara('painel')">Voltar ao painel</button>
+        } @else {
+          <button class="btn-claro grande" type="button" [disabled]="!questao" (click)="comecar()">
+            @if (!questao) { <ed-carregando [mini]="true" /> }
+            {{ questao ? 'Abrir o presente' : 'Preparando a questão…' }}
+            @if (questao) { <ed-icone nome="gift" [tamanho]="18" /> }
+          </button>
+          <button class="capa-depois" type="button" (click)="irPara('painel')">Agora não</button>
+        }
+      </div>
+    </section>
+  } @else if (fase === 'capa' && !direto && !revisao) {
     <section class="capa" aria-live="polite">
       <button class="capa-sair" type="button" (click)="sair()" aria-label="Voltar ao painel"><ed-icone nome="x" [tamanho]="20" /></button>
       <div class="capa-miolo">
@@ -45,7 +91,7 @@
         <button class="faixa-sair" type="button" (click)="sair()" aria-label="Sair da questão"><ed-icone nome="x" [tamanho]="18" /></button>
         <div class="faixa-area">
           <span class="faixa-ico"><ed-icone [nome]="info.icone" [tamanho]="15" /></span>
-          <span><b>{{ info.nome }}</b><small>Questão {{ numero }} de 4</small></span>
+          <span><b>{{ info.nome }}</b><small>{{ bonus ? 'Questão bônus · revisão de erro' : 'Questão ' + numero + ' de 4' }}</small></span>
         </div>
         <div class="faixa-tempo" role="timer" [attr.aria-label]="'Tempo restante ' + tempoTexto">
           <ed-icone nome="clock" [tamanho]="15" />
@@ -191,7 +237,7 @@
     <div class="veu" (click)="confirmandoSaida = false"></div>
     <section class="sair-folha" role="dialog" aria-modal="true" aria-labelledby="titulo-sair">
       <h2 id="titulo-sair">Sair da questão?</h2>
-      <p>O tempo continua contando e a questão de {{ info.nome }} de hoje fica sem resposta.</p>
+      <p>{{ bonus ? 'O tempo continua contando e a questão bônus fica sem resposta.' : 'O tempo continua contando e a questão de ' + info.nome + ' de hoje fica sem resposta.' }}</p>
       <div class="sair-acoes">
         <button class="btn-principal" type="button" (click)="confirmandoSaida = false">Continuar respondendo</button>
         <button class="btn-sec perigo" type="button" (click)="confirmarSaida()">Sair mesmo assim</button>

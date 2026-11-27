@@ -61,6 +61,12 @@ export class PerfilPublicoComponent implements OnInit, OnDestroy {
     const v: Record<string, number> = { linguagens: p.acertosLinguagens, humanas: p.acertosHumanas, naturezas: p.acertosNaturezas, exatas: p.acertosExatas };
     return AREAS.map(a => ({ ...a, acertos: v[a.chave] ?? 0 }));
   }
+  // Dois primeiros nomes; se o segundo for "de", "da" etc., leva o seguinte junto ("Maria da Silva").
+  get nomeCurto(): string {
+    const p = this.perfil, nome = (p?.nome || p?.usuario || '').trim().split(/\s+/);
+    const n = nome.length > 2 && /^(d[aeo]s?|e)$/i.test(nome[1]) ? 3 : 2;
+    return nome.slice(0, n).join(' ');
+  }
   get capa(): string { return lerAvatar(this.perfil?.avatar).capa || 'caderno'; }
   get mini(): UsuarioMini | null { const p = this.perfil; return p ? { id: p.id, nome: p.nome, usuario: p.usuario, avatar: p.avatar } : null; }
   get temPlacar() { const p = this.perfil?.placar; return !!p && p.vitorias + p.derrotas + p.empates > 0; }

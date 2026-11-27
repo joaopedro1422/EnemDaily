@@ -10,6 +10,7 @@ export interface Usuario{
     streakDiasAtivos: number;
     qntDiasAtivos: number;
     maiorSequencia?: number;
+    maiorSequenciaAcertos?: number;
     onboardingVisto?: boolean;
     email?: string;
     demo: boolean;

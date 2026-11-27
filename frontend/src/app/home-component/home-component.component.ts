@@ -4,6 +4,7 @@ import { CarregandoComponent } from '../shared/carregando/carregando.component';
 import { Recomendacao, UsuarioService } from '../services/usuario.service';
 import { ConteudoService } from '../services/conteudo.service';
 import { chaveConteudoDaQuestao } from '../models/conteudo';
+import { BonusStatus } from '../models/questao';
 import { Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
@@ -91,6 +92,7 @@ export class HomeComponentComponent implements OnInit, OnDestroy {
   desempenho: DesempenhoArea[] = [];
   semana: DiaSemana[] = [];
   progressoCampus: Progresso = progressoDoUsuario(null);
+  acesasCampus: Partial<Record<'linguagens' | 'humanas' | 'naturezas' | 'exatas', boolean>> | null = null;
   totalPecas = 0;
   readonly totalCampus = TOTAL_PECAS;
 
@@ -249,6 +251,17 @@ export class HomeComponentComponent implements OnInit, OnDestroy {
   }
 
 
+  bonus: BonusStatus | null = null;
+  private bonusPedido = '';
+  private carregarBonus(usuario: Usuario) {
+    if (usuario.demo) { this.bonus = null; return; }
+    const chave = `${usuario.id}:${new Date().toDateString()}:${usuario.xpTotal}`;
+    if (chave === this.bonusPedido) return;
+    this.bonusPedido = chave;
+    this.questaoService.getBonus().subscribe({ next: b => (this.bonus = b?.disponivel ? b : null), error: () => (this.bonus = null) });
+  }
+  abrirBonus() { this.router.navigate(['/desafio', 'bonus']); }
+
   abrirConfirmacao(area: ChaveArea) {
     const linha = this.linhasDia.find(l => l.info.chave === area);
     if (!linha || (linha.estado === 'pendente' && !linha.disponivel)) return;
@@ -387,9 +400,11 @@ export class HomeComponentComponent implements OnInit, OnDestroy {
     ];
 
     this.progressoCampus = progressoDoUsuario(usuario);
+    this.acesasCampus = { linguagens: !!usuario.lingRespHj, humanas: !!usuario.humRespHj, naturezas: !!usuario.natRespHj, exatas: !!usuario.exatRespHj };
     this.totalPecas = totalDePecas(this.progressoCampus);
 
     this.carregarRecomendacao(usuario);
+    this.carregarBonus(usuario);
     this.xpAno = (usuario.xpAnoAreas ?? []).reduce((s, m) => s + (m.naturezas ?? 0) + (m.humanas ?? 0) + (m.linguagens ?? 0) + (m.exatas ?? 0), 0);
     if (this.canvas) this.desenharGrafico();
   }

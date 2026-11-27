@@ -75,6 +75,9 @@ export class DesafioComponent implements OnInit, OnDestroy {
   tempoGasto = 0;
   aguardandoServidor = false;
   revisao = false;
+  bonus = false;
+  erradaEm = '';
+  readonly xpMaxBonus = 50;
   respondidaEm = '';
   direto = false;
   resumoDia: { resultados: ResultadoArea[]; sequencia: number; xp: number } | null = null;
@@ -129,6 +132,7 @@ export class DesafioComponent implements OnInit, OnDestroy {
   }
 
   private iniciar(param: string | null) {
+    if (param === 'bonus') { this.iniciarBonus(); return; }
     const info = AREAS.find(a => a.chave === param);
     if (!info) {
       this.router.navigate(['/Home']);
@@ -163,6 +167,44 @@ export class DesafioComponent implements OnInit, OnDestroy {
           Alert.toast('Novo login detectado em outro dispositivo', 'error');
         }
       }
+    });
+  }
+
+  // Questão bônus: uma questão que o aluno errou antes, devolvida num dia surpresa da semana.
+  private iniciarBonus() {
+    this.bonus = true;
+    this.questaoService.getBonus().subscribe({
+      next: s => {
+        const info = s.disponivel && s.area ? AREAS.find(a => a.chave === s.area!.toLowerCase()) : null;
+        if (!info) { this.router.navigate(['/Home']); return; }
+        this.area = info.chave;
+        this.info = info;
+        this.numero = AREAS.indexOf(info) + 1;
+        const d = new Date();
+        this.codigoPagina = `*${String(d.getDate()).padStart(2, '0')}${String(d.getMonth() + 1).padStart(2, '0')}BONUS*`;
+        if (s.erradaEm) {
+          const [a, m, dia] = s.erradaEm.split('-').map(Number);
+          this.erradaEm = new Date(a, m - 1, dia).toLocaleDateString('pt-BR', { day: 'numeric', month: 'long' });
+        }
+        if (s.respondida && s.revisao) {
+          const r = s.revisao;
+          this.revisao = true;
+          this.questao = r.questao;
+          this.selecionada = r.alternativa;
+          this.esgotou = r.alternativa === null && r.tempoGasto >= TEMPO_TOTAL;
+          this.resultado = r.acerto ? 'acerto' : 'erro';
+          this.xpGanho = this.xpMostrado = r.xp;
+          this.tempoGasto = r.tempoGasto;
+          this.respondidaEm = r.respondidaEm;
+          this.carregou = true;
+          this.fase = 'resultado';
+          this.proxima = null;
+          return;
+        }
+        this.questao = s.questao;
+        this.carregou = true;
+      },
+      error: () => { this.falhouCarregar = true; }
     });
   }
 
@@ -214,7 +256,7 @@ export class DesafioComponent implements OnInit, OnDestroy {
         this.enviar();
       }
     }, 1000);
-    if (this.usuario) {
+    if (this.usuario && !this.bonus) {
       this.usuario[this.area].ultimaResposta = hojeISO();
       this.authService.atualizarUsuario(this.usuario);
     }
@@ -285,7 +327,7 @@ export class DesafioComponent implements OnInit, OnDestroy {
 
     const inicio = performance.now();
     this.aguardandoServidor = true;
-    this.questaoService.enviarResposta({
+    (this.bonus ? this.questaoService.enviarBonus.bind(this.questaoService) : this.questaoService.enviarResposta.bind(this.questaoService))({
       area: this.area.toUpperCase(),
       alternativa: this.esgotou ? null : this.selecionada,
       tempoGasto: this.tempoGasto
@@ -295,7 +337,7 @@ export class DesafioComponent implements OnInit, OnDestroy {
         this.somTambores.pause();
         this.aguardandoServidor = false;
         if (e.status === 409) {
-          Alert.toast('Você já respondeu essa área hoje', 'error');
+          Alert.toast(this.bonus ? 'A questão bônus de hoje já foi respondida' : 'Você já respondeu essa área hoje', 'error');
           this.router.navigate(['/Home']);
           return;
         }
@@ -336,6 +378,12 @@ export class DesafioComponent implements OnInit, OnDestroy {
   }
 
   private aoResponder(res: Usuario, emblemasAntes: string[]) {
+    if (this.bonus) {
+      this.aguardandoServidor = false;
+      this.proxima = null;
+      this.conquistas = this.resultado === 'acerto' ? [{ icone: 'sparkles', texto: 'Erro corrigido' }] : [];
+      return;
+    }
     this.acertosDepois = acertosTotais(res);
     this.aguardandoServidor = false;
     const depois = progressoDoUsuario(res);

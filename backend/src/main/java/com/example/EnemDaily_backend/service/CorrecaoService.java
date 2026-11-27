@@ -96,7 +96,7 @@ public class CorrecaoService {
             bonusPct = dias >= 20 ? 20 : dias >= 8 ? 15 : dias >= 4 ? 10 : 0;
             xp = (int) Math.floor(xpBase * (1 + bonusPct / 100.0));
         }
-        var usuarioAtualizado = usuarios.registraResposta(new RespostaDTO(xp, tempo, acerto, q.getAssunto(), area, xpBase, marcada), usuario);
+        var usuarioAtualizado = usuarios.registraResposta(new RespostaDTO(xp, tempo, acerto, q.getAssunto(), area, xpBase, marcada, q.getId()), usuario);
         return new Correcao(usuarioAtualizado, acerto, xp, xpBase, bonusPct, indiceCorreto, q);
     }
 

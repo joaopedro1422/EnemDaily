@@ -99,7 +99,7 @@ export class PerfilComponent implements OnInit, OnDestroy {
   get statsCapa(): StatsCapa {
     const u = this.usuario;
     return {
-      xp: this.xp, maiorSequencia: this.maiorSequencia, diasAtivos: u?.qntDiasAtivos ?? 0,
+      xp: this.xp, maiorSequencia: this.maiorSequencia, maiorSequenciaAcertos: Math.max(u?.maiorSequenciaAcertos ?? 0, u?.streak ?? 0), diasAtivos: u?.qntDiasAtivos ?? 0,
       acertos: { linguagens: u?.linguagens?.acertos ?? 0, humanas: u?.humanas?.acertos ?? 0, naturezas: u?.naturezas?.acertos ?? 0, exatas: u?.exatas?.acertos ?? 0 },
       duelosVencidos: this.duelosVencidos, redacoes: this.redacoes, simulados: this.simulados, emblemas: (u?.emblemas ?? '').split('|').filter(Boolean)
     };

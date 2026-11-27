@@ -32,6 +32,8 @@ export interface DadosCampus {
 const limitar = (t: Trilha, n: number) => Math.max(0, Math.min(TOTAL_POR_TRILHA[t], Math.floor(n || 0)));
 
 const ehPredio = (p: Peca) => p.nome.includes(' · ') && !p.lote;
+// pessoas nunca são uma etapa sozinhas: entram junto com a próxima peça de verdade
+const ehPessoa = (p: any) => /^(Estudante|Estudantes|Fila do teatro|Sarau no palco|Apicultora|Arqueóloga|Observadores|Turistas|Visitantes|Guia|Monitoria|Robô)/.test(p.nome);
 function etapasDe(lista: Peca[]): number[] {
   const tamanhos: number[] = [];
   if (!lista.length) return tamanhos;
@@ -41,14 +43,15 @@ function etapasDe(lista: Peca[]): number[] {
     const p = lista[i];
     if (p.lote) { pendente++; i++; continue; }
     if (ehPredio(p)) { tamanhos.push(pendente + 1); pendente = 0; i++; continue; }
+    if (ehPessoa(p)) { pendente++; i++; continue; }
     let j = i;
-    while (j < lista.length && !lista[j].lote && !ehPredio(lista[j])) j++;
+    while (j < lista.length && !lista[j].lote && !ehPredio(lista[j]) && !ehPessoa(lista[j])) j++;
     const run = j - i;
     if (run === 1 && j < lista.length) { pendente += 1; i = j; continue; }
     for (let c = 0; c < run; c += 2) tamanhos.push((c === 0 ? pendente : 0) + Math.min(2, run - c));
     pendente = 0; i = j;
   }
-  if (pendente) tamanhos.push(pendente);
+  if (pendente) { if (tamanhos.length) tamanhos[tamanhos.length - 1] += pendente; else tamanhos.push(pendente); }
   return tamanhos;
 }
 const ETAPAS = Object.fromEntries((['linguagens', 'humanas', 'naturezas', 'exatas'] as Trilha[]).map(t => [t, etapasDe(TRILHAS[t])])) as Record<Trilha, number[]>;

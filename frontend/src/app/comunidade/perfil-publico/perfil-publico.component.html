@@ -25,7 +25,7 @@
       <div class="pp-id">
         <span class="pp-av"><ed-avatar [valor]="perfil.avatar" [nome]="perfil.nome || perfil.usuario" [tamanho]="112" [encher]="true" /></span>
         <div class="pp-nome">
-          <h1>{{ perfil.nome || perfil.usuario }}</h1>
+          <h1 [attr.title]="perfil.nome || perfil.usuario">{{ nomeCurto }}</h1>
           <span>&#64;{{ perfil.usuario }}@if (perfil.perfilPrivado) { <i class="pp-privado"><ed-icone nome="lock" [tamanho]="12" />Privado</i> }</span>
         </div>
       </div>

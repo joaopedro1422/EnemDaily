@@ -1,4 +1,5 @@
 package com.example.EnemDaily_backend.controller;
+import com.example.EnemDaily_backend.service.BonusService;
 
 import com.example.EnemDaily_backend.DTO.ProvaDTOs;
 import com.example.EnemDaily_backend.Enum.AreaEnum;
@@ -26,9 +27,11 @@ public class QuestaoController {
     private final StatusGeracao statusGeracao;
     private final AcessoAdmin acessoAdmin;
     private final CorrecaoService correcaoService;
+    private final BonusService bonusService;
 
-    public QuestaoController(GeradorQuestaoService geradorQuestaoService, StatusGeracao statusGeracao, AcessoAdmin acessoAdmin, CorrecaoService correcaoService) {
+    public QuestaoController(GeradorQuestaoService geradorQuestaoService, StatusGeracao statusGeracao, AcessoAdmin acessoAdmin, CorrecaoService correcaoService, BonusService bonusService) {
         this.correcaoService = correcaoService;
+        this.bonusService = bonusService;
         this.geradorQuestaoService = geradorQuestaoService;
         this.statusGeracao = statusGeracao;
         this.acessoAdmin = acessoAdmin;
@@ -38,6 +41,22 @@ public class QuestaoController {
     public ResponseEntity<?> getQuestaoExemplo(@PathVariable("area") String area) {
         var q = geradorQuestaoService.getQuestaoExemplo(AreaEnum.parse(area));
         return q == null ? ResponseEntity.noContent().build() : ResponseEntity.ok(q);
+    }
+
+    @GetMapping("bonus")
+    public ResponseEntity<?> bonus(Authentication authentication) {
+        if (authentication == null || !(authentication.getPrincipal() instanceof Usuario usuario)) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        return ResponseEntity.ok(bonusService.status(usuario));
+    }
+
+    @PostMapping("bonus/resposta")
+    public ResponseEntity<?> responderBonus(@RequestBody ProvaDTOs.Responder dto, Authentication authentication) {
+        if (authentication == null || !(authentication.getPrincipal() instanceof Usuario usuario)) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        try {
+            return ResponseEntity.ok(bonusService.responder(usuario, dto.alternativa(), dto.tempoGasto()));
+        } catch (BonusService.SemBonus e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("erro", e.getMessage()));
+        }
     }
 
     @GetMapping("geracao")

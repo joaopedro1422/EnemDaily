@@ -7,6 +7,7 @@ export type CategoriaCapa = 'Estudos' | 'Cursos' | 'Conquistas' | 'Games' | 'Pai
 export interface StatsCapa {
   xp: number;
   maiorSequencia: number;
+  maiorSequenciaAcertos: number;
   diasAtivos: number;
   acertos: { linguagens: number; humanas: number; naturezas: number; exatas: number };
   duelosVencidos: number;
@@ -50,16 +51,22 @@ export const CAPAS: Capa[] = [
   { codigo: 'engenharia', nome: 'Planta Baixa', descricao: 'Ponte pênsil, engrenagem girando e cálculo estrutural.', categoria: 'Cursos', raridade: 'rara', requisito: '40 acertos em Matemática', progresso: s => [s.acertos.exatas, 40] },
   { codigo: 'letras', nome: 'Máquina de Escrever', descricao: 'Letras voando de uma máquina antiga. Para Letras e Jornalismo.', categoria: 'Cursos', raridade: 'rara', requisito: '40 acertos em Linguagens', progresso: s => [s.acertos.linguagens, 40] },
   { codigo: 'sorriso', nome: 'Sorriso', descricao: 'Dente brilhando, escova e espuma. Para quem sonha com Odontologia.', categoria: 'Cursos', raridade: 'rara', requisito: '60 acertos em Natureza', progresso: s => [s.acertos.naturezas, 60] },
+  { codigo: 'arquitetura', nome: 'Prancheta', descricao: 'Planta, régua T, compasso e a maquete pronta. Para Arquitetura.', categoria: 'Cursos', raridade: 'rara', requisito: '50 acertos em Matemática', progresso: s => [s.acertos.exatas, 50] },
+  { codigo: 'psicologia', nome: 'Mente Aberta', descricao: 'Engrenagens girando e flores brotando das ideias. Para Psicologia.', categoria: 'Cursos', raridade: 'rara', requisito: '50 acertos em Humanas', progresso: s => [s.acertos.humanas, 50] },
+  { codigo: 'veterinaria', nome: 'Patinhas', descricao: 'Cachorro, gato, estetoscópio e muito carinho. Para Veterinária.', categoria: 'Cursos', raridade: 'rara', requisito: '50 acertos em Natureza', progresso: s => [s.acertos.naturezas, 50] },
+  { codigo: 'relacoes', nome: 'Diplomacia', descricao: 'Rotas entre bandeiras e um avião cruzando o mundo. Para Relações Internacionais.', categoria: 'Cursos', raridade: 'epica', requisito: '30 acertos em cada área', progresso: s => [Math.min(s.acertos.linguagens, s.acertos.humanas, s.acertos.naturezas, s.acertos.exatas), 30] },
   { codigo: 'cidade', nome: 'Cidade à Noite', descricao: 'Skyline com as janelas acendendo uma a uma.', categoria: 'Paisagens', raridade: 'rara', requisito: '20 dias ativos', progresso: s => [s.diasAtivos, 20] },
   { codigo: 'montanhas', nome: 'Cume', descricao: 'Cordilheira ao amanhecer, com a bandeira fincada no topo.', categoria: 'Paisagens', raridade: 'rara', requisito: '2.500 XP', progresso: s => [s.xp, 2500] },
   { codigo: 'arcade', nome: 'Modo Arcade', descricao: 'Sol retrô, grade neon e a barra de XP enchendo.', categoria: 'Games', raridade: 'rara', requisito: '1.500 XP', progresso: s => [s.xp, 1500] },
   { codigo: 'codigo', nome: 'Terminal', descricao: 'O algoritmo da aprovação rodando. Para quem quer Computação.', categoria: 'Cursos', raridade: 'epica', requisito: '3.000 XP', progresso: s => [s.xp, 3000] },
   { codigo: 'duelista', nome: 'Arena', descricao: 'Espadas cruzadas e faíscas. Só para quem vence duelos.', categoria: 'Conquistas', raridade: 'epica', requisito: '5 duelos vencidos', progresso: s => [s.duelosVencidos, 5] },
+  { codigo: 'combo', nome: 'Combo x8', descricao: 'Contador de combo em neon: oito acertos sem errar nenhum.', categoria: 'Conquistas', raridade: 'epica', requisito: '8 acertos seguidos', progresso: s => [s.maiorSequenciaAcertos, 8] },
   { codigo: 'chamas', nome: 'Em Chamas', descricao: 'Fogo de verdade, com a sua maior sequência estampada.', categoria: 'Conquistas', raridade: 'epica', requisito: '15 dias seguidos', progresso: s => [s.maiorSequencia, 15] },
   { codigo: 'redacao', nome: 'Nota 1000', descricao: 'A redação corrigida com caneta vermelha e nota máxima.', categoria: 'Estudos', raridade: 'epica', requisito: '5 redações registradas', progresso: s => [s.redacoes, 5] },
   { codigo: 'gabarito', nome: 'Cartão-Resposta', descricao: 'O gabarito preenchido, o lápis e o relógio de prova.', categoria: 'Estudos', raridade: 'epica', requisito: '4 simulados cadastrados', progresso: s => [s.simulados, 4] },
   { codigo: 'aurora', nome: 'Aurora', descricao: 'Aurora boreal dançando sobre pinheiros e uma cabana acesa.', categoria: 'Paisagens', raridade: 'epica', requisito: '45 dias ativos', progresso: s => [s.diasAtivos, 45] },
-  { codigo: 'constelacao', nome: 'Constelação', descricao: 'Estrelas que formam um capelo de formatura.', categoria: 'Conquistas', raridade: 'lendaria', requisito: '30 dias seguidos', progresso: s => [s.maiorSequencia, 30] },
+  { codigo: 'fenix', nome: 'Fênix', descricao: 'Uma fênix de fogo de asas abertas. Trinta dias sem apagar a chama.', categoria: 'Conquistas', raridade: 'lendaria', requisito: '30 dias seguidos', progresso: s => [s.maiorSequencia, 30] },
+  { codigo: 'constelacao', nome: 'Constelação', descricao: 'Estrelas que formam um capelo de formatura.', categoria: 'Conquistas', raridade: 'lendaria', requisito: '60 dias seguidos', progresso: s => [s.maiorSequencia, 60] },
   { codigo: 'foguete', nome: 'Rumo à Aprovação', descricao: 'Decolagem com planeta de anéis e rastro de fumaça.', categoria: 'Games', raridade: 'lendaria', requisito: '10.000 XP', progresso: s => [s.xp, 10000] },
   { codigo: 'aprovado', nome: 'Aprovado!', descricao: 'A carta da aprovação, carimbo e chuva de confete.', categoria: 'Conquistas', raridade: 'lendaria', requisito: '500 acertos', progresso: s => [total(s), 500] },
   { codigo: 'campeao', nome: 'Pódio', descricao: 'Troféu no topo do pódio, holofotes e louros.', categoria: 'Conquistas', raridade: 'lendaria', requisito: 'Emblema de campeão do mês', progresso: s => [s.emblemas.includes('campeao_mes') ? 1 : 0, 1], emblema: 'campeao_mes' },
@@ -473,6 +480,154 @@ const ARTE: Record<string, (id: string, d: DadosCapa) => string> = {
     o += `<path d="M0,${H} L0,142 C120,128 240,150 360,136 S560,126 680,138 L760,132 L760,${H} Z" fill="#E8F1FA"/><path d="M0,142 C120,128 240,150 360,136 S560,126 680,138 L760,132" fill="none" stroke="#FFFFFF" stroke-width="2"/>`;
     for (const [x, h] of [[420, 40], [446, 30], [700, 46], [728, 34], [750, 40]]) o += `<path d="M${x},${138 - h} l-12,${h * .45} h6 l-10,${h * .4} h8 l-8,${h * .3} h32 l-8,${-h * .3} h8 l-10,${-h * .4} h6 z" fill="#0B1E3A"/>`;
     o += `<path d="M560,138 v-18 l16,-12 16,12 v18 z" fill="#3B2A22"/><path d="M556,122 l20,-16 20,16" fill="none" stroke="#E8F1FA" stroke-width="3"/><rect x="570" y="124" width="8" height="8" fill="#FFD66B"/><circle cx="574" cy="128" r="12" fill="#FFD66B" opacity=".18"/><rect x="584" y="110" width="4" height="10" fill="#3B2A22"/>`;
+    return o;
+  },
+  arquitetura: id => {
+    const azul = '#2A3A5E', terra = '#D9734E';
+    let o = `<defs><linearGradient id="${id}f" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F7F2E8"/><stop offset="1" stop-color="#E9E0CF"/></linearGradient></defs><rect width="${W}" height="${H}" fill="url(#${id}f)"/>`;
+    for (let x = 0; x < W; x += 12) o += `<line x1="${x}" y1="0" x2="${x}" y2="${H}" stroke="#7FA6D9" stroke-opacity="${x % 60 === 0 ? .25 : .1}"/>`;
+    for (let y = 0; y < H; y += 12) o += `<line x1="0" y1="${y}" x2="${W}" y2="${y}" stroke="#7FA6D9" stroke-opacity="${y % 60 === 0 ? .25 : .1}"/>`;
+    const L = `fill="none" stroke="${azul}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"`;
+    // fachada desenhada
+    o += `<path d="M360,140 V86 L420,46 L480,86 V140 Z" ${L}/><path d="M352,92 L420,40 L488,92" ${L} stroke-width="2"/><rect x="378" y="100" width="22" height="22" ${L}/><path d="M389,100 v22 M378,111 h22" ${L} stroke-width="1"/><rect x="436" y="104" width="26" height="36" ${L}/><circle cx="456" cy="122" r="1.6" fill="${azul}"/><circle cx="420" cy="72" r="8" ${L}/>`;
+    o += `<path d="M352,152 H488 M352,148 v8 M488,148 v8" ${L} stroke-width="1"/><text x="420" y="164" text-anchor="middle" font-family="ui-monospace, Consolas, monospace" font-size="9" fill="${azul}">8,40 m</text>`;
+    // compasso de desenho
+    o += `<g transform="translate(520 26)"><circle r="4" fill="${azul}"/><path d="M0,0 L-14,56 M0,0 L16,54" stroke="#8A93A8" stroke-width="3" stroke-linecap="round"/><path d="M-14,56 l-2,6 M16,54 l1,6" stroke="${azul}" stroke-width="2"/></g><path d="M490,86 A34,34 0 0 1 540,74" fill="none" stroke="${terra}" stroke-width="1.4" stroke-dasharray="3 3"/>`;
+    // maquete isométrica
+    const iso2 = (x: number, y: number, z: number) => [626 + (x - y) * 17, 92 + (x + y) * 9.5 - z * 19];
+    const p = (pts: number[][]) => pts.map(([x, y, z]) => iso2(x, y, z).map(v => v.toFixed(1)).join(',')).join(' ');
+    o += `<polygon points="${p([[-1.2, -1.2, 0], [3.4, -1.2, 0], [3.4, 2.6, 0], [-1.2, 2.6, 0]])}" fill="#D7CDB8"/>`;
+    o += `<polygon points="${p([[0, 2, 0], [3, 2, 0], [3, 2, 1.6], [0, 2, 1.6]])}" fill="#FFFFFF" stroke="${azul}" stroke-width=".8"/>`;
+    o += `<polygon points="${p([[3, 0, 0], [3, 2, 0], [3, 2, 1.6], [3, 0, 1.6]])}" fill="#E6E2DA" stroke="${azul}" stroke-width=".8"/>`;
+    o += `<polygon points="${p([[0, 2, 1.6], [3, 2, 1.6], [3, 1, 2.6], [0, 1, 2.6]])}" fill="${terra}" stroke="${azul}" stroke-width=".8"/>`;
+    o += `<polygon points="${p([[0, 0, 1.6], [3, 0, 1.6], [3, 1, 2.6], [0, 1, 2.6]])}" fill="#B85A3A"/>`;
+    o += `<polygon points="${p([[3, 0, 1.6], [3, 2, 1.6], [3, 1, 2.6]])}" fill="#F2EEE6" stroke="${azul}" stroke-width=".8"/>`;
+    for (const x of [.5, 2]) o += `<polygon points="${p([[x, 2, .5], [x + .6, 2, .5], [x + .6, 2, 1.1], [x, 2, 1.1]])}" fill="#7FB4E0"/>`;
+    o += `<polygon points="${p([[3, .7, 0], [3, 1.3, 0], [3, 1.3, 1], [3, .7, 1]])}" fill="#7A5530"/>`;
+    o += `<circle cx="${iso2(-.6, 2, 0)[0]}" cy="${iso2(-.6, 2, 0)[1] - 10}" r="9" fill="#7CC66F"/><line x1="${iso2(-.6, 2, 0)[0]}" y1="${iso2(-.6, 2, 0)[1]}" x2="${iso2(-.6, 2, 0)[0]}" y2="${iso2(-.6, 2, 0)[1] - 6}" stroke="#7A5530" stroke-width="2"/>`;
+    // régua T e esquadro
+    o += `<g transform="translate(548 160) rotate(-3)"><rect x="0" y="-4" width="190" height="8" fill="#F2C14E" stroke="#B5871A"/><rect x="-6" y="-18" width="10" height="36" fill="#F2C14E" stroke="#B5871A"/>${Array.from({ length: 18 }, (_, k) => `<line x1="${12 + k * 10}" y1="-4" x2="${12 + k * 10}" y2="${k % 5 ? -1 : 1}" stroke="#7A5306" stroke-width=".8"/>`).join('')}</g>`;
+    o += `<path d="M700,20 L748,20 L700,80 Z" fill="#9CD3FF" fill-opacity=".45" stroke="#4FA3FF" stroke-width="1.4"/><path d="M710,30 L728,30 L710,52 Z" fill="none" stroke="#4FA3FF" stroke-width="1"/>`;
+    return o;
+  },
+
+  psicologia: id => {
+    let o = `<defs><linearGradient id="${id}f" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#EFE6FF"/><stop offset="1" stop-color="#FFD6E7"/></linearGradient><linearGradient id="${id}c" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5A3FB0"/><stop offset="1" stop-color="#3A2470"/></linearGradient></defs><rect width="${W}" height="${H}" fill="url(#${id}f)"/>`;
+    o += `<text x="370" y="150" font-family="Georgia, serif" font-size="170" fill="#7A5CF0" opacity=".1">ψ</text>`;
+    // perfil de uma cabeça olhando para a esquerda
+    o += `<path d="M690,${H} C690,150 700,140 706,128 C716,108 720,90 716,70 C710,36 682,14 646,14 C606,14 578,40 574,74 C572,86 566,94 560,102 C556,108 560,112 566,112 L570,112 C570,120 568,124 572,128 C566,132 570,138 576,138 C574,146 578,152 590,152 C604,152 612,156 614,${H} Z" fill="url(#${id}c)"/>`;
+    // engrenagens dentro da cabeça
+    const eng = (cx: number, cy: number, r: number, n: number, cls: string, cor: string) => {
+      let d = ''; for (let k = 0; k < n; k++) d += `<rect x="${-r * .22}" y="${-r - r * .34}" width="${r * .44}" height="${r * .4}" rx="1.5" transform="rotate(${(k * 360) / n})"/>`;
+      return `<g transform="translate(${cx} ${cy})"><g class="${cls}"><g fill="${cor}">${d}<circle r="${r}"/></g><circle r="${r * .4}" fill="#3A2470"/></g></g>`;
+    };
+    o += eng(634, 66, 16, 10, 'ce-gira', '#FFD66B') + eng(666, 94, 11, 8, 'ce-gira-inv', '#FF9CC2') + eng(670, 50, 8, 7, 'ce-gira-inv', '#9CD3FF');
+    // flores brotando do topo
+    for (const [x, y, c, d] of [[612, 18, '#FF7AA8', 0], [640, 8, '#FFD66B', .6], [672, 14, '#9CD3FF', 1.2], [700, 30, '#B7F0C8', 1.8]] as [number, number, string, number][]) {
+      o += `<path d="M${x},${y + 14} q-2,-8 0,-14" stroke="#5FAE5A" stroke-width="2" fill="none"/><g class="ce-flutua" style="animation-delay:-${d}s">${[0, 72, 144, 216, 288].map(a => `<ellipse cx="${x}" cy="${y - 5}" rx="3" ry="5" fill="${c}" transform="rotate(${a} ${x} ${y})"/>`).join('')}<circle cx="${x}" cy="${y}" r="2.6" fill="#FFF6C2"/></g>`;
+    }
+    // balões de pensamento
+    o += `<circle cx="548" cy="70" r="4" fill="#FFFFFF"/><circle cx="534" cy="54" r="6.5" fill="#FFFFFF"/><g class="ce-flutua"><path d="M440,52 c-6,-22 22,-34 36,-22 c8,-14 34,-10 36,6 c18,0 22,24 6,30 c2,16 -22,22 -32,12 c-10,12 -36,8 -38,-8 c-16,-2 -18,-20 -8,-18 z" fill="#FFFFFF"/><text x="478" y="60" text-anchor="middle" font-family="${F}" font-size="13" font-weight="800" fill="#5A3FB0">e se…?</text></g>`;
+    // peça de quebra-cabeça
+    o += `<g class="ce-sobe" style="animation-delay:-1s"><path d="M400,112 h12 c0,-8 12,-8 12,0 h12 v12 c8,0 8,12 0,12 v12 h-36 z" fill="#FF9CC2" stroke="#D9578A" stroke-width="1.5"/></g>`;
+    o += `<path d="M380,40 q6,-8 12,0 q6,8 12,0" fill="none" stroke="#7A5CF0" stroke-width="2" stroke-linecap="round" opacity=".5"/>`;
+    return o;
+  },
+
+  veterinaria: id => {
+    let o = `<defs><linearGradient id="${id}f" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#EAF8EE"/><stop offset="1" stop-color="#BFEBD0"/></linearGradient></defs><rect width="${W}" height="${H}" fill="url(#${id}f)"/>`;
+    const pata = (x: number, y: number, a: number, cor: string) => `<g transform="translate(${x} ${y}) rotate(${a})" fill="${cor}"><ellipse cx="0" cy="4" rx="7" ry="6"/><circle cx="-7" cy="-5" r="2.8"/><circle cx="-2.4" cy="-8.4" r="2.8"/><circle cx="2.4" cy="-8.4" r="2.8"/><circle cx="7" cy="-5" r="2.8"/></g>`;
+    for (let k = 0; k < 8; k++) o += pata(300 + k * 34, 150 - k * 10 + (k % 2) * 12, 70, '#2E7D55').replace('<g ', `<g opacity="${(.12 + k * .03).toFixed(2)}" `);
+    // cachorro
+    o += `<g transform="translate(560 98)"><ellipse cx="0" cy="58" rx="44" ry="8" fill="#000000" opacity=".08"/><path d="M-38,-26 C-52,-30 -58,4 -44,14 C-38,18 -34,6 -32,-6 Z" fill="#A9743F"/><path d="M38,-26 C52,-30 58,4 44,14 C38,18 34,6 32,-6 Z" fill="#A9743F"/><ellipse cx="0" cy="0" rx="38" ry="40" fill="#E2B27A"/><ellipse cx="0" cy="18" rx="20" ry="15" fill="#F6DFC0"/><ellipse cx="0" cy="8" rx="8" ry="6" fill="#2E3140"/><path d="M0,14 v6 M-7,22 q7,6 14,0" stroke="#2E3140" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M-4,24 q4,10 8,0 z" fill="#F28AB2"/><circle cx="-14" cy="-10" r="5" fill="#2E3140"/><circle cx="14" cy="-10" r="5" fill="#2E3140"/><circle cx="-12" cy="-12" r="1.6" fill="#FFFFFF"/><circle cx="16" cy="-12" r="1.6" fill="#FFFFFF"/></g>`;
+    // gato
+    o += `<g transform="translate(672 104)"><polygon points="-28,-22 -22,-48 -6,-30" fill="#8A93A8"/><polygon points="28,-22 22,-48 6,-30" fill="#8A93A8"/><polygon points="-24,-26 -21,-40 -12,-30" fill="#F28AB2"/><polygon points="24,-26 21,-40 12,-30" fill="#F28AB2"/><ellipse cx="0" cy="0" rx="32" ry="30" fill="#A9B1C2"/><path d="M-10,-28 l2,10 M0,-30 v10 M10,-28 l-2,10" stroke="#8A93A8" stroke-width="2.4" stroke-linecap="round"/><ellipse cx="-11" cy="-2" rx="4" ry="6" fill="#36B37D"/><ellipse cx="11" cy="-2" rx="4" ry="6" fill="#36B37D"/><ellipse cx="-11" cy="-2" rx="1.4" ry="4.4" fill="#1E2230"/><ellipse cx="11" cy="-2" rx="1.4" ry="4.4" fill="#1E2230"/><path d="M-3,8 h6 l-3,4 z" fill="#F28AB2"/><path d="M0,12 q-4,5 -8,2 M0,12 q4,5 8,2" stroke="#4A4F66" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M-12,10 h-18 M-12,14 h-16 M12,10 h18 M12,14 h16" stroke="#FFFFFF" stroke-width="1" opacity=".8"/></g>`;
+    // estetoscópio entre os dois
+    o += `<path d="M590,128 C610,170 650,170 660,132" fill="none" stroke="#2BB5A8" stroke-width="4" stroke-linecap="round"/><path d="M590,128 l-6,-12 M660,132 l6,-12" stroke="#2BB5A8" stroke-width="3" stroke-linecap="round"/><circle cx="625" cy="160" r="8" fill="#DDEFF4" stroke="#2BB5A8" stroke-width="3"/>`;
+    // coração e osso
+    o += `<g class="ce-pulso" style="transform-origin:618px 34px"><path d="M618,46 C606,38 600,32 600,26 a9,9 0 0 1 18,-3 a9,9 0 0 1 18,3 c0,6 -6,12 -18,20 z" fill="#FF5C7A"/></g>`;
+    o += `<g class="ce-flutua"><g transform="translate(470 60) rotate(-20)"><rect x="-22" y="-5" width="44" height="10" rx="4" fill="#FFFFFF" stroke="#C9CFDC"/><circle cx="-22" cy="-6" r="6.5" fill="#FFFFFF" stroke="#C9CFDC"/><circle cx="-22" cy="6" r="6.5" fill="#FFFFFF" stroke="#C9CFDC"/><circle cx="22" cy="-6" r="6.5" fill="#FFFFFF" stroke="#C9CFDC"/><circle cx="22" cy="6" r="6.5" fill="#FFFFFF" stroke="#C9CFDC"/><rect x="-20" y="-4" width="40" height="8" fill="#FFFFFF"/></g></g>`;
+    for (const [x, y, s, d] of [[738, 30, 1, 0], [512, 136, .7, .9]]) o += `<path class="ce-pisca" style="animation-delay:-${d}s" d="M${x},${y - 8 * s} L${x + 2 * s},${y - 2 * s} L${x + 8 * s},${y} L${x + 2 * s},${y + 2 * s} L${x},${y + 8 * s} L${x - 2 * s},${y + 2 * s} L${x - 8 * s},${y} L${x - 2 * s},${y - 2 * s} Z" fill="#FFFFFF"/>`;
+    return o;
+  },
+
+  relacoes: id => {
+    let o = `<defs><linearGradient id="${id}f" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0B2447"/><stop offset="1" stop-color="#19376D"/></linearGradient></defs><rect width="${W}" height="${H}" fill="url(#${id}f)"/>`;
+    for (let k = 1; k < 6; k++) o += `<path d="M300,${k * 28} Q530,${k * 28 - 12} 760,${k * 28}" fill="none" stroke="#FFFFFF" stroke-opacity=".06"/>`;
+    for (let k = 0; k < 9; k++) o += `<line x1="${320 + k * 52}" y1="0" x2="${310 + k * 54}" y2="${H}" stroke="#FFFFFF" stroke-opacity=".05"/>`;
+    // continentes simplificados em pontilhado
+    const r = sorteio(81);
+    const blobs: [number, number, number, number][] = [[380, 60, 46, 26], [400, 118, 22, 32], [520, 56, 34, 22], [540, 110, 24, 34], [640, 64, 56, 30], [700, 130, 26, 14]];
+    for (const [cx, cy, rx, ry] of blobs) for (let k = 0; k < 90; k++) {
+      const a = r() * Math.PI * 2, d = Math.sqrt(r());
+      o += `<circle cx="${(cx + Math.cos(a) * rx * d).toFixed(1)}" cy="${(cy + Math.sin(a) * ry * d).toFixed(1)}" r="1.5" fill="#5CF2C8" opacity="${(.35 + r() * .4).toFixed(2)}"/>`;
+    }
+    const pins: [number, number, string[]][] = [[392, 70, ['#2F9E5B', '#F2C14E', '#2836C6']], [536, 52, ['#E5484D', '#FFFFFF', '#2836C6']], [660, 64, ['#E5484D', '#F2C14E', '#E5484D']], [548, 120, ['#36B37D', '#FFFFFF', '#E5484D']], [700, 128, ['#2836C6', '#FFFFFF', '#E5484D']]];
+    const rotas = [[0, 1], [1, 2], [1, 3], [2, 4], [0, 3]];
+    rotas.forEach(([a, b]) => { const [x1, y1] = pins[a], [x2, y2] = pins[b], mx = (x1 + x2) / 2, my = Math.min(y1, y2) - 30; o += `<path d="M${x1},${y1} Q${mx},${my} ${x2},${y2}" fill="none" stroke="#FFD66B" stroke-width="1.6" stroke-dasharray="4 4" opacity=".8"/>`; });
+    for (const [x, y, cores] of pins) o += `<circle cx="${x}" cy="${y}" r="10" fill="#FFD66B" opacity=".15" class="ce-pisca"/><line x1="${x}" y1="${y}" x2="${x}" y2="${y - 20}" stroke="#FFFFFF" stroke-width="1.4"/><g transform="translate(${x} ${y - 20})">${cores.map((c, i) => `<rect x="${i * 6}" y="0" width="6" height="11" fill="${c}"/>`).join('')}<rect width="18" height="11" fill="none" stroke="#FFFFFF" stroke-opacity=".5"/></g><circle cx="${x}" cy="${y}" r="3" fill="#FFD66B"/>`;
+    const [x1, y1] = pins[1], [x2, y2] = pins[2], rota = `M${x1},${y1} Q${(x1 + x2) / 2},${Math.min(y1, y2) - 30} ${x2},${y2}`;
+    o += `<g><path d="M-8,0 L8,0 M-2,-7 L3,0 L-2,7 M-7,-3 L-5,0 L-7,3" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/><animateMotion dur="5s" repeatCount="indefinite" rotate="auto" path="${rota}"/></g>`;
+    o += `<g transform="translate(470 150)"><circle r="12" fill="none" stroke="#FFFFFF" stroke-opacity=".5"/><path d="M0,-10 L3,0 L0,10 L-3,0 Z" fill="#FFD66B"/></g>`;
+    return o;
+  },
+  combo: id => {
+    let o = `<defs><radialGradient id="${id}f" cx=".78" cy=".5" r=".9"><stop offset="0" stop-color="#4A1A9E"/><stop offset=".5" stop-color="#1E0A4A"/><stop offset="1" stop-color="#0A0420"/></radialGradient>
+      <linearGradient id="${id}t" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF6A0"/><stop offset=".5" stop-color="#FFC23D"/><stop offset="1" stop-color="#FF4FA3"/></linearGradient>
+      <linearGradient id="${id}c" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#5CF2FF"/><stop offset="1" stop-color="#8C7BFF"/></linearGradient></defs><rect width="${W}" height="${H}" fill="url(#${id}f)"/>`;
+    const r = sorteio(91);
+    for (let k = 0; k < 40; k++) {
+      const a = r() * Math.PI * 2, d0 = 60 + r() * 30, d1 = d0 + 60 + r() * 220;
+      o += `<line class="ce-pisca" style="animation-delay:-${(r() * 2).toFixed(2)}s;animation-duration:1.2s" x1="${(600 + Math.cos(a) * d0).toFixed(0)}" y1="${(85 + Math.sin(a) * d0 * .55).toFixed(0)}" x2="${(600 + Math.cos(a) * d1).toFixed(0)}" y2="${(85 + Math.sin(a) * d1 * .55).toFixed(0)}" stroke="#FFFFFF" stroke-opacity="${(.08 + r() * .18).toFixed(2)}" stroke-width="${(1 + r() * 1.6).toFixed(1)}"/>`;
+    }
+    o += `<circle cx="600" cy="84" r="70" fill="#FF4FA3" opacity=".12"/><circle cx="600" cy="84" r="46" fill="#FFC23D" opacity=".12"/>`;
+    for (const [x, y, rot, c] of [[470, 42, -20, '#5CF2FF'], [726, 128, 25, '#FFC23D'], [736, 36, 10, '#FF4FA3']] as [number, number, number, string][]) o += `<path transform="translate(${x} ${y}) rotate(${rot})" d="M4,-22 L-10,2 H0 L-6,22 L12,-4 H2 Z" fill="${c}"/>`;
+    o += `<text x="604" y="34" text-anchor="middle" font-family="${F}" font-size="22" font-weight="800" font-style="italic" fill="url(#${id}c)" stroke="#0A0420" stroke-width="4" paint-order="stroke" letter-spacing="3" transform="skewX(-8)">COMBO!</text>`;
+    o += `<g class="ce-pulso" style="transform-origin:600px 90px"><text x="600" y="122" text-anchor="middle" font-family="${F}" font-size="104" font-weight="800" font-style="italic" fill="#0A0420" stroke="#0A0420" stroke-width="14" stroke-linejoin="round" opacity=".7">x8</text><text x="600" y="122" text-anchor="middle" font-family="${F}" font-size="104" font-weight="800" font-style="italic" fill="url(#${id}t)" stroke="#FFFFFF" stroke-width="2.5" paint-order="stroke">x8</text></g>`;
+    const cores = ['#36E39B', '#36E39B', '#5CF2FF', '#5CF2FF', '#FFC23D', '#FFC23D', '#FF7A3A', '#FF4FA3'];
+    cores.forEach((c, k) => o += `<rect class="ce-barra" style="animation-delay:${(k * .12).toFixed(2)}s" x="${548 + k * 14}" y="${140 - k * 1.5}" width="10" height="${12 + k * 1.5}" rx="2" fill="${c}"/>`);
+    o += `<text x="548" y="${H - 6}" font-family="ui-monospace, Consolas, monospace" font-size="9" font-weight="800" fill="#FFFFFF" opacity=".6" letter-spacing="2">8 ACERTOS SEGUIDOS</text>`;
+    for (const [x, y, s, d] of [[668, 40, 1.2, 0], [530, 70, .9, .5], [690, 112, .8, 1], [476, 118, .7, 1.4]]) o += `<path class="ce-pisca" style="animation-delay:-${d}s" d="M${x},${y - 10 * s} L${x + 2.6 * s},${y - 2.6 * s} L${x + 10 * s},${y} L${x + 2.6 * s},${y + 2.6 * s} L${x},${y + 10 * s} L${x - 2.6 * s},${y + 2.6 * s} L${x - 10 * s},${y} L${x - 2.6 * s},${y - 2.6 * s} Z" fill="#FFFFFF"/>`;
+    return o;
+  },
+
+  fenix: id => {
+    let o = `<defs><radialGradient id="${id}f" cx=".78" cy=".55" r=".9"><stop offset="0" stop-color="#5A1206"/><stop offset=".45" stop-color="#2A0806"/><stop offset="1" stop-color="#0E0303"/></radialGradient>
+      <radialGradient id="${id}g" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#FFB347" stop-opacity=".75"/><stop offset=".5" stop-color="#FF5A1F" stop-opacity=".3"/><stop offset="1" stop-color="#FF5A1F" stop-opacity="0"/></radialGradient>
+      <linearGradient id="${id}p" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF3B0"/><stop offset=".5" stop-color="#FFB347"/><stop offset="1" stop-color="#E8381E"/></linearGradient>
+      <linearGradient id="${id}d" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFE38A"/><stop offset="1" stop-color="#C9871A"/></linearGradient></defs><rect width="${W}" height="${H}" fill="url(#${id}f)"/>`;
+    o += `<ellipse cx="600" cy="72" rx="160" ry="95" fill="url(#${id}g)"/>`;
+    const r = sorteio(33);
+    for (let i = 0; i < 18; i++) o += `<circle class="ce-brasa" style="animation-delay:-${(r() * 4).toFixed(2)}s;animation-duration:${(2.6 + r() * 2.4).toFixed(1)}s" cx="${(420 + r() * 340).toFixed(0)}" cy="${(120 + r() * 50).toFixed(0)}" r="${(1 + r() * 1.8).toFixed(1)}" fill="${r() > .5 ? '#FFC93C' : '#FF7A3A'}"/>`;
+    const pena = (x0: number, y0: number, x1: number, y1: number, w: number, cor: string) => {
+      const mx = (x0 + x1) / 2, my = (y0 + y1) / 2, dx = x1 - x0, dy = y1 - y0, L = Math.hypot(dx, dy), nx = -dy / L * w, ny = dx / L * w;
+      return `<path d="M${x0},${y0} Q${(mx + nx).toFixed(1)},${(my + ny).toFixed(1)} ${x1},${y1} Q${(mx - nx).toFixed(1)},${(my - ny).toFixed(1)} ${x0},${y0} Z" fill="${cor}"/>`;
+    };
+    const corPena = ['#FFF3B0', '#FFD66B', '#FFB347', '#FF8A3C', '#FF5A1F', '#E8381E', '#B8221A'];
+    o += `<g transform="translate(600 84) scale(1.3) translate(-600 -84)">`;
+    // cauda dourada com olhos nas pontas
+    for (const [x1, y1, w] of [[560, 146, 9], [600, 154, 10], [640, 146, 9], [580, 152, 7], [620, 152, 7]] as [number, number, number][]) o += pena(600, 84, x1, y1, w, `url(#${id}d)`) + `<circle cx="${x1}" cy="${y1 - 5}" r="4" fill="#E8381E"/><circle cx="${x1}" cy="${y1 - 5}" r="1.8" fill="#FFF3B0"/>`;
+    // asas abertas em duas camadas de penas, batendo devagar
+    for (const lado of [-1, 1]) {
+      let asa = '';
+      for (let k = 0; k < 8; k++) {
+        const ang = (-78 + k * 10) * Math.PI / 180, comp = 92 - Math.abs(k - 2) * 7;
+        const x1 = 600 + lado * (12 + Math.cos(ang) * comp), y1 = 64 + Math.sin(ang) * comp * .62 + k * 3;
+        asa += pena(600 + lado * 10, 62, +x1.toFixed(1), +y1.toFixed(1), 13, corPena[Math.min(6, 2 + Math.floor(k / 2))]);
+      }
+      for (let k = 0; k < 6; k++) {
+        const ang = (-60 + k * 11) * Math.PI / 180, comp = 52 - k * 3;
+        const x1 = 600 + lado * (10 + Math.cos(ang) * comp), y1 = 64 + Math.sin(ang) * comp * .6 + k * 2;
+        asa += pena(600 + lado * 8, 64, +x1.toFixed(1), +y1.toFixed(1), 10, corPena[Math.min(3, Math.floor(k / 2))]);
+      }
+      o += `<g class="ce-asa" style="transform-origin:${600 + lado * 8}px 64px">${asa}</g>`;
+    }
+    // corpo, cabeça e crista
+    o += `<ellipse cx="600" cy="74" rx="11" ry="20" fill="url(#${id}p)"/><circle cx="600" cy="48" r="9" fill="#FFD66B"/>`;
+    o += `<path d="M608,46 L620,50 L608,53 Z" fill="#FFF3B0"/><circle cx="603" cy="46" r="1.8" fill="#3A0A0A"/>`;
+    o += [[-6, -16], [0, -20], [6, -16]].map(([dx, dy], i) => `<path class="ce-chama" style="transform-origin:${600 + dx}px 40px;animation-delay:-${i * .3}s" d="M${600 + dx},40 q-4,${dy / 2} 0,${dy} q4,${-dy / 2} 0,${-dy} z" fill="#FF8A3C"/>`).join('');
+    o += `</g>`;
+    o += `<text x="452" y="40" text-anchor="middle" font-family="${F}" font-size="12" font-weight="800" fill="#FFD9A8" opacity=".85" letter-spacing="2">30 DIAS SEGUIDOS</text>`;
     return o;
   },
 };

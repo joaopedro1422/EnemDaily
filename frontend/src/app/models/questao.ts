@@ -54,3 +54,12 @@ export interface AssuntoResumo{
   totalAcertos: number;
   porcentagem : number;
 }
+export interface BonusStatus {
+  disponivel: boolean;
+  respondida: boolean;
+  area: 'LINGUAGENS' | 'HUMANAS' | 'EXATAS' | 'NATUREZAS' | null;
+  xpMax: number;
+  erradaEm: string | null;
+  questao: Questao | null;
+  revisao: Revisao | null;
+}

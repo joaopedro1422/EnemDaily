@@ -345,6 +345,7 @@ function trilhaGeral(): Peca[] {
   add('Praça · piso', 13, 13, P => topo(10.7, 10.7, 15.3, 15.3, .01, P.praca) + [11.7, 12.7, 13.7, 14.7].map(v => topo(v, 10.7, v + .04, 15.3, .011, P.caminho2) + topo(10.7, v, 15.3, v + .04, .011, P.caminho2)).join(''), { camada: 0, anim: 'surge' });
   add('Fonte simples', 13, 13, fonte(1), { grupo: 'fonte', nivel: 1, anim: 'cresce' });
   add('Terreno da entrada', 13, 18, P => caminho(12.5, 16, 13.5, 20, P), { lote: [10, 16, 16, 20], camada: 0, anim: 'surge' });
+  add('Caminho até Natureza', 14.9, 18, P => caminho(13.5, 17.6, 16.3, 18.4, P), { camada: 0, anim: 'surge' });
   add('Portão simples', 13, 15.7, P => portaoSimples(15.72, P), { grupo: 'portal', nivel: 0, anim: 'cresce' });
   add('Portal de madeira', 13, 19.7, portal(1), { grupo: 'portal', nivel: 1, anim: 'cresce' });
   add('Canteiros da praça', 13, 13, P => canteiro(14.5, 10.75, .7, .45, P, 11) + canteiro(10.75, 14.5, .45, .7, P, 12), { chave: 25.1 });
@@ -366,7 +367,6 @@ function trilhaGeral(): Peca[] {
   add('Torre do relógio · base', 13, 7.8, P => box(TR.x, TR.y, topoRC, TR.w, TR.d, 1.7, P.parede), { chave: k(RC) + .02, anim: 'cai' });
   add('Torre · relógio do dia', 13, 8.5, P => simboloFaceY(TR.y + TR.d, TR.x + TR.w / 2, topoRC + 1.0, .95, P, P.branco), { chave: k(RC) + .03, anim: 'brota' });
   add('Torre · cobertura', 13, 7.8, P => { const z = topoRC + 1.7, c = [TR.x + TR.w / 2, TR.y + TR.d / 2]; return box(TR.x - .08, TR.y - .08, z, TR.w + .16, TR.d + .16, .1, P.caneta) + poly([[TR.x - .05, TR.y + TR.d + .05, z + .1], [TR.x + TR.w + .05, TR.y + TR.d + .05, z + .1], [c[0], c[1], z + 1.0]], shade(P.caneta, .9)) + poly([[TR.x + TR.w + .05, TR.y - .05, z + .1], [TR.x + TR.w + .05, TR.y + TR.d + .05, z + .1], [c[0], c[1], z + 1.0]], shade(P.caneta, .72)); }, { chave: k(RC) + .04, anim: 'cai' });
-  add('Caminho até Natureza', 14.9, 18, P => caminho(13.5, 17.6, 16.3, 18.4, P), { camada: 0, anim: 'surge' });
   add('Residência A · fundação', 7.9, 14.8, P => fundacao(RA, P), { chave: k(RA), anim: 'cresce' });
   add('Residência A · 1º andar', 7.9, 14.8, P => andar(RA, 0, P, { passo: .75 }), { chave: k(RA), anim: 'cai' });
   add('Residência A · 2º andar', 7.9, 14.8, P => andar(RA, 1, P, { passo: .75 }), { chave: k(RA), anim: 'cai' });

@@ -47,5 +47,9 @@ export const ESTILO_CAPAS = `
   .ce-aurora { animation: ce-aurora 7s ease-in-out infinite alternate; }
   @keyframes ce-aurora { from { transform: skewX(-6deg) scaleY(.92); opacity: .75; } to { transform: skewX(6deg) scaleY(1.08); opacity: 1; } }
   .ce-ponteiro { animation: ce-gira 12s linear infinite; transform-origin: 0 0; }
+  .ce-asa { animation: ce-asa 2.6s ease-in-out infinite; }
+  @keyframes ce-asa { 50% { transform: rotate(0deg) scaleY(.86); } }
+  .ce-barra { animation: ce-barra 1.6s ease-in-out infinite; transform-box: fill-box; transform-origin: bottom; }
+  @keyframes ce-barra { 0%, 100% { transform: scaleY(1); } 40% { transform: scaleY(.55); } }
   @media (prefers-reduced-motion: reduce) { ed-capa * { animation: none !important; } }
 `;

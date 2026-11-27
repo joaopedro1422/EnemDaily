@@ -1,4 +1,5 @@
 package com.example.EnemDaily_backend.service;
+import com.example.EnemDaily_backend.model.Area;
 
 import com.example.EnemDaily_backend.DTO.*;
 import com.example.EnemDaily_backend.Enum.AreaEnum;
@@ -141,6 +142,7 @@ public class UsuarioService {
         context.put("acerto", resposta.acerto());
         context.put("tempoGasto", resposta.tempoGasto());
         if (resposta.alternativa() != null) context.put("alternativa", resposta.alternativa());
+        if (resposta.questaoId() != null) context.put("questaoId", resposta.questaoId());
         Event event = new Event();
         event.setIdUsuario(usuario.getId());
         event.setTipo(EventType.RESPOSTA_QUESTAO);
@@ -170,6 +172,46 @@ public class UsuarioService {
         }
         return  getUsuarioResponseDTO(usuario);
     }
+    /** Questão bônus: soma o XP ao aluno, à área e aos grupos, sem contar como questão do dia. */
+    public UsuarioResponseDTO registraBonus(Usuario usuario, AreaEnum area, Long questaoId, boolean acerto, int xp, int tempo, Integer alternativa, java.time.LocalDate erradaEm) {
+        if (xp > 0) {
+            usuario.setXpTotal(usuario.getXpTotal() + xp);
+            Area dados = switch (area) {
+                case NATUREZAS -> usuario.getNaturezas();
+                case HUMANAS -> usuario.getHumanas();
+                case EXATAS -> usuario.getExatas();
+                case LINGUAGENS -> usuario.getLinguagens();
+            };
+            dados.setXp(dados.getXp() + xp);
+        }
+        Map<String, Object> context = new HashMap<>();
+        context.put("xp", xp);
+        context.put("area", area);
+        context.put("acerto", acerto);
+        context.put("tempoGasto", tempo);
+        context.put("questaoId", questaoId);
+        if (alternativa != null) context.put("alternativa", alternativa);
+        if (erradaEm != null) context.put("erradaEm", erradaEm.toString());
+        Event event = new Event();
+        event.setIdUsuario(usuario.getId());
+        event.setTipo(EventType.RESPOSTA_BONUS);
+        event.setData(LocalDateTime.now());
+        event.setJsonContext(context);
+        eventRepository.save(event);
+        usuarioRepository.save(usuario);
+        if (acerto && xp > 0) {
+            for (GrupoUsuario gu : grupoUsuarioRepository.findAllByUsuario(usuario)) {
+                Grupo grupo = gu.getGrupo();
+                if (!isGrupoCompativelComArea(grupo, area.toString())) continue;
+                gu.addXp(xp);
+                grupoUsuarioRepository.save(gu);
+                long seq = streamService.nextSeq(grupo.getId());
+                streamService.publishDelta(grupo.getId(), new RankingDeltaEvent(grupo.getId(), usuario.getUsuario(), xp, seq));
+            }
+        }
+        return getUsuarioResponseDTO(usuario);
+    }
+
     private boolean isGrupoCompativelComArea(Grupo grupo, String area) {
         return (grupo.isHumanas() && "HUMANAS".equals(area)) ||
                 (grupo.isExatas() && "EXATAS".equals(area)) ||
@@ -206,7 +248,7 @@ public class UsuarioService {
         );
         return  new UsuarioResponseDTO(usuario.getId(),usuario.getDataUtilmoAcesso(), usuario.getPagFavorita(), usuario.getEmblemas(), usuario.getNome(), usuario.getUsuario(), usuario.getAvatar(), usuario.isDemo() && !DemoService.EMAIL.equals(usuario.getEmail()),
                 usuario.getXpTotal(), eventRepository.xpHoje(usuario.getId()),  usuario.getStreak(),getStreakDiasAtivos(usuario.getId()), eventRepository.contarDiasAtivos(usuario.getId()),  usuario.getNaturezas(), usuario.getHumanas(), usuario.getLinguagens(), usuario.getExatas(),
-                usuario.isHumRespondidaHj(), usuario.isExatRespondidaHj(), usuario.isLingRespondidaHj(), usuario.isNatRespondidaHj(), presenca, getXpAnoAtual(usuario.getId()), getGruposUsuario(usuario), eventRepository.maiorSequenciaDiasAtivos(usuario.getId()), !Boolean.FALSE.equals(usuario.getOnboardingVisto()), usuario.getEmail());
+                usuario.isHumRespondidaHj(), usuario.isExatRespondidaHj(), usuario.isLingRespondidaHj(), usuario.isNatRespondidaHj(), presenca, getXpAnoAtual(usuario.getId()), getGruposUsuario(usuario), eventRepository.maiorSequenciaDiasAtivos(usuario.getId()), !Boolean.FALSE.equals(usuario.getOnboardingVisto()), usuario.getEmail(), usuario.recordeDeAcertos());
     }
     private int calcularXpGrupo(Usuario u, Grupo g) {
         int xp = 0;

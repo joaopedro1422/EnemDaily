@@ -107,6 +107,23 @@
                 </button>
               </li>
             }
+            @if (bonus; as b) {
+              <li>
+                <button class="linha linha-bonus" type="button" [class.feita]="b.respondida" [style.--a]="'#8C4BFF'" [style.--at]="'#6A2BD8'" (click)="abrirBonus()">
+                  <span class="area-ico"><ed-icone nome="gift" [tamanho]="18" /></span>
+                  <span class="linha-texto"><b>Questão bônus</b><span>Revisão de erro</span></span>
+                  @if (b.respondida) {
+                    @if (b.revisao?.acerto) {
+                      <span class="selo selo-ok"><ed-icone nome="check" [tamanho]="15" [traco]="2.5" />Acertou</span>
+                    } @else {
+                      <span class="selo selo-erro"><ed-icone nome="x" [tamanho]="15" [traco]="2.5" />Errou</span>
+                    }
+                  } @else {
+                    <span class="linha-acao">Responder<ed-icone nome="chevron-right" [tamanho]="18" /></span>
+                  }
+                </button>
+              </li>
+            }
           </ol>
 
           <div class="desafio-rodape">
@@ -209,7 +226,7 @@
 
         <section class="bloco campus" aria-labelledby="titulo-campus">
           <div class="campus-palco">
-            <ed-campus [progresso]="progressoCampus" [memoria]="'campus-' + usuarioLogado.id" modo="auto" [extras]="extras$ | async" [sons]="false" />
+            <ed-campus [progresso]="progressoCampus" [memoria]="'campus-' + usuarioLogado.id" modo="auto" [extras]="extras$ | async" [sons]="false" [acesas]="acesasCampus" />
             <button class="campus-abrir" type="button" (click)="abrirCampus()" aria-label="Explorar o campus">
               <ed-icone nome="arrow-right" [tamanho]="16" />
             </button>
