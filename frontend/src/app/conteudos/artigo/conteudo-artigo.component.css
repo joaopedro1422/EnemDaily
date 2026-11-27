@@ -66,3 +66,12 @@
   .art-topo { margin-left: 256px; }
   .art-cta { grid-template-columns: minmax(0, 1fr) auto; align-items: center; padding: 28px; }
 }
+
+.art-estudo { display: flex; justify-content: center; margin-top: 8px; font-family: var(--ed-fonte); }
+.art-estudo-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 48px; padding: 0 22px 0 18px; border-radius: 999px; border: 1.5px solid var(--ed-ok); background: var(--ed-folha); color: var(--ed-ok); font: 800 15px var(--ed-fonte); cursor: pointer; transition: background-color var(--ed-t-rapido), color var(--ed-t-rapido); }
+.art-estudo-btn:hover { background: var(--ed-ok-suave); }
+.art-estudo-btn:focus-visible { outline: 2px solid var(--ed-ok); outline-offset: 2px; }
+.art-estudo-marca { display: grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid currentColor; }
+.art-estudo.on .art-estudo-btn { background: var(--ed-ok); color: #FFFFFF; }
+.art-estudo.on .art-estudo-marca { border-color: #FFFFFF; background: #FFFFFF; color: var(--ed-ok); }
+@media (max-width: 480px) { .art-estudo-btn { width: 100%; } }

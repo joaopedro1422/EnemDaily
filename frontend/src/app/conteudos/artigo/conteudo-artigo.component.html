@@ -49,6 +49,15 @@
         </section>
       }
 
+      @if (logado && !previa && estudado !== null) {
+        <div class="art-estudo" [class.on]="estudado">
+          <button type="button" class="art-estudo-btn" [attr.aria-pressed]="estudado" (click)="alternarEstudado.emit()">
+            <span class="art-estudo-marca">@if (estudado) { <ed-icone nome="check" [tamanho]="13" /> }</span>
+            {{ estudado ? 'Estudado' : 'Marcar como estudado' }}
+          </button>
+        </div>
+      }
+
       <aside class="art-cta" [class.depois]="respondeu" aria-label="Desafio diário do enem.daily">
         <div class="art-cta-txt">
           <span class="art-cta-rot">Desafio diário enem<span class="pt"></span>daily</span>

@@ -2,7 +2,6 @@
 .ci { max-width: var(--ed-largura); margin: 0 auto; padding: 28px 16px 72px; display: grid; gap: 32px; }
 
 .ci-topo { display: grid; gap: 12px; max-width: 760px; }
-.ci-rot { font-size: 12px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--ed-caneta-texto); }
 .ci-topo h1 { margin: 0; font-size: clamp(30px, 6.5vw, 44px); font-weight: 800; letter-spacing: -.035em; line-height: 1.08; text-wrap: balance; }
 .ci-topo p { margin: 0; font-family: var(--ed-fonte-leitura); font-size: 17.5px; line-height: 1.6; color: var(--ed-tinta-2); }
 .ci-busca { display: flex; align-items: center; gap: 10px; height: 52px; margin-top: 8px; padding: 0 16px; border-radius: 14px; border: 1.5px solid var(--ed-pauta-forte); background: var(--ed-folha); color: var(--ed-tinta-3); }
@@ -22,11 +21,42 @@
 .ci-grupo h2 { display: flex; align-items: center; gap: 10px; margin: 0 0 14px; font-size: 20px; font-weight: 800; letter-spacing: -.02em; }
 .ci-grupo h2 ed-icone { color: var(--ct); }
 .ci-cards { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
-.ci-card { height: 100%; display: grid; grid-template-rows: auto 1fr auto; gap: 8px; padding: 18px; border-radius: 16px; background: var(--ed-folha); border: 1px solid var(--ed-pauta); border-top: 4px solid var(--c); color: var(--ed-tinta); text-decoration: none; transition: transform var(--ed-t-rapido), box-shadow var(--ed-t-rapido); }
+.ci-card { position: relative; height: 100%; display: grid; grid-template-rows: auto 1fr auto; gap: 8px; padding: 18px; border-radius: 16px; background: var(--ed-folha); border: 1px solid var(--ed-pauta); border-top: 4px solid var(--c); color: var(--ed-tinta); transition: transform var(--ed-t-rapido), box-shadow var(--ed-t-rapido), background-color var(--ed-t-rapido), border-color var(--ed-t-rapido); }
 .ci-card:hover { transform: translateY(-2px); box-shadow: var(--ed-sombra); }
-.ci-card b { font-size: 17px; font-weight: 800; letter-spacing: -.015em; line-height: 1.25; }
-.ci-card span { font-size: 14px; line-height: 1.5; color: var(--ed-tinta-2); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-.ci-card i { display: inline-flex; align-items: center; gap: 6px; font-style: normal; font-size: 13.5px; font-weight: 700; color: var(--ct); }
+.ci-card:has(.ci-link:focus-visible) { outline: 2px solid var(--ed-caneta); outline-offset: 2px; }
+/* O link do título cobre o card inteiro; a etiqueta fica por cima dele. */
+.ci-link { font-size: 17px; font-weight: 800; letter-spacing: -.015em; line-height: 1.25; color: inherit; text-decoration: none; outline: 0; }
+.ci-link::after { content: ""; position: absolute; inset: 0; border-radius: inherit; }
+.ci-desc { font-size: 14px; line-height: 1.5; color: var(--ed-tinta-2); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.ci-rodape { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.ci-rodape i { display: inline-flex; align-items: center; gap: 6px; font-style: normal; font-size: 13.5px; font-weight: 700; color: var(--ct); white-space: nowrap; }
+
+.ci-tag { position: relative; z-index: 1; flex: none; display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 11px 0 8px; border-radius: 999px; border: 1.5px solid var(--ed-pauta-forte); background: var(--ed-folha); color: var(--ed-tinta-2); font: 700 12.5px var(--ed-fonte); cursor: pointer; transition: background-color var(--ed-t-rapido), border-color var(--ed-t-rapido), color var(--ed-t-rapido); }
+.ci-tag:hover { border-color: var(--ed-ok); color: var(--ed-ok); }
+.ci-tag:focus-visible { outline: 2px solid var(--ed-ok); outline-offset: 2px; }
+.ci-tag-marca { display: grid; place-items: center; width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid currentColor; }
+.ci-tag.on, .ci-tag.on:hover { border-color: var(--ed-ok); background: var(--ed-ok); color: #FFFFFF; }
+.ci-tag.on .ci-tag-marca { border-color: #FFFFFF; background: #FFFFFF; color: var(--ed-ok); }
+.ci-tag.on .ci-tag-marca ed-icone { animation: ci-marca 260ms cubic-bezier(.2, .9, .3, 1.4); }
+@keyframes ci-marca { from { transform: scale(0); } to { transform: scale(1); } }
+
+.ci-card.feito { background: color-mix(in srgb, var(--ed-ok) 8%, var(--ed-folha)); border-color: color-mix(in srgb, var(--ed-ok) 32%, var(--ed-folha)); border-top-color: var(--ed-ok); }
+
+.ci-grupo h2 .ci-grupo-conta { margin-left: auto; padding: 3px 9px; border-radius: 999px; background: var(--ed-fundo-2); color: var(--ed-tinta-2); font-size: 12.5px; font-weight: 800; letter-spacing: 0; }
+
+.ci-estudo { display: grid; gap: 12px; margin-top: 4px; padding: 14px; border-radius: 16px; background: var(--ed-folha); border: 1px solid var(--ed-pauta); }
+.ci-progresso { display: grid; gap: 8px; font-size: 14px; color: var(--ed-tinta-2); }
+.ci-progresso b { color: var(--ed-ok); font-size: 16px; }
+.ci-progresso-barra { height: 8px; border-radius: 999px; background: var(--ed-fundo-2); overflow: hidden; }
+.ci-progresso-barra i { display: block; height: 100%; border-radius: inherit; background: var(--ed-ok); transition: width 400ms ease; }
+.ci-situacao { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 4px; border-radius: 12px; background: var(--ed-fundo-2); }
+.ci-situacao button { display: inline-flex; align-items: center; justify-content: center; gap: 5px; height: 34px; padding: 0 6px; border: 0; border-radius: 9px; background: transparent; color: var(--ed-tinta-2); font: 700 13.5px var(--ed-fonte); cursor: pointer; white-space: nowrap; }
+.ci-situacao button small { padding: 0 6px; border-radius: 999px; background: var(--ed-pauta); font-size: 11px; }
+.ci-situacao button.on { background: var(--ed-folha); color: var(--ed-tinta); box-shadow: 0 1px 3px rgba(15, 20, 48, .12); }
+.ci-situacao .ci-situacao-ok.on { color: var(--ed-ok); }
+.ci-situacao .ci-situacao-ok.on small { background: var(--ed-ok-suave); color: var(--ed-ok); }
+
+@media (prefers-reduced-motion: reduce) { .ci-tag.on .ci-tag-marca ed-icone { animation: none; } }
 
 @media (min-width: 760px) {
   .ci { padding: 44px 24px 88px; gap: 40px; }

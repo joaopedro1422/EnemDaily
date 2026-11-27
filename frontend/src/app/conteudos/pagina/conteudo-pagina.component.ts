@@ -15,7 +15,7 @@ import { SeoService } from '../seo';
   template: `
     <main class="cp">
       @if (pagina) {
-        <app-conteudo-artigo [pagina]="pagina" [logado]="logado" (criarConta)="criarConta()" (irAoDesafio)="irAoDesafio()" />
+        <app-conteudo-artigo [pagina]="pagina" [logado]="logado" [estudado]="estudado" (alternarEstudado)="alternarEstudado()" (criarConta)="criarConta()" (irAoDesafio)="irAoDesafio()" />
       } @else if (naoEncontrado) {
         <div class="cp-vazio">
           <h1>Conteúdo não encontrado</h1>
@@ -45,9 +45,18 @@ export class ConteudoPaginaComponent implements OnInit, OnDestroy {
   pagina: PaginaConteudo | null = null;
   naoEncontrado = false;
   logado = false;
+  /** null até saber; só é carregado para quem está logado. */
+  estudado: boolean | null = null;
+  private estudados: Set<string> | null = null;
+  private salvando = false;
 
   ngOnInit() {
-    this.subs.add(this.auth.usuario$.subscribe(u => (this.logado = !!u)));
+    this.subs.add(this.auth.usuario$.subscribe(u => {
+      this.logado = !!u;
+      this.estudados = null;
+      this.atualizarEstudado();
+      if (u) this.conteudos.estudados().subscribe({ next: l => { this.estudados = new Set(l); this.atualizarEstudado(); }, error: () => {} });
+    }));
     this.subs.add(this.route.paramMap.pipe(
       switchMap(p => {
         this.pagina = null;
@@ -57,6 +66,7 @@ export class ConteudoPaginaComponent implements OnInit, OnDestroy {
     ).subscribe({
       next: pg => {
         this.pagina = pg;
+        this.atualizarEstudado();
         window.scrollTo({ top: 0 });
         this.aplicarSeo(pg);
       },
@@ -70,6 +80,25 @@ export class ConteudoPaginaComponent implements OnInit, OnDestroy {
   }
 
   criarConta() { this.auth.open(); }
+
+  private atualizarEstudado() {
+    this.estudado = this.pagina && this.estudados ? this.estudados.has(`${this.pagina.area}/${this.pagina.slug}`) : null;
+  }
+
+  /** Marca na hora e desfaz se o servidor recusar. */
+  alternarEstudado() {
+    const pg = this.pagina;
+    if (!pg || !this.estudados || this.salvando) return;
+    const k = `${pg.area}/${pg.slug}`;
+    const marcar = !this.estudados.has(k);
+    const aplicar = (sim: boolean) => { if (sim) this.estudados?.add(k); else this.estudados?.delete(k); this.atualizarEstudado(); };
+    aplicar(marcar);
+    this.salvando = true;
+    this.conteudos.marcarEstudado(pg.area, pg.slug, marcar).subscribe({
+      next: () => (this.salvando = false),
+      error: () => { this.salvando = false; aplicar(!marcar); }
+    });
+  }
 
   irAoDesafio() { this.router.navigate(['/Home']); }
 

@@ -160,7 +160,7 @@ export class AdminComponent implements OnInit, OnDestroy {
         this.apagando = false;
         this.excluindo = null;
         const rotulos: Record<string, string> = {
-          eventos: 'Respostas e eventos', simulados: 'Simulados', redacoes: 'Redações', amizades: 'Amizades e pedidos',
+          eventos: 'Respostas e eventos', simulados: 'Simulados', redacoes: 'Redações', conteudosEstudados: 'Conteúdos marcados como estudados', amizades: 'Amizades e pedidos',
           duelos: 'Duelos', bloqueios: 'Bloqueios', inscricoesPush: 'Inscrições de notificação',
           participacoesEmGrupos: 'Participações em grupos', atividadesEmGrupos: 'Atividades em grupos',
           gruposTransferidos: 'Grupos com admin transferido', gruposApagados: 'Grupos apagados (sem outros membros)',

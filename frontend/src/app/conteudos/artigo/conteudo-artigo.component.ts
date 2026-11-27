@@ -15,6 +15,9 @@ export class ConteudoArtigoComponent {
   @Input({ required: true }) pagina!: PaginaConteudo;
   @Input() logado = false;
   @Input() previa = false;
+  /** null enquanto não se sabe (ou para quem não está logado): o botão não aparece. */
+  @Input() estudado: boolean | null = null;
+  @Output() alternarEstudado = new EventEmitter<void>();
   @Output() criarConta = new EventEmitter<void>();
   @Output() irAoDesafio = new EventEmitter<void>();
 

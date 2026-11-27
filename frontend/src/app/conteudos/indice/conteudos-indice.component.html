@@ -1,8 +1,7 @@
 <main class="ci">
   <header class="ci-topo">
-    <span class="ci-rot">Conteúdos</span>
-    <h1>Os assuntos do ENEM, do jeito que caem na prova</h1>
-    <p>Resumo de cada assunto, como ele é cobrado no ENEM, os erros mais comuns e uma questão para treinar.</p>
+    <h1>Os principais assuntos do ENEM</h1>
+    <p>Organizados exatamente como caem na prova</p>
     <label class="ci-busca">
       <ed-icone nome="search" [tamanho]="18" />
       <input type="search" [(ngModel)]="busca" name="busca" placeholder="Buscar assunto, por exemplo: Primeira Guerra" autocomplete="off" />
@@ -15,27 +14,50 @@
         </button>
       }
     </div>
+    @if (logado && todos.length) {
+      <div class="ci-estudo">
+        <div class="ci-progresso">
+          <span><b>{{ totalEstudados }}</b> de {{ todos.length }} conteúdos estudados</span>
+          <span class="ci-progresso-barra" aria-hidden="true"><i [style.width.%]="pctEstudados"></i></span>
+        </div>
+        <div class="ci-situacao" role="group" aria-label="Filtrar por situação">
+          <button type="button" [class.on]="situacao === 'todos'" (click)="situacao = 'todos'">Todos</button>
+          <button type="button" [class.on]="situacao === 'faltam'" (click)="situacao = 'faltam'">Faltam<small>{{ todos.length - totalEstudados }}</small></button>
+          <button type="button" class="ci-situacao-ok" [class.on]="situacao === 'estudados'" (click)="situacao = 'estudados'"><ed-icone nome="check" [tamanho]="14" />Estudados<small>{{ totalEstudados }}</small></button>
+        </div>
+      </div>
+    }
   </header>
 
   @if (carregando) {
     <div class="ci-vazio"><ed-carregando [tamanho]="44" /></div>
   } @else if (!grupos.length) {
     <div class="ci-vazio">
-      <b>{{ todos.length ? 'Nenhum assunto encontrado' : 'Os primeiros conteúdos estão sendo preparados' }}</b>
-      <p>{{ todos.length ? 'Tente outro termo ou outra área.' : 'Volte em breve.' }}</p>
+      <b>{{ mensagemVazia.titulo }}</b>
+      <p>{{ mensagemVazia.texto }}</p>
     </div>
   } @else {
     @for (g of grupos; track g.area) {
       <section class="ci-grupo" [style.--c]="info(g.area).cor" [style.--ct]="info(g.area).corTexto">
-        <h2><ed-icone [nome]="info(g.area).icone" [tamanho]="18" />{{ info(g.area).nome }}</h2>
+        <h2>
+          <ed-icone [nome]="info(g.area).icone" [tamanho]="18" />{{ info(g.area).nome }}
+          @if (logado) { <small class="ci-grupo-conta">{{ estudadosNaArea(g.area) }}/{{ contar(g.area) }}</small> }
+        </h2>
         <ul class="ci-cards">
           @for (c of g.itens; track c.slug) {
             <li>
-              <a class="ci-card" [routerLink]="['/conteudos', c.area, c.slug]">
-                <b>{{ c.assunto }}</b>
-                <span>{{ c.descricao }}</span>
-                <i>Ler conteúdo<ed-icone nome="arrow-right" [tamanho]="15" /></i>
-              </a>
+              <div class="ci-card" [class.feito]="estudou(c)">
+                <a class="ci-link" [routerLink]="['/conteudos', c.area, c.slug]">{{ c.assunto }}</a>
+                <span class="ci-desc">{{ c.descricao }}</span>
+                <div class="ci-rodape">
+                  <i>Ler conteúdo<ed-icone nome="arrow-right" [tamanho]="15" /></i>
+                  <button type="button" class="ci-tag" [class.on]="estudou(c)" [attr.aria-pressed]="estudou(c)"
+                          [attr.aria-label]="(estudou(c) ? 'Desmarcar como estudado: ' : 'Marcar como estudado: ') + c.assunto" (click)="alternarEstudado(c)">
+                    <span class="ci-tag-marca">@if (estudou(c)) { <ed-icone nome="check" [tamanho]="11" /> }</span>
+                    {{ estudou(c) ? 'Estudado' : 'Marcar estudado' }}
+                  </button>
+                </div>
+              </div>
             </li>
           }
         </ul>
