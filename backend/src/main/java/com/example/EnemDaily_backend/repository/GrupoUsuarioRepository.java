@@ -36,7 +36,7 @@ public interface GrupoUsuarioRepository extends JpaRepository<GrupoUsuario, UUID
             FROM event e
             WHERE e.data >= :inicioMes 
               AND e.data <= :fimMes
-              AND e.tipo = 'RESPOSTA_QUESTAO'
+              AND e.tipo IN ('RESPOSTA_QUESTAO', 'RESPOSTA_BONUS')
             GROUP BY e.id_usuario
         ) ranking ON ranking.id_usuario = gu.usuario_id
         WHERE gu.grupo_id = :grupoId

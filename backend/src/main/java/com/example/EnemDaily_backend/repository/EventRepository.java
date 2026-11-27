@@ -135,7 +135,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
         SELECT COALESCE(SUM((e.json_context->>'xp')::int), 0)
         FROM event e
         WHERE e.id_usuario = :usuarioId
-          AND e.tipo = 'RESPOSTA_QUESTAO'
+          AND e.tipo IN ('RESPOSTA_QUESTAO', 'RESPOSTA_BONUS')
           AND e.data >= date_trunc('week', now()) - interval '1 day'
     """, nativeQuery = true)
     int xpSemanal(UUID usuarioId);
@@ -147,7 +147,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
         ) AS xp_mensal
     FROM event
     WHERE id_usuario = :usuarioId
-      AND tipo = 'RESPOSTA_QUESTAO'
+      AND tipo IN ('RESPOSTA_QUESTAO', 'RESPOSTA_BONUS')
       AND data >= date_trunc('month', CURRENT_DATE)
       AND data < CURRENT_DATE + INTERVAL '1 day';
 """, nativeQuery = true)
@@ -157,7 +157,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
         FROM event e
         JOIN grupos g ON g.id = :grupoId
         WHERE e.id_usuario = :usuarioId
-          AND e.tipo = 'RESPOSTA_QUESTAO'
+          AND e.tipo IN ('RESPOSTA_QUESTAO', 'RESPOSTA_BONUS')
           AND e.data >= date_trunc('week', CURRENT_DATE)
           AND e.data <  date_trunc('week', CURRENT_DATE) + INTERVAL '1 week'
           AND (
@@ -181,7 +181,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
         FROM event e
         JOIN grupos g ON g.id = :grupoId
         WHERE e.id_usuario = :usuarioId
-          AND e.tipo = 'RESPOSTA_QUESTAO'
+          AND e.tipo IN ('RESPOSTA_QUESTAO', 'RESPOSTA_BONUS')
           AND e.data >= CURRENT_DATE
           AND e.data <  CURRENT_DATE + INTERVAL '1 day'
           AND (
@@ -196,7 +196,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
         SELECT COALESCE(SUM((e.json_context->>'xp')::int), 0)
         FROM event e
         WHERE e.id_usuario = :usuarioId
-          AND e.tipo = 'RESPOSTA_QUESTAO'
+          AND e.tipo IN ('RESPOSTA_QUESTAO', 'RESPOSTA_BONUS')
           AND e.data >= CURRENT_DATE
           AND e.data <  CURRENT_DATE + INTERVAL '1 day'
         """, nativeQuery = true)
@@ -206,7 +206,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
         FROM event e
         JOIN grupos g ON g.id = :grupoId
         WHERE e.id_usuario = :usuarioId
-          AND e.tipo = 'RESPOSTA_QUESTAO'
+          AND e.tipo IN ('RESPOSTA_QUESTAO', 'RESPOSTA_BONUS')
           AND e.data >= date_trunc('month', CURRENT_DATE)
           AND e.data <  date_trunc('month', CURRENT_DATE) + INTERVAL '1 month'
           AND (
@@ -258,7 +258,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
       ON e.data >= m.mes_inicio
      AND e.data <  m.mes_inicio + interval '1 month'
      AND e.id_usuario = :usuarioId
-     AND e.tipo = 'RESPOSTA_QUESTAO'
+     AND e.tipo IN ('RESPOSTA_QUESTAO', 'RESPOSTA_BONUS')
     GROUP BY mes
     ORDER BY mes
   """, nativeQuery = true)

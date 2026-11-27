@@ -66,7 +66,11 @@ public class BonusService {
         return dia.getDayOfWeek().getValue() - 1 == (int) Math.floorMod(h, 7L);
     }
 
-    private boolean hojeTemBonus() { return modoTeste || ehDiaDeBonus(LocalDate.now()); }
+    /** Ligado todo dia por padrão; com enemdaily.bonus.todo-dia=false volta ao sorteio de um dia por semana. */
+    @Value("${enemdaily.bonus.todo-dia:true}")
+    private boolean todoDia;
+
+    private boolean hojeTemBonus() { return todoDia || modoTeste || ehDiaDeBonus(LocalDate.now()); }
 
     public Status status(Usuario u) {
         if (u == null || u.isDemo() || !hojeTemBonus()) return Status.nenhum();
