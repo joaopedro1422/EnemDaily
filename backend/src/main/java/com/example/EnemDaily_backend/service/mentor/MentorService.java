@@ -142,6 +142,19 @@ public class MentorService {
         return montar(u.getId());
     }
 
+    /** "Começar": o aluno leu a orientação do estudo de hoje e foi estudar. */
+    @Transactional
+    public Painel iniciar(Usuario u, long assuntoId) {
+        exigirAssunto(u, assuntoId);
+        MentorPlano p = planos.findByUsuarioId(u.getId()).orElseThrow(NoSuchElementException::new);
+        Calculo c = calcular(u.getId(), p);
+        boolean deHoje = c.pendentesHoje().stream()
+                .anyMatch(t -> t.tipo() == PlanejadorMentor.Tipo.ESTUDO && Objects.equals(t.assuntoId(), assuntoId));
+        if (!deHoje) throw new IllegalArgumentException("Esse assunto não está no seu dia de hoje.");
+        progresso.iniciar(u.getId(), assuntoId);
+        return montar(u.getId());
+    }
+
     /** Só o dia de hoje, para o card da tela inicial (sem o mapa do ano). */
     public record Hoje(boolean configurado, List<Tarefa> tarefas) {}
 
@@ -179,27 +192,6 @@ public class MentorService {
     public Painel remover(Usuario u, long assuntoId, boolean remover) {
         exigirAssunto(u, assuntoId);
         progresso.remover(u.getId(), assuntoId, remover);
-        return montar(u.getId());
-    }
-
-    /** Marca tudo o que falta hoje. Assunto dividido em partes conta como a parte do dia. */
-    @Transactional
-    public Painel concluirDia(Usuario u) {
-        exigir(u);
-        MentorPlano p = planos.findByUsuarioId(u.getId()).orElseThrow(NoSuchElementException::new);
-        Calculo c = calcular(u.getId(), p);
-        for (PlanejadorMentor.Tarefa t : c.pendentesHoje()) {
-            switch (t.tipo()) {
-                case ESTUDO -> {
-                    if (t.partes() > 1) progresso.marcarParte(u.getId(), t.assuntoId(), t.minutos());
-                    else progresso.marcarEstudado(u.getId(), t.assuntoId(), false);
-                }
-                case REVISAO -> progresso.marcarRevisado(u.getId(), t.assuntoId(), false);
-                case REDACAO -> {
-                    if (!c.redacaoNaSemana()) marcarRedacao(u.getId(), c.hoje(), true);
-                }
-            }
-        }
         return montar(u.getId());
     }
 
@@ -461,7 +453,7 @@ public class MentorService {
                 LocalDate dia = d;
                 List<Tarefa> previstas = r.dia(d).map(x -> ordenarDoDia(x.tarefas()).stream()
                         .filter(t -> !(c.redacaoNaSemana() && t.tipo() == PlanejadorMentor.Tipo.REDACAO && mesmaSemana(dia, hoje)))
-                        .map(t -> tarefa(t, hoje, Set.of(), false)).toList()).orElse(List.of());
+                        .map(t -> tarefa(t, hoje, Set.of(), Set.of(), false)).toList()).orElse(List.of());
                 dias.add(new Dia(d, fase, 0, previstas.size(), previstas));
             }
         }
@@ -485,8 +477,10 @@ public class MentorService {
                     registros.findAllByUsuarioIdAndData(uid, d.getData()).forEach(x -> s.remove(x.getAssuntoId()));
                     return s;
                 }).orElse(Set.of());
+        Set<Long> iniciados = estudos.findAllByUsuarioIdAndIniciadoEm(uid, hoje).stream()
+                .map(EstudoAssunto::getAssuntoId).collect(Collectors.toSet());
         List<Tarefa> lista = new ArrayList<>();
-        for (PlanejadorMentor.Tarefa t : ordenarDoDia(c.pendentesHoje())) lista.add(tarefa(t, hoje, deOntem, c.redacaoNaSemana()));
+        for (PlanejadorMentor.Tarefa t : ordenarDoDia(c.pendentesHoje())) lista.add(tarefa(t, hoje, deOntem, iniciados, c.redacaoNaSemana()));
         for (MentorRegistro reg : c.registrosHoje()) lista.add(feita(reg));
         return lista;
     }
@@ -515,14 +509,14 @@ public class MentorService {
         return ts.stream().sorted(Comparator.comparingInt(t -> switch (t.tipo()) { case ESTUDO -> 0; case REVISAO -> 1; case REDACAO -> 2; })).toList();
     }
 
-    private Tarefa tarefa(PlanejadorMentor.Tarefa t, LocalDate hoje, Set<Long> deOntem, boolean redacaoNaSemana) {
-        if (t.tipo() == PlanejadorMentor.Tipo.REDACAO) return new Tarefa("redacao", null, 0, 0, 0, false, redacaoNaSemana, false);
+    private Tarefa tarefa(PlanejadorMentor.Tarefa t, LocalDate hoje, Set<Long> deOntem, Set<Long> iniciados, boolean redacaoNaSemana) {
+        if (t.tipo() == PlanejadorMentor.Tipo.REDACAO) return new Tarefa("redacao", null, 0, 0, 0, false, redacaoNaSemana, false, false);
         ItemCatalogo i = catalogo.item(t.assuntoId()).orElse(null);
         AssuntoMini m = i == null ? null : mini(i);
         if (t.tipo() == PlanejadorMentor.Tipo.ESTUDO)
-            return new Tarefa("estudo", m, t.parte(), t.partes(), 0, deOntem.contains(t.assuntoId()), false, false);
+            return new Tarefa("estudo", m, t.parte(), t.partes(), 0, deOntem.contains(t.assuntoId()), false, false, iniciados.contains(t.assuntoId()));
         int atraso = t.devidaDesde() != null && t.devidaDesde().isBefore(hoje) ? (int) ChronoUnit.DAYS.between(t.devidaDesde(), hoje) : 0;
-        return new Tarefa(i != null && i.habilidade() ? "treino" : "revisao", m, 0, 0, atraso, false, false, t.revisaoFinal());
+        return new Tarefa(i != null && i.habilidade() ? "treino" : "revisao", m, 0, 0, atraso, false, false, t.revisaoFinal(), false);
     }
 
     private Tarefa feita(MentorRegistro reg) {
@@ -533,7 +527,7 @@ public class MentorService {
             case MentorRegistro.REVISAO -> i != null && i.habilidade() ? "treino" : "revisao";
             default -> "estudo";
         };
-        return new Tarefa(tipo, m, 0, 0, 0, false, true, false);
+        return new Tarefa(tipo, m, 0, 0, 0, false, true, false, false);
     }
 
     AssuntoMini mini(ItemCatalogo i) {

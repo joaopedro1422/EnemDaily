@@ -1,5 +1,4 @@
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
-import { AsyncPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
@@ -20,7 +19,7 @@ interface ParaHoje { nome: string; area: string; link: string[]; rotulo: string;
 @Component({
   selector: 'app-conteudos-indice',
   standalone: true,
-  imports: [AsyncPipe, FormsModule, RouterLink, IconeComponent, CarregandoComponent],
+  imports: [FormsModule, RouterLink, IconeComponent, CarregandoComponent],
   templateUrl: './conteudos-indice.component.html',
   styleUrl: './conteudos-indice.component.css'
 })
@@ -136,7 +135,7 @@ export class ConteudosIndiceComponent implements OnInit, OnDestroy {
     if (!this.todos.length) return { titulo: 'Os primeiros conteúdos estão sendo preparados', texto: 'Volte em breve.' };
     const semBusca = !this.busca.trim();
     if (semBusca && this.situacao === 'estudados') {
-      return { titulo: 'Nenhum conteúdo marcado ainda', texto: 'Estudou um assunto, aqui ou por fora? Toque em “Marcar estudado” no card dele.' };
+      return { titulo: 'Nenhum conteúdo marcado ainda', texto: 'Estudou um assunto, aqui ou por fora? Toque em “Já estudei” no card dele.' };
     }
     if (semBusca && this.situacao === 'faltam') {
       return { titulo: 'Você estudou todos os conteúdos daqui', texto: 'Quando sair conteúdo novo, ele aparece nesta lista.' };

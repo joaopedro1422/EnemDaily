@@ -25,6 +25,8 @@ export interface Tarefa {
   deOntem: boolean;
   feita: boolean;
   revisaoFinal: boolean;
+  /** Estudo cuja orientação o aluno já leu hoje: aí a tarefa pode ser concluída. */
+  iniciada: boolean;
 }
 
 export interface DiaMapa { data: string; fase: Fase; feitas: number; planejadas: number | null; }

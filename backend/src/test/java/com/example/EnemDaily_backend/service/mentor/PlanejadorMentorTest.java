@@ -34,6 +34,7 @@ class PlanejadorMentorTest {
         for (JsonNode n : raiz.path("assuntos")) idPorNome.put(n.path("nome").asText(), id++);
         List<Item> itens = new ArrayList<>();
         for (JsonNode n : raiz.path("assuntos")) {
+            if (n.path("foraDoPlano").asBoolean(false)) continue;
             List<Long> pre = new ArrayList<>();
             n.path("prerequisitos").forEach(x -> pre.add(idPorNome.get(x.asText())));
             List<Long> rec = new ArrayList<>();
@@ -45,6 +46,7 @@ class PlanejadorMentorTest {
             porId.put(i.id(), i);
         }
         catalogo = List.copyOf(itens);
+        assertFalse(porId.containsKey(idPorNome.get("Interpretação de Texto")), "habilidade bloqueada fica fora do plano");
         assertTrue(catalogo.size() >= 140, "catálogo carregado");
         assertFalse(idPorNome.containsValue(null));
     }
@@ -123,7 +125,7 @@ class PlanejadorMentorTest {
         Resultado r = plano(config(30, 0, 0, Set.of()), Map.of());
         assertFalse(r.foraDoPlano().isEmpty(), "com 2h30 por semana não cabe tudo");
         // Os assuntos que mais caem entram sempre.
-        for (String nome : List.of("Interpretação de Texto", "Razão e Proporção", "Inglês: interpretação de texto"))
+        for (String nome : List.of("Razão e Proporção", "Inglês: interpretação de texto"))
             assertTrue(r.noPlano().contains(idPorNome.get(nome)), nome);
         double incPlano = r.noPlano().stream().mapToDouble(id -> porId.get(id).incidencia()).average().orElse(0);
         double incFora = r.foraDoPlano().stream().mapToDouble(id -> porId.get(id).incidencia()).average().orElse(0);

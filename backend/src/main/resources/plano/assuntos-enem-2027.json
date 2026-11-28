@@ -12,7 +12,7 @@
     "oQueE": "O cronograma organiza seus estudos: mostra o que estudar, em que ordem, quanto por semana e o que ainda falta, priorizando o que mais cai no ENEM.",
     "oQueNaoE": "Não é um curso nem uma mentoria. Os resumos, flashcards e questões do enem.daily são apoio extra. O estudo de cada assunto é feito por você, com as fontes que preferir.",
     "comoEstudar": "Para cada assunto: estude com uma boa fonte (livro didático, videoaula ou apostila), resolva questões, de preferência de provas anteriores do ENEM, e só então marque como estudado.",
-    "comoConcluir": "Marque como estudado quando conseguir fazer o que está em \"O que dominar\". A marcação é sua: o plano se organiza a partir do que você informa.",
+    "comoConcluir": "Marque como estudado quando conseguir fazer o que está em \"O que priorizar\". A marcação é sua: o plano se organiza a partir do que você informa.",
     "comoRevisar": "Revise do seu jeito: refaça questões, releia suas anotações ou use os flashcards do enem.daily. Marque como revisado quando terminar.",
     "resultado": "O plano dá direção. O resultado depende da sua dedicação, do tempo que você estuda e de fatores que nenhuma ferramenta controla. O enem.daily não garante nota nem aprovação."
   },
@@ -4349,9 +4349,7 @@
       "confiancaIncidencia": "media",
       "nivel": "intermediario",
       "minutos": 45,
-      "prerequisitos": [
-        "Interpretação de Texto"
-      ],
+      "prerequisitos": [],
       "recomendadosAntes": [],
       "comoCai": "Leitura de poemas, contos e trechos de romances: eu lírico, narrador, ritmo e imagens. O ENEM cobra a leitura do texto literário, não a decoreba de escolas.",
       "dominar": [
@@ -4535,6 +4533,7 @@
       "disciplina": "Português",
       "nome": "Interpretação de Texto",
       "tipo": "habilidade",
+      "foraDoPlano": true,
       "incidencia": 10.19,
       "confiancaIncidencia": "alta",
       "nivel": "base",
@@ -4604,9 +4603,7 @@
       "confiancaIncidencia": "alta",
       "nivel": "intermediario",
       "minutos": 45,
-      "prerequisitos": [
-        "Interpretação de Texto"
-      ],
+      "prerequisitos": [],
       "recomendadosAntes": [],
       "comoCai": "Sentido de palavras e expressões no contexto, ambiguidade, polissemia, ironia e o efeito de sentido de cada escolha linguística.",
       "dominar": [
@@ -4763,9 +4760,7 @@
       "confiancaIncidencia": "alta",
       "nivel": "intermediario",
       "minutos": 45,
-      "prerequisitos": [
-        "Interpretação de Texto"
-      ],
+      "prerequisitos": [],
       "recomendadosAntes": [],
       "comoCai": "Conectivos e retomadas (pronomes, sinônimos) que constroem a progressão do texto e a relação entre as ideias.",
       "dominar": [
@@ -4797,9 +4792,7 @@
       "confiancaIncidencia": "alta",
       "nivel": "intermediario",
       "minutos": 45,
-      "prerequisitos": [
-        "Interpretação de Texto"
-      ],
+      "prerequisitos": [],
       "recomendadosAntes": [],
       "comoCai": "Estratégias de convencimento em artigos de opinião, propagandas e discursos: tipos de argumento, falácias e manipulação. Também ajuda na redação.",
       "dominar": [
@@ -4864,9 +4857,7 @@
       "confiancaIncidencia": "estimada",
       "nivel": "intermediario",
       "minutos": 45,
-      "prerequisitos": [
-        "Interpretação de Texto"
-      ],
+      "prerequisitos": [],
       "recomendadosAntes": [],
       "comoCai": "Paródia, paráfrase, citação e alusão entre textos, obras de arte e publicidade.",
       "dominar": [

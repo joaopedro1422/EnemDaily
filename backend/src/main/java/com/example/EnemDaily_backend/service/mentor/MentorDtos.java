@@ -20,8 +20,9 @@ public final class MentorDtos {
      * tipo: estudo, revisao, treino ou redacao. atrasoDias: revisão vencida há N dias. deOntem: estava no plano
      * de um dia anterior e voltou. feita: já marcada hoje.
      */
+    /** iniciada: estudo cuja orientação o aluno já leu hoje (aí a tarefa pode ser concluída). */
     public record Tarefa(String tipo, AssuntoMini assunto, int parte, int partes, int atrasoDias, boolean deOntem,
-                         boolean feita, boolean revisaoFinal) {}
+                         boolean feita, boolean revisaoFinal, boolean iniciada) {}
 
     /** feitas e planejadas por dia; planejadas é nulo em dias passados sem retrato salvo. */
     public record DiaMapa(LocalDate data, String fase, int feitas, Integer planejadas) {}

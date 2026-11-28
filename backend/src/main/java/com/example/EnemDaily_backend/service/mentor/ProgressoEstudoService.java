@@ -158,10 +158,19 @@ public class ProgressoEstudoService {
     public void remover(UUID usuario, long assuntoId, boolean remover) {
         EstudoAssunto e = obter(usuario, assuntoId);
         e.setRemovido(remover);
-        if (!remover && !e.estudado() && e.getAdiadoAte() == null && e.getMinutosFeitos() == 0) {
+        if (!remover && !e.estudado() && e.getAdiadoAte() == null && e.getMinutosFeitos() == 0 && e.getIniciadoEm() == null) {
             if (e.getId() != null) estudos.delete(e);
             return;
         }
+        estudos.save(e);
+    }
+
+    /** O aluno leu a orientação do dia e começou o estudo. */
+    @Transactional
+    public void iniciar(UUID usuario, long assuntoId) {
+        EstudoAssunto e = obter(usuario, assuntoId);
+        if (e.estudado()) return;
+        e.setIniciadoEm(hoje());
         estudos.save(e);
     }
 

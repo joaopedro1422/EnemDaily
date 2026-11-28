@@ -89,24 +89,24 @@
                 <span class="t-txt">
                   <b>{{ t.assunto?.nome ?? 'Redação da semana' }}</b>
                   <span class="t-meta">
-                    <span class="t-tipo" [attr.data-tipo]="t.tipo">{{ rotulo(t) }}</span>
-                    @if (t.assunto && t.tipo === 'estudo') { <span>{{ pesos[t.assunto.peso] }}</span> }
+                    @if (ehHoje && t.tipo === 'estudo' && t.iniciada) {
+                      <span class="t-chip andamento">Em andamento</span>
+                    } @else {
+                      <span class="t-tipo" [attr.data-tipo]="t.tipo">{{ rotulo(t) }}</span>
+                      @if (t.assunto && t.tipo === 'estudo') { <span>{{ pesos[t.assunto.peso] }}</span> }
+                    }
                     @if (t.deOntem) { <span class="t-chip"><ed-icone nome="history" [tamanho]="12" />De ontem</span> }
                     @if (t.atrasoDias > 0) { <span class="t-chip"><ed-icone nome="clock" [tamanho]="12" />{{ t.atrasoDias === 1 ? 'Desde ontem' : 'Há ' + t.atrasoDias + ' dias' }}</span> }
                   </span>
                 </span>
               </button>
-              <button class="t-check" type="button" (click)="check(t, $event)" [disabled]="ocupado || !ehHoje"
-                      [class.aberto]="perguntaRevisao === t.assunto?.id && !!t.assunto"
-                      [attr.aria-label]="ehHoje ? 'Marcar ' + (t.assunto?.nome ?? 'redação') + ' como feito' : 'Só dá para marcar no dia'">
-                <ed-icone nome="check" [tamanho]="18" [traco]="3" />
-              </button>
-              @if (perguntaRevisao === t.assunto?.id && !!t.assunto) {
-                <div class="t-revisao">
-                  <span>Como foi?</span>
-                  <button type="button" (click)="revisar(t, false)" [disabled]="ocupado">Tranquila</button>
-                  <button type="button" class="sec" (click)="revisar(t, true)" [disabled]="ocupado">Com dificuldade</button>
-                </div>
+              @if (ehHoje && precisaComecar(t)) {
+                <button class="t-comecar" type="button" (click)="check(t, $event)" [disabled]="ocupado">Iniciar</button>
+              } @else {
+                <button class="t-check" type="button" (click)="check(t, $event)" [disabled]="ocupado || !ehHoje"
+                        [attr.aria-label]="ehHoje ? 'Concluir ' + (t.assunto?.nome ?? 'redação') : 'Só dá para marcar no dia'">
+                  <ed-icone nome="check" [tamanho]="18" [traco]="3" />
+                </button>
               }
             </li>
           }
@@ -127,9 +127,6 @@
         @if (pendentes.length && !passado) {
           @if (!confirmandoNaoDeu) {
             <footer class="dia-pe">
-              <button class="cr-btn" type="button" (click)="concluirDia()" [disabled]="ocupado || !ehHoje">
-                <ed-icone nome="check" [tamanho]="18" [traco]="2.8" />{{ pendentes.length > 1 ? 'Concluir o dia' : 'Concluir' }}
-              </button>
               <button class="cr-texto" type="button" (click)="confirmandoNaoDeu = true" [disabled]="ocupado || !ehHoje">Hoje não deu</button>
             </footer>
           } @else {

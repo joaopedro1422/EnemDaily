@@ -40,6 +40,8 @@ public class EstudoAssunto {
     /** Assuntos longos são estudados em partes: quanto já foi feito antes de concluir. */
     private int minutosFeitos;
     private int partesFeitas;
+    /** Dia em que o aluno leu a orientação e começou o estudo. Só vale para o próprio dia. */
+    private LocalDate iniciadoEm;
 
     public EstudoAssunto(UUID usuarioId, Long assuntoId) {
         this.usuarioId = usuarioId;

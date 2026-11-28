@@ -21,8 +21,6 @@
           }
         </ul>
       </section>
-    } @else if (cronograma$ | async) {
-      <a class="ci-cronograma" routerLink="/cronograma"><ed-icone nome="calendar-check" [tamanho]="18" />Cronograma de estudos<ed-icone nome="chevron-right" [tamanho]="16" /></a>
     }
     <label class="ci-busca">
       <ed-icone nome="search" [tamanho]="18" />
@@ -76,7 +74,7 @@
                   <button type="button" class="ci-tag" [class.on]="estudou(c)" [attr.aria-pressed]="estudou(c)"
                           [attr.aria-label]="(estudou(c) ? 'Desmarcar como estudado: ' : 'Marcar como estudado: ') + c.assunto" (click)="alternarEstudado(c)">
                     <span class="ci-tag-marca">@if (estudou(c)) { <ed-icone nome="check" [tamanho]="11" /> }</span>
-                    {{ estudou(c) ? 'Estudado' : 'Marcar estudado' }}
+                    {{ estudou(c) ? 'Estudado' : 'Já estudei' }}
                   </button>
                 </div>
               </div>

@@ -26,13 +26,11 @@
 
     <h2 id="fl-titulo">{{ redacao ? 'Redação da semana' : assunto?.nome }}</h2>
 
-    <div class="fl-chips">
-      @if (rotuloTarefa) { <span class="fl-chip forte">{{ rotuloTarefa }}</span> }
-      @if (assunto && !redacao) { <span class="fl-chip">{{ pesos[assunto.peso] }}</span> }
-      @if (tarefa?.deOntem) { <span class="fl-chip suave"><ed-icone nome="history" [tamanho]="13" />De ontem</span> }
-      @if ((tarefa?.atrasoDias ?? 0) > 0) { <span class="fl-chip suave"><ed-icone nome="clock" [tamanho]="13" />Desde {{ tarefa!.atrasoDias === 1 ? 'ontem' : 'há ' + tarefa!.atrasoDias + ' dias' }}</span> }
-      @if (situacao) { <span class="fl-chip ok"><ed-icone nome="check" [tamanho]="13" [traco]="3" />{{ situacao }}</span> }
-    </div>
+    @if (contexto === 'hoje') {
+      <p class="fl-alerta"><ed-icone nome="triangle-alert" [tamanho]="17" />Conclua apenas após realizar o estudo do dia</p>
+    } @else if (situacao) {
+      <div class="fl-chips"><span class="fl-chip ok"><ed-icone nome="check" [tamanho]="13" [traco]="3" />{{ situacao }}</span></div>
+    }
 
     @if (redacao) {
       <p class="fl-texto">Uma redação completa, no tempo da prova. Depois de corrigida, registre a nota em Redações para acompanhar cada competência.</p>
@@ -41,15 +39,10 @@
       <p class="fl-texto">Não foi possível carregar os detalhes agora.</p>
     } @else if (!detalhe) {
       <div class="fl-carregando"><ed-carregando [tamanho]="40" /></div>
-    } @else {
+    } @else if (concluindo) {
       <section class="fl-sec">
-        <h3><ed-icone nome="target" [tamanho]="15" />Como cai no ENEM</h3>
-        <p class="fl-texto">{{ detalhe.comoCai }}</p>
-      </section>
-
-      <section class="fl-sec">
-        <h3><ed-icone nome="check" [tamanho]="15" [traco]="2.6" />O que dominar
-          @if (marcados.size) { <small>{{ marcados.size }}/{{ detalhe.dominar.length }}</small> }
+        <h3><ed-icone nome="check" [tamanho]="15" [traco]="2.6" />O que estudei
+          @if (trava) { <small [class.ok]="!faltamItens">{{ marcados.size }}/{{ totalDominar }}</small> }
         </h3>
         <ul class="fl-dominar">
           @for (d of detalhe.dominar; track $index) {
@@ -60,41 +53,71 @@
         </ul>
       </section>
 
-      @if (detalhe.flashcards.length) {
+      <ng-container [ngTemplateOutlet]="cards" />
+
+      @if (verGuia) {
         <section class="fl-sec">
-          <button class="fl-sec-btn" type="button" (click)="verCards = !verCards" [attr.aria-expanded]="verCards">
-            <h3><ed-icone nome="sparkles" [tamanho]="15" />Revisão rápida <small>{{ detalhe.flashcards.length }} cards</small></h3>
-            <ed-icone nome="chevron-down" [tamanho]="18" [class.virado]="verCards" />
-          </button>
-          @if (verCards) {
-            <div class="fl-cards">
-              <button class="fl-card" type="button" [class.virado]="virado" (click)="virado = !virado" [attr.aria-label]="virado ? 'Ver pergunta' : 'Ver resposta'">
-                <span class="fl-card-face frente"><small>Pergunta</small>{{ detalhe.flashcards[card].pergunta }}<em>Toque para ver a resposta</em></span>
-                <span class="fl-card-face verso"><small>Resposta</small>{{ detalhe.flashcards[card].resposta }}</span>
-              </button>
-              <div class="fl-cards-nav">
-                <button type="button" (click)="proximoCard(-1)" aria-label="Card anterior"><ed-icone nome="chevron-right" [tamanho]="18" class="girar" /></button>
-                <span>{{ card + 1 }} de {{ detalhe.flashcards.length }}</span>
-                <button type="button" (click)="proximoCard(1)" aria-label="Próximo card"><ed-icone nome="chevron-right" [tamanho]="18" /></button>
-              </div>
-            </div>
-          }
+          <h3><ed-icone nome="target" [tamanho]="15" />Como cai no ENEM</h3>
+          <p class="fl-texto">{{ detalhe.comoCai }}</p>
         </section>
+        @if (linkConteudo) { <ng-container [ngTemplateOutlet]="resumo" /> }
+      } @else {
+        <button class="fl-ver-guia" type="button" (click)="verGuia = true"><ed-icone nome="target" [tamanho]="15" />Ver orientação</button>
       }
+    } @else {
+      <section class="fl-sec">
+        <h3><ed-icone nome="target" [tamanho]="15" />Como cai no ENEM</h3>
+        <p class="fl-texto">{{ detalhe.comoCai }}</p>
+      </section>
+
+      <section class="fl-sec">
+        <h3><ed-icone nome="check" [tamanho]="15" [traco]="2.6" />O que priorizar</h3>
+        <ul class="fl-lista">
+          @for (d of detalhe.dominar; track $index) { <li>{{ d }}</li> }
+        </ul>
+      </section>
+
+      @if (!guia) { <ng-container [ngTemplateOutlet]="cards" /> }
 
       @if (detalhe.prerequisitos.length) {
         <p class="fl-pre"><ed-icone nome="history" [tamanho]="14" />Vem depois de {{ nomesPre }}</p>
       }
 
-      @if (linkConteudo) {
-        <a class="fl-link" [routerLink]="linkConteudo" (click)="fechar()"><ed-icone nome="book-open" [tamanho]="17" />Resumo de apoio<ed-icone nome="chevron-right" [tamanho]="17" /></a>
-      }
+      @if (linkConteudo) { <ng-container [ngTemplateOutlet]="resumo" /> }
     }
+
+    <ng-template #resumo>
+      <a class="fl-link" [routerLink]="linkConteudo" (click)="fechar()"><ed-icone nome="book-open" [tamanho]="17" />{{ guia ? 'Comece pelo resumo de apoio' : 'Resumo de apoio' }}<ed-icone nome="chevron-right" [tamanho]="17" /></a>
+    </ng-template>
+
+    <ng-template #cards>
+      @if (detalhe && totalCards) {
+        <section class="fl-sec">
+          <h3><ed-icone nome="sparkles" [tamanho]="15" />Fixação rápida
+            @if (trava) { <small [class.ok]="!faltamCards">{{ revelados.size }}/{{ totalCards }}</small> }
+          </h3>
+          <ol class="fl-cards">
+            @for (f of detalhe.flashcards; track $index) {
+              <li>
+                <button class="fl-card" type="button" [class.virado]="virados.has($index)" (click)="virar($index)" [attr.aria-label]="virados.has($index) ? 'Ver pergunta' : 'Ver resposta'">
+                  <span class="fl-card-face frente"><small>Pergunta</small>{{ f.pergunta }}<em>Toque para ver a resposta</em></span>
+                  <span class="fl-card-face verso"><small>Resposta</small>{{ f.resposta }}</span>
+                </button>
+              </li>
+            }
+          </ol>
+        </section>
+      }
+    </ng-template>
 
     <footer class="fl-pe">
       @switch (contexto) {
         @case ('hoje') {
-          @if (redacao) {
+          @if (guia) {
+            <button class="fl-btn" type="button" [disabled]="ocupado || !detalhe" (click)="emitir('iniciar')">Entendi</button>
+          } @else if (!liberado) {
+            <button class="fl-btn trava" type="button" disabled><ed-icone nome="lock" [tamanho]="17" />{{ textoTrava }}</button>
+          } @else if (redacao) {
             <button class="fl-btn" type="button" [disabled]="ocupado" (click)="emitir('redacao-feita')"><ed-icone nome="check" [tamanho]="18" [traco]="2.8" />Fiz a redação</button>
           } @else if (revisao) {
             <span class="fl-pergunta">Como foi a revisão?</span>
@@ -102,11 +125,10 @@
               <button class="fl-btn" type="button" [disabled]="ocupado" (click)="emitir('tranquila')">Tranquila</button>
               <button class="fl-btn sec" type="button" [disabled]="ocupado" (click)="emitir('dificil')">Com dificuldade</button>
             </div>
-          } @else if (emPartes) {
-            <button class="fl-btn" type="button" [disabled]="ocupado" (click)="emitir('parte')"><ed-icone nome="check" [tamanho]="18" [traco]="2.8" />Fiz a parte de hoje</button>
-            <button class="fl-btn sec" type="button" [disabled]="ocupado" (click)="emitir('terminar')">Terminei o assunto todo</button>
+          } @else if (parteIntermediaria) {
+            <button class="fl-btn" type="button" [disabled]="ocupado" (click)="emitir('parte')"><ed-icone nome="check" [tamanho]="18" [traco]="2.8" />Concluí a parte {{ tarefa!.parte }} de {{ tarefa!.partes }}</button>
           } @else {
-            <button class="fl-btn" type="button" [disabled]="ocupado" (click)="emitir('concluir')"><ed-icone nome="check" [tamanho]="18" [traco]="2.8" />Concluí</button>
+            <button class="fl-btn" type="button" [disabled]="ocupado" (click)="emitir(emPartes ? 'terminar' : 'concluir')"><ed-icone nome="check" [tamanho]="18" [traco]="2.8" />{{ emPartes ? 'Concluí a última parte' : 'Concluí' }}</button>
           }
           <button class="fl-texto-btn" type="button" [disabled]="ocupado" (click)="emitir('nao-consegui')">Não consegui hoje</button>
         }

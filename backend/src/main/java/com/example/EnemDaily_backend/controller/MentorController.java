@@ -63,11 +63,6 @@ public class MentorController {
         return executar(auth, u -> mentor.notificacoes(u, n != null && n.ativo()));
     }
 
-    @PostMapping("/hoje/concluir")
-    public ResponseEntity<?> concluirDia(Authentication auth) {
-        return executar(auth, mentor::concluirDia);
-    }
-
     @PostMapping("/hoje/nao-consegui")
     public ResponseEntity<?> naoConseguiDia(Authentication auth) {
         return executar(auth, mentor::naoConseguiDia);
@@ -91,6 +86,11 @@ public class MentorController {
     @DeleteMapping("/assuntos/{id}/estudado")
     public ResponseEntity<?> naoEstudado(@PathVariable long id, Authentication auth) {
         return executar(auth, u -> mentor.desfazer(u, id));
+    }
+
+    @PostMapping("/assuntos/{id}/iniciar")
+    public ResponseEntity<?> iniciar(@PathVariable long id, Authentication auth) {
+        return executar(auth, u -> mentor.iniciar(u, id));
     }
 
     @PostMapping("/assuntos/{id}/parte")

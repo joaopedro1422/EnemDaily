@@ -55,7 +55,6 @@ export class CronogramaComponent implements OnInit, OnDestroy {
   folha: Folha | null = null;
   ocupado = false;
   /** Revisão em que o aluno tocou no check: pergunta "como foi?" na própria linha. */
-  perguntaRevisao: number | null = null;
   confirmandoNaoDeu = false;
   bemVindoFechado = false;
   aviso: Aviso | null = null;
@@ -127,7 +126,6 @@ export class CronogramaComponent implements OnInit, OnDestroy {
   selecionar(data: string) {
     if (!this.painel) return;
     this.selecionado = data === this.painel.hoje ? null : data;
-    this.perguntaRevisao = null;
     this.confirmandoNaoDeu = false;
     if (!this.cache.has(data)) this.buscarDias(data);
     this.centralizar(data, true);
@@ -313,37 +311,14 @@ export class CronogramaComponent implements OnInit, OnDestroy {
 
   // ---------------------------------------------------------------- ações de hoje
 
-  /** Check na linha da tarefa (só hoje). */
+  /** Estudo de hoje que o aluno ainda não começou: primeiro ele lê a orientação. */
+  precisaComecar(t: Tarefa): boolean { return t.tipo === 'estudo' && !t.iniciada; }
+
+  /** "Iniciar" e a bolinha abrem a folha: concluir sempre passa por ela. */
   check(t: Tarefa, ev?: Event) {
     ev?.stopPropagation();
     if (this.ocupado || t.feita || !this.ehHoje) return;
-    if (t.tipo === 'redacao') {
-      this.executar(this.api.redacao(true), 'Redação da semana feita', undefined, true);
-      return;
-    }
-    const a = t.assunto;
-    if (!a) return;
-    if (t.tipo === 'revisao' || t.tipo === 'treino') {
-      this.perguntaRevisao = this.perguntaRevisao === a.id ? null : a.id;
-      return;
-    }
-    const pedido = t.partes > 1 ? this.api.parte(a.id) : this.api.estudado(a.id);
-    const texto = t.partes > 1 ? `Parte de hoje feita · ${a.nome}` : `${a.nome} concluído`;
-    this.executar(pedido, texto, () => this.desfazer(a.id), true);
-  }
-
-  revisar(t: Tarefa, dificil: boolean) {
-    const a = t.assunto;
-    if (!a || !this.ehHoje) return;
-    this.perguntaRevisao = null;
-    const texto = dificil ? `${a.nome} volta em 4 dias` : `${a.nome} revisado`;
-    this.executar(this.api.revisado(a.id, dificil), texto, () => this.desfazer(a.id), true);
-  }
-
-  concluirDia() {
-    if (!this.ehHoje) return;
-    const ids = this.pendentes.map(t => t.assunto?.id).filter((x): x is number => x != null);
-    this.executar(this.api.concluirDia(), 'Dia concluído', ids.length ? () => this.desfazerVarios(ids) : undefined, true);
+    this.abrir(t);
   }
 
   naoDeuHoje() {
@@ -356,20 +331,10 @@ export class CronogramaComponent implements OnInit, OnDestroy {
     this.executar(this.api.desfazer(id), 'Desfeito');
   }
 
-  private desfazerVarios(ids: number[]) {
-    const proximo = (i: number) => {
-      if (i >= ids.length) { this.mostrar({ texto: 'Desfeito' }); return; }
-      this.api.desfazer(ids[i]).subscribe({ next: p => { this.atualizar(p); proximo(i + 1); }, error: () => proximo(i + 1) });
-    };
-    this.esconderAviso();
-    proximo(0);
-  }
-
   // ---------------------------------------------------------------- folha do assunto
 
   abrir(t: Tarefa) {
     if (this.ocupado) return;
-    this.perguntaRevisao = null;
     const contexto: ContextoAssunto = t.feita ? 'feito' : this.ehHoje ? 'hoje' : 'previsto';
     this.folha = { tarefa: t, assunto: t.assunto, contexto };
   }
@@ -387,6 +352,7 @@ export class CronogramaComponent implements OnInit, OnDestroy {
     const fechar = () => (this.folha = null);
     switch (acao) {
       case 'redacao-feita': this.executar(this.api.redacao(true), 'Redação da semana feita', undefined, true, fechar); break;
+      case 'iniciar': this.executar(this.api.iniciar(a!.id), 'Bom estudo! Volte aqui para concluir.', undefined, false, fechar); break;
       case 'concluir':
       case 'terminar': this.executar(this.api.estudado(a!.id), `${nome} concluído`, () => this.desfazer(a!.id), true, fechar); break;
       case 'parte': this.executar(this.api.parte(a!.id), `Parte de hoje feita · ${nome}`, () => this.desfazer(a!.id), true, fechar); break;

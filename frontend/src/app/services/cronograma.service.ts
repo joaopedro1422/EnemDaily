@@ -28,7 +28,6 @@ export class CronogramaService {
 
   notificacoes(ativo: boolean): Observable<Painel> { return this.http.put<Painel>(`${this.base}/notificacoes`, { ativo }, { headers: this.headers }); }
 
-  concluirDia(): Observable<Painel> { return this.post('/hoje/concluir'); }
 
   naoConseguiDia(): Observable<Painel> { return this.post('/hoje/nao-consegui'); }
 
@@ -40,6 +39,7 @@ export class CronogramaService {
 
   naoEstudado(id: number): Observable<Painel> { return this.http.delete<Painel>(`${this.base}/assuntos/${id}/estudado`, { headers: this.headers }); }
 
+  iniciar(id: number): Observable<Painel> { return this.post(`/assuntos/${id}/iniciar`); }
   parte(id: number): Observable<Painel> { return this.post(`/assuntos/${id}/parte`); }
 
   revisado(id: number, dificil: boolean): Observable<Painel> { return this.post(`/assuntos/${id}/revisado`, { dificil }); }

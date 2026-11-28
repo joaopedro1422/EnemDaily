@@ -76,7 +76,7 @@ export class GeracaoComponent implements OnInit, OnChanges, OnDestroy {
 
   ngOnInit() {
     const reduzido = matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-    const duracao = this.modo === 'editar' ? 2600 : 4600;
+    const duracao = this.modo === 'editar' ? 4200 : 8000;
     // 14 colunas x 7 linhas: a grade se preenche coluna a coluna, como as semanas do ano.
     for (let col = 0; col < 14; col++) {
       for (let lin = 0; lin < 7; lin++) {

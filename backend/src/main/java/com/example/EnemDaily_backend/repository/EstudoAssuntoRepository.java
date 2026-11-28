@@ -13,4 +13,6 @@ public interface EstudoAssuntoRepository extends JpaRepository<EstudoAssunto, Lo
     Optional<EstudoAssunto> findByUsuarioIdAndAssuntoId(UUID usuarioId, Long assuntoId);
 
     List<EstudoAssunto> findAllByUsuarioIdAndEstudadoEmIsNotNull(UUID usuarioId);
+
+    List<EstudoAssunto> findAllByUsuarioIdAndIniciadoEm(UUID usuarioId, java.time.LocalDate iniciadoEm);
 }

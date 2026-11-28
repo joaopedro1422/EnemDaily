@@ -122,6 +122,8 @@ public class CatalogoMentor {
         List<JsonNode> ligados = new ArrayList<>();
         List<String> semBanco = new ArrayList<>();
         for (JsonNode n : raiz.path("assuntos")) {
+            // Habilidade que não se estuda como assunto (ex.: Interpretação de Texto): treina-se fazendo questões.
+            if (n.path("foraDoPlano").asBoolean(false)) continue;
             Long id = idPorChave.get(chave(n.path("area").asInt(), n.path("nome").asText()));
             if (id == null) { semBanco.add(n.path("nome").asText()); continue; }
             idPorNome.put(normalizar(n.path("nome").asText()), id);
