@@ -41,7 +41,7 @@ const CORES = ['var(--ed-lc)', 'var(--ed-ch)', 'var(--ed-cn)', 'var(--ed-mt)'];
     .gr-centro { width: min(360px, 100%); display: grid; justify-items: center; gap: 26px; }
     .gr-grade { display: grid; grid-template-columns: repeat(14, 1fr); grid-auto-rows: 1fr; gap: 5px; width: 100%; }
     .gr-grade i { aspect-ratio: 1; border-radius: 4px; background: rgba(255, 255, 255, .1); animation: gr-celula 520ms cubic-bezier(.2, 1.3, .4, 1) both; animation-delay: var(--d); }
-    .gr-grade i:not(.vazia) { background: var(--c); box-shadow: 0 0 12px -2px color-mix(in srgb, var(--c) 70%, transparent); }
+    .gr-grade i:not(.vazia) { background: var(--c); }
     @keyframes gr-celula { from { opacity: 0; transform: scale(.2); } }
     .gr-texto { min-height: 26px; display: grid; place-items: center; text-align: center; }
     .gr-texto p { font-size: 16.5px; font-weight: 700; letter-spacing: -.01em; animation: gr-frase 900ms ease both; }

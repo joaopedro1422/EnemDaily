@@ -7,11 +7,15 @@ import { AREAS_CONTEUDO, ChaveAreaConteudo, ResumoConteudo, infoAreaConteudo } f
 import { ConteudoService } from '../../services/conteudo.service';
 import { AuthServiceService } from '../../services/auth-service.service';
 import { RecursosService } from '../../services/recursos.service';
+import { CronogramaService } from '../../services/cronograma.service';
+import { Tarefa } from '../../models/cronograma';
 import { IconeComponent } from '../../shared/icone/icone.component';
 import { CarregandoComponent } from '../../shared/carregando/carregando.component';
 import { SeoService } from '../seo';
 
 type Situacao = 'todos' | 'faltam' | 'estudados';
+/** Assunto do cronograma de hoje que tem página de conteúdo. */
+interface ParaHoje { nome: string; area: string; link: string[]; rotulo: string; feita: boolean; }
 
 @Component({
   selector: 'app-conteudos-indice',
@@ -25,6 +29,7 @@ export class ConteudosIndiceComponent implements OnInit, OnDestroy {
   private seo = inject(SeoService);
   private auth = inject(AuthServiceService);
   readonly cronograma$ = inject(RecursosService).cronograma$;
+  private cronograma = inject(CronogramaService);
   private subs = new Subscription();
 
   readonly areas = AREAS_CONTEUDO;
@@ -37,6 +42,8 @@ export class ConteudosIndiceComponent implements OnInit, OnDestroy {
   logado = false;
   estudados = new Set<string>();
   private salvando = new Set<string>();
+  /** Os assuntos do cronograma de hoje com página de conteúdo. */
+  paraHoje: ParaHoje[] = [];
 
   ngOnInit() {
     this.seo.aplicar({
@@ -51,6 +58,26 @@ export class ConteudosIndiceComponent implements OnInit, OnDestroy {
       this.situacao = 'todos';
       if (u) this.conteudos.estudados().subscribe({ next: l => (this.estudados = new Set(l)), error: () => {} });
     }));
+    this.subs.add(this.cronograma$.subscribe(liberado => {
+      this.paraHoje = [];
+      if (liberado) this.cronograma.hoje().subscribe({ next: h => (this.paraHoje = h.configurado ? this.montarParaHoje(h.tarefas) : []), error: () => {} });
+    }));
+  }
+
+  /** Um card por assunto com página: o que falta primeiro, sem repetir. */
+  private montarParaHoje(tarefas: Tarefa[]): ParaHoje[] {
+    const vistos = new Set<number>();
+    const ordenadas = [...tarefas.filter(t => !t.feita), ...tarefas.filter(t => t.feita)];
+    const lista: ParaHoje[] = [];
+    for (const t of ordenadas) {
+      const a = t.assunto;
+      if (!a?.conteudo || vistos.has(a.id)) continue;
+      vistos.add(a.id);
+      const rotulo = t.tipo === 'revisao' ? 'Revisão' : t.tipo === 'treino' ? 'Treino'
+        : t.tipo === 'parte' ? 'Parte feita' : t.partes > 1 ? `Parte ${t.parte} de ${t.partes}` : 'Estudo';
+      lista.push({ nome: a.nome, area: a.area, link: ['/conteudos', ...a.conteudo.split('/')], rotulo, feita: t.feita });
+    }
+    return lista;
   }
 
   ngOnDestroy() {

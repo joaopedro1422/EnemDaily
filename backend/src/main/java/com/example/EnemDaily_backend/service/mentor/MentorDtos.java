@@ -26,11 +26,10 @@ public final class MentorDtos {
     /** feitas e planejadas por dia; planejadas é nulo em dias passados sem retrato salvo. */
     public record DiaMapa(LocalDate data, String fase, int feitas, Integer planejadas) {}
 
-    public record DiaSemana(LocalDate data, String fase, int feitas, Integer planejadas, List<Tarefa> tarefas) {}
+    /** Um dia do calendário com as tarefas: passado = o que foi feito; hoje e futuro = o que o plano prevê. */
+    public record Dia(LocalDate data, String fase, int feitas, Integer planejadas, List<Tarefa> tarefas) {}
 
     public record Area(String area, int estudados, int noPlano, double cobertura) {}
-
-    public record Proximo(AssuntoMini assunto, LocalDate data) {}
 
     /**
      * cobertura: fração das questões da prova que os assuntos estudados cobrem. coberturaPlano: a que o plano
@@ -43,8 +42,8 @@ public final class MentorDtos {
 
     public record Painel(boolean configurado, LocalDate hoje, LocalDate prova, boolean provaConfirmada,
                          Map<String, String> orientacao, Config config, Fases fases, Resumo resumo,
-                         List<Tarefa> hojeTarefas, List<DiaSemana> semana, List<DiaMapa> mapa, List<Area> areas,
-                         List<Proximo> proximos, List<AssuntoMini> fora, List<AssuntoMini> removidos,
+                         List<Tarefa> hojeTarefas, List<Dia> dias, List<DiaMapa> mapa, List<Area> areas,
+                         List<AssuntoMini> fora, List<AssuntoMini> removidos,
                          int estudadosAntes) {}
 
     public record Flashcard(String pergunta, String resposta) {}

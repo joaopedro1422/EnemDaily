@@ -2,7 +2,26 @@
   <header class="ci-topo">
     <h1>Os principais assuntos do ENEM</h1>
     <p>Organizados exatamente como caem na prova</p>
-    @if (cronograma$ | async) {
+    @if (paraHoje.length) {
+      <section class="ci-hoje" aria-labelledby="ci-hoje-titulo">
+        <header>
+          <h2 id="ci-hoje-titulo"><ed-icone nome="calendar-check" [tamanho]="17" />Para hoje</h2>
+          <a routerLink="/cronograma">Cronograma<ed-icone nome="chevron-right" [tamanho]="15" /></a>
+        </header>
+        <ul>
+          @for (h of paraHoje; track h.link.join('/')) {
+            <li>
+              <a class="ci-hoje-card" [class.feito]="h.feita" [routerLink]="h.link" [style.--c]="info(h.area).cor" [style.--ct]="info(h.area).corTexto">
+                <span class="ci-hoje-ico"><ed-icone [nome]="info(h.area).icone" [tamanho]="17" /></span>
+                <span class="ci-hoje-txt"><b>{{ h.nome }}</b><small>{{ h.rotulo }}</small></span>
+                @if (h.feita) { <span class="ci-hoje-ok"><ed-icone nome="check" [tamanho]="14" [traco]="3" /></span> }
+                @else { <ed-icone nome="chevron-right" [tamanho]="18" /> }
+              </a>
+            </li>
+          }
+        </ul>
+      </section>
+    } @else if (cronograma$ | async) {
       <a class="ci-cronograma" routerLink="/cronograma"><ed-icone nome="calendar-check" [tamanho]="18" />Cronograma de estudos<ed-icone nome="chevron-right" [tamanho]="16" /></a>
     }
     <label class="ci-busca">

@@ -43,6 +43,11 @@ public class MentorController {
         return executar(auth, mentor::hoje);
     }
 
+    @GetMapping("/dias")
+    public ResponseEntity<?> dias(@RequestParam("de") String de, @RequestParam("ate") String ate, Authentication auth) {
+        return executar(auth, u -> mentor.dias(u, java.time.LocalDate.parse(de), java.time.LocalDate.parse(ate)));
+    }
+
     @PutMapping("/plano")
     public ResponseEntity<?> salvar(@RequestBody ConfigEntrada config, Authentication auth) {
         return executar(auth, u -> mentor.salvarConfig(u, config));
@@ -131,7 +136,7 @@ public class MentorController {
             return ResponseEntity.notFound().build();
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("erro", e.getMessage() == null ? "Não encontrado." : e.getMessage()));
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | java.time.format.DateTimeParseException e) {
             return ResponseEntity.badRequest().body(Map.of("erro", e.getMessage()));
         } catch (DataIntegrityViolationException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("erro", "Tente de novo em instantes."));

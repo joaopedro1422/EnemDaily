@@ -41,7 +41,7 @@ import { IconeComponent } from '../../shared/icone/icone.component';
     .cf.fechando .cf-folha { transform: translateY(100%); transition: transform 240ms ease-in; }
     .cf-alca { justify-self: center; width: 40px; height: 4px; border-radius: 2px; background: var(--ed-pauta-forte); }
     .cf-cab { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px; }
-    .cf-selo { width: 44px; height: 44px; border-radius: 14px; display: grid; place-items: center; background: var(--ed-caneta); color: #FFFFFF; box-shadow: 0 10px 20px -12px rgba(40, 54, 198, .8); }
+    .cf-selo { width: 44px; height: 44px; border-radius: 14px; display: grid; place-items: center; background: var(--ed-caneta); color: #FFFFFF; }
     .cf-cab h2 { font-size: 21px; font-weight: 800; letter-spacing: -.03em; line-height: 1.15; }
     .cf-x { width: 38px; height: 38px; border-radius: 50%; border: 0; display: grid; place-items: center; background: var(--ed-fundo-2); color: var(--ed-tinta-2); cursor: pointer; }
     .cf-lista { list-style: none; display: grid; gap: 14px; }
@@ -49,7 +49,7 @@ import { IconeComponent } from '../../shared/icone/icone.component';
     .cf-ico { width: 36px; height: 36px; border-radius: 11px; display: grid; place-items: center; background: var(--ed-caneta-suave); color: var(--ed-caneta-texto); }
     .cf-lista b { font-size: 15px; font-weight: 800; letter-spacing: -.01em; }
     .cf-lista p { margin-top: 2px; font-size: 14px; line-height: 1.5; color: var(--ed-tinta-2); }
-    .cf-btn { height: 50px; border: 0; border-radius: 14px; background: var(--ed-caneta); color: var(--ed-sobre-caneta); font: 800 15.5px var(--ed-fonte); cursor: pointer; box-shadow: 0 12px 24px -14px rgba(40, 54, 198, .9); transition: background var(--ed-t-rapido), transform var(--ed-t-rapido); }
+    .cf-btn { height: 50px; border: 0; border-radius: 14px; background: var(--ed-caneta); color: var(--ed-sobre-caneta); font: 800 15.5px var(--ed-fonte); cursor: pointer; transition: background var(--ed-t-rapido), transform var(--ed-t-rapido); }
     .cf-btn:hover { background: var(--ed-caneta-hover); }
     .cf-btn:active { transform: scale(.98); }
     @media (min-width: 640px) {

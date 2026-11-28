@@ -2,7 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { APIURL } from '../models/Environment';
-import { ConfigEntrada, DetalheAssunto, HojeResumo, Painel } from '../models/cronograma';
+import { ConfigEntrada, DetalheAssunto, DiaCalendario, HojeResumo, Painel } from '../models/cronograma';
 
 /** API do "Meu cronograma". Toda ação devolve o painel já recalculado. */
 @Injectable({ providedIn: 'root' })
@@ -15,6 +15,10 @@ export class CronogramaService {
   }
 
   painel(): Observable<Painel> { return this.http.get<Painel>(this.base, { headers: this.headers }); }
+
+  dias(de: string, ate: string): Observable<DiaCalendario[]> {
+    return this.http.get<DiaCalendario[]>(`${this.base}/dias`, { headers: this.headers, params: { de, ate } });
+  }
 
   hoje(): Observable<HojeResumo> { return this.http.get<HojeResumo>(`${this.base}/hoje`, { headers: this.headers }); }
 

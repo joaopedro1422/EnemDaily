@@ -76,7 +76,7 @@ import { IconeComponent } from '../../shared/icone/icone.component';
     .aj-txt b { display: block; font-size: 15px; font-weight: 700; }
     .aj-txt small { display: block; margin-top: 2px; font-size: 13px; color: var(--ed-tinta-3); }
     .aj-item input[type="checkbox"] { appearance: none; width: 46px; height: 28px; border-radius: 999px; background: var(--ed-pauta-forte); position: relative; cursor: pointer; transition: background var(--ed-t-medio); }
-    .aj-item input[type="checkbox"]::after { content: ""; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: #FFFFFF; box-shadow: 0 1px 3px rgba(0, 0, 0, .25); transition: transform var(--ed-t-medio) var(--ed-curva); }
+    .aj-item input[type="checkbox"]::after { content: ""; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: #FFFFFF; transition: transform var(--ed-t-medio) var(--ed-curva); }
     .aj-item input[type="checkbox"]:checked { background: var(--ed-ok); }
     .aj-item input[type="checkbox"]:checked::after { transform: translateX(18px); }
     .aj-mini { height: 34px; padding: 0 14px; border-radius: 10px; border: 0; background: var(--ed-caneta); color: var(--ed-sobre-caneta); font: 800 13.5px var(--ed-fonte); cursor: pointer; }

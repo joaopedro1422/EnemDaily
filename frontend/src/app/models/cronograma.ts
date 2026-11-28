@@ -29,11 +29,10 @@ export interface Tarefa {
 
 export interface DiaMapa { data: string; fase: Fase; feitas: number; planejadas: number | null; }
 
-export interface DiaSemana extends DiaMapa { tarefas: Tarefa[]; }
+/** Um dia do calendário: passado = o que foi feito; hoje e futuro = o que o plano prevê. */
+export interface DiaCalendario extends DiaMapa { tarefas: Tarefa[]; }
 
 export interface AreaProgresso { area: ChaveArea; estudados: number; noPlano: number; cobertura: number; }
-
-export interface Proximo { assunto: AssuntoMini; data: string; }
 
 export interface ConfigCronograma {
   inicio: string;
@@ -76,10 +75,9 @@ export interface Painel {
   fases: { base: string; aprofundamento: string; retaFinal: string; atual: Fase } | null;
   resumo: Resumo | null;
   hojeTarefas: Tarefa[];
-  semana: DiaSemana[];
+  dias: DiaCalendario[];
   mapa: DiaMapa[];
   areas: AreaProgresso[];
-  proximos: Proximo[];
   fora: AssuntoMini[];
   removidos: AssuntoMini[];
   estudadosAntes: number;

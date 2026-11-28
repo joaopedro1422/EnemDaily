@@ -7,6 +7,21 @@
 .ci-cronograma { justify-self: start; display: inline-flex; align-items: center; gap: 8px; height: 42px; padding: 0 12px 0 14px; border-radius: 12px; background: var(--ed-caneta-suave); color: var(--ed-caneta-texto); font-size: 14.5px; font-weight: 800; text-decoration: none; transition: background var(--ed-t-rapido); }
 .ci-cronograma:hover { background: color-mix(in srgb, var(--ed-caneta) 18%, var(--ed-folha)); }
 .ci-cronograma ed-icone:last-child { opacity: .7; }
+.ci-hoje { display: grid; gap: 10px; margin-top: 6px; }
+.ci-hoje header { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.ci-hoje h2 { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--ed-caneta-texto); }
+.ci-hoje header a { display: inline-flex; align-items: center; gap: 2px; font-size: 13.5px; font-weight: 700; color: var(--ed-caneta-texto); text-decoration: none; }
+.ci-hoje ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.ci-hoje-card { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px; padding: 12px 14px 12px 12px; border-radius: 16px; border: 1px solid var(--ed-pauta); border-left: 4px solid var(--c); background: var(--ed-folha); color: var(--ed-tinta); text-decoration: none; transition: border-color var(--ed-t-rapido); }
+.ci-hoje-card:hover { border-color: color-mix(in srgb, var(--c) 45%, var(--ed-pauta)); border-left-color: var(--c); }
+.ci-hoje-card > ed-icone { color: var(--ed-tinta-3); }
+.ci-hoje-ico { width: 36px; height: 36px; border-radius: 11px; display: grid; place-items: center; background: color-mix(in srgb, var(--c) 14%, var(--ed-folha)); color: var(--c); }
+.ci-hoje-txt { display: grid; gap: 2px; min-width: 0; }
+.ci-hoje-txt b { font-size: 15px; font-weight: 800; letter-spacing: -.01em; line-height: 1.25; }
+.ci-hoje-txt small { font-size: 12.5px; font-weight: 700; color: var(--ct); }
+.ci-hoje-card.feito { background: var(--ed-fundo-2); border-color: transparent; border-left-color: var(--ed-ok); }
+.ci-hoje-card.feito .ci-hoje-txt b { color: var(--ed-tinta-2); }
+.ci-hoje-ok { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: var(--ed-ok); color: #FFFFFF; }
 .ci-busca { display: flex; align-items: center; gap: 10px; height: 52px; margin-top: 8px; padding: 0 16px; border-radius: 14px; border: 1.5px solid var(--ed-pauta-forte); background: var(--ed-folha); color: var(--ed-tinta-3); }
 .ci-busca:focus-within { border-color: var(--ed-caneta); box-shadow: 0 0 0 4px var(--ed-caneta-suave); }
 .ci-busca input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; color: var(--ed-tinta); font: 500 16px var(--ed-fonte); }

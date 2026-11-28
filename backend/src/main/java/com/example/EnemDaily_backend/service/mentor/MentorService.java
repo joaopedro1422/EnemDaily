@@ -358,7 +358,7 @@ public class MentorService {
         if (p == null) {
             int antes = (int) estudos.findAllByUsuarioIdAndEstudadoEmIsNotNull(uid).stream().filter(e -> cat.containsKey(e.getAssuntoId())).count();
             return new Painel(false, ProgressoEstudoService.hoje(), prova, catalogo.provaConfirmada(), orientacao, null, null, null,
-                    List.of(), List.of(), List.of(), List.of(), List.of(), List.of(), List.of(), antes);
+                    List.of(), List.of(), List.of(), List.of(), List.of(), List.of(), antes);
         }
 
         Calculo c = calcular(uid, p);
@@ -372,26 +372,8 @@ public class MentorService {
                 .collect(Collectors.toMap(MentorDia::getData, Function.identity(), (a, b) -> a));
         List<Tarefa> hojeTarefas = tarefasDeHoje(uid, c);
 
-        // Semana corrente, de segunda a domingo.
-        LocalDate seg = hoje.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
-        List<DiaSemana> semana = new ArrayList<>();
-        for (int i = 0; i < 7; i++) {
-            LocalDate d = seg.plusDays(i);
-            String fase = fase(d, r);
-            if (d.isBefore(hoje)) {
-                List<Tarefa> feitas = regsPorDia.getOrDefault(d, List.of()).stream().map(this::feita).toList();
-                MentorDia ret = retratoPorDia.get(d);
-                semana.add(new DiaSemana(d, fase, feitas.size(), ret == null ? null : ret.getPlanejadas(), feitas));
-            } else if (d.equals(hoje)) {
-                MentorDia ret = retratoPorDia.get(d);
-                semana.add(new DiaSemana(d, fase, c.registrosHoje().size(), ret == null ? hojeTarefas.size() : Math.max(ret.getPlanejadas(), hojeTarefas.size()), hojeTarefas));
-            } else {
-                List<Tarefa> previstas = r.dia(d).map(x -> ordenarDoDia(x.tarefas()).stream()
-                        .filter(t -> !(c.redacaoNaSemana() && t.tipo() == PlanejadorMentor.Tipo.REDACAO))
-                        .map(t -> tarefa(t, hoje, Set.of(), c.redacaoNaSemana())).toList()).orElse(List.of());
-                semana.add(new DiaSemana(d, fase, 0, previstas.size(), previstas));
-            }
-        }
+        // Dias com tarefas para o calendário: uma semana para trás e quatro para a frente (o resto vem sob demanda).
+        List<Dia> dias = diasDetalhados(uid, c, hoje.minusDays(7), hoje.plusDays(27), regsPorDia, retratoPorDia, hojeTarefas);
 
         // Mapa do ano: do começo do plano até a prova.
         List<DiaMapa> mapa = new ArrayList<>();
@@ -434,21 +416,60 @@ public class MentorService {
             areas.add(new Area(a, estudadosArea, noPlano, inc == 0 ? 0 : arred(feita / inc)));
         }
 
-        Set<Long> deHoje = c.pendentesHoje().stream().filter(t -> t.assuntoId() != null).map(PlanejadorMentor.Tarefa::assuntoId).collect(Collectors.toSet());
-        List<Proximo> proximos = r.sequencia().stream()
-                .filter(id -> !deHoje.contains(id) && r.inicioPrevisto().containsKey(id) && r.inicioPrevisto().get(id).isAfter(hoje))
-                .sorted(Comparator.comparing(id -> r.inicioPrevisto().get(id)))
-                .limit(6)
-                .map(id -> catalogo.item(id).map(i -> new Proximo(mini(i), r.inicioPrevisto().get(id))).orElse(null))
-                .filter(Objects::nonNull).toList();
         List<AssuntoMini> fora = r.foraDoPlano().stream().map(id -> catalogo.item(id).map(this::mini).orElse(null)).filter(Objects::nonNull).toList();
         List<AssuntoMini> removidos = c.linhas().values().stream().filter(EstudoAssunto::isRemovido)
                 .map(e -> catalogo.item(e.getAssuntoId()).map(this::mini).orElse(null)).filter(Objects::nonNull).toList();
 
         Config config = new Config(p.getInicio(), Arrays.stream(c.cfg().minutos()).boxed().toList(), List.copyOf(c.cfg().foco()), p.getLingua(), p.isNotificacoes());
         Fases fases = new Fases(r.inicio(), r.inicioAprofundamento(), r.inicioRetaFinal(), fase(hoje, r));
-        return new Painel(true, hoje, prova, catalogo.provaConfirmada(), orientacao, config, fases, resumo, hojeTarefas, semana, mapa,
-                areas, proximos, fora, removidos, 0);
+        return new Painel(true, hoje, prova, catalogo.provaConfirmada(), orientacao, config, fases, resumo, hojeTarefas, dias, mapa,
+                areas, fora, removidos, 0);
+    }
+
+    /** Dias de um trecho do calendário, para quando o aluno rola para além do que veio no painel. */
+    @Transactional
+    public List<Dia> dias(Usuario u, LocalDate de, LocalDate ate) {
+        exigir(u);
+        if (de == null || ate == null || ate.isBefore(de) || ChronoUnit.DAYS.between(de, ate) > 62)
+            throw new IllegalArgumentException("Intervalo inválido.");
+        MentorPlano p = planos.findByUsuarioId(u.getId()).orElseThrow(NoSuchElementException::new);
+        Calculo c = calcular(u.getId(), p);
+        LocalDate fimPassado = ate.isBefore(c.hoje()) ? ate : c.hoje();
+        Map<LocalDate, List<MentorRegistro>> regs = registros.findAllByUsuarioIdAndDataBetween(u.getId(), de, fimPassado).stream()
+                .collect(Collectors.groupingBy(MentorRegistro::getData));
+        Map<LocalDate, MentorDia> rets = retratos.findAllByUsuarioIdAndDataBetween(u.getId(), de, fimPassado).stream()
+                .collect(Collectors.toMap(MentorDia::getData, Function.identity(), (a, b) -> a));
+        return diasDetalhados(u.getId(), c, de, ate, regs, rets, tarefasDeHoje(u.getId(), c));
+    }
+
+    private List<Dia> diasDetalhados(UUID uid, Calculo c, LocalDate de, LocalDate ate, Map<LocalDate, List<MentorRegistro>> regsPorDia,
+                                     Map<LocalDate, MentorDia> retratoPorDia, List<Tarefa> hojeTarefas) {
+        LocalDate hoje = c.hoje();
+        Resultado r = c.resultado();
+        LocalDate prova = catalogo.prova();
+        List<Dia> dias = new ArrayList<>();
+        for (LocalDate d = de; !d.isAfter(ate) && d.isBefore(prova); d = d.plusDays(1)) {
+            String fase = fase(d, r);
+            if (d.isBefore(hoje)) {
+                List<Tarefa> feitas = regsPorDia.getOrDefault(d, List.of()).stream().map(this::feita).toList();
+                MentorDia ret = retratoPorDia.get(d);
+                dias.add(new Dia(d, fase, feitas.size(), ret == null ? null : ret.getPlanejadas(), feitas));
+            } else if (d.equals(hoje)) {
+                int feitas = (int) hojeTarefas.stream().filter(Tarefa::feita).count();
+                dias.add(new Dia(d, fase, feitas, hojeTarefas.size(), hojeTarefas));
+            } else {
+                LocalDate dia = d;
+                List<Tarefa> previstas = r.dia(d).map(x -> ordenarDoDia(x.tarefas()).stream()
+                        .filter(t -> !(c.redacaoNaSemana() && t.tipo() == PlanejadorMentor.Tipo.REDACAO && mesmaSemana(dia, hoje)))
+                        .map(t -> tarefa(t, hoje, Set.of(), false)).toList()).orElse(List.of());
+                dias.add(new Dia(d, fase, 0, previstas.size(), previstas));
+            }
+        }
+        return dias;
+    }
+
+    private static boolean mesmaSemana(LocalDate a, LocalDate b) {
+        return a.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)).equals(b.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)));
     }
 
     // ------------------------------------------------------------------ peças
