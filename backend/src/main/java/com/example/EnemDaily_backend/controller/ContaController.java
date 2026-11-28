@@ -3,6 +3,7 @@ package com.example.EnemDaily_backend.controller;
 import com.example.EnemDaily_backend.model.Usuario;
 import com.example.EnemDaily_backend.repository.UsuarioRepository;
 import com.example.EnemDaily_backend.service.ContaService;
+import com.example.EnemDaily_backend.service.EscolaService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -19,13 +20,32 @@ public class ContaController {
     public record NomeUsuario(String usuario) {}
     public record Email(String email, String senhaAtual) {}
     public record Senha(String senhaAtual, String novaSenha) {}
+    public record EscolaEscolhida(Long codigo, Long idLivre, String nome) {}
 
     private final ContaService conta;
     private final UsuarioRepository usuarios;
+    private final EscolaService escolas;
 
-    public ContaController(ContaService conta, UsuarioRepository usuarios) {
+    public ContaController(ContaService conta, UsuarioRepository usuarios, EscolaService escolas) {
         this.conta = conta;
         this.usuarios = usuarios;
+        this.escolas = escolas;
+    }
+
+    @GetMapping("/escolas")
+    public ResponseEntity<?> buscarEscolas(@RequestParam String q, Authentication auth) {
+        return executar(auth, eu -> escolas.buscar(q));
+    }
+
+    /** Escola do aluno: {"escola": opção} ou {"escola": null}. */
+    @GetMapping("/escola")
+    public ResponseEntity<?> escola(Authentication auth) {
+        return executar(auth, eu -> java.util.Collections.singletonMap("escola", escolas.minha(eu).orElse(null)));
+    }
+
+    @PutMapping("/escola")
+    public ResponseEntity<?> definirEscola(@RequestBody EscolaEscolhida corpo, Authentication auth) {
+        return executar(auth, eu -> java.util.Collections.singletonMap("escola", escolas.definir(eu, corpo.codigo(), corpo.idLivre(), corpo.nome()).orElse(null)));
     }
 
     @GetMapping("/disponivel")

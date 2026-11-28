@@ -57,6 +57,16 @@ public class GrupoController {
         }
     }
 
+    /** Destaque do grupo no dia anterior; 204 quando ninguém pontuou ontem. */
+    @GetMapping("/{id}/destaque-ontem")
+    public ResponseEntity<?> getDestaqueOntem(@PathVariable("id") UUID id){
+        try{
+            return grupoService.destaqueOntem(id).<ResponseEntity<?>>map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.noContent().build());
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
     @GetMapping("/publicos")
     public ResponseEntity<?> getGruposPublicos(Authentication authentication){
         Usuario usuario = (Usuario) authentication.getPrincipal();

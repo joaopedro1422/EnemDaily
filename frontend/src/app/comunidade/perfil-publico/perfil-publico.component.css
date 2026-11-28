@@ -43,6 +43,9 @@
 .pp-vazio .pp-pri { flex: none; padding: 0 22px; }
 
 .pp-menu { position: relative; flex: none; }
+.pp-escola { margin-left: auto; max-width: calc(100% - 56px); display: inline-flex; align-items: center; gap: 7px; height: 34px; padding: 0 13px 0 11px; border-radius: 999px; background: var(--ed-fundo-2); color: var(--ed-tinta-2); font-size: 13px; font-weight: 700; }
+.pp-escola ed-icone { flex: none; color: var(--ed-caneta-texto); }
+.pp-escola span { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .pp-mais { width: 48px; height: 48px; border-radius: 14px; border: 1.5px solid var(--ed-pauta-forte); background: var(--ed-folha); color: var(--ed-tinta-2); display: grid; place-items: center; cursor: pointer; }
 .pp-menu-lista { position: absolute; right: 0; bottom: calc(100% + 6px); z-index: 10; min-width: 220px; display: grid; padding: 6px; border-radius: 16px; background: var(--ed-folha); border: 1px solid var(--ed-pauta); box-shadow: var(--ed-sombra); animation: pp-menu 180ms var(--ed-curva) both; }
 @keyframes pp-menu { from { transform: translateY(4px); opacity: 0; } }
@@ -90,6 +93,7 @@
 .pp-trancado p { margin: 0; max-width: 38ch; font-size: 14px; color: var(--ed-tinta-2); }
 
 @media (max-width: 560px) {
+  .pp-acoes.eu .pp-pri { flex-basis: 100%; }
   .pp-capa-fundo { height: 128px; }
   .pp-id { padding-top: 66px; }
   .pp-areas { grid-template-columns: repeat(2, 1fr); }

@@ -45,6 +45,44 @@
         @if (eUsuario.ok) { <p class="cf-ok">{{ eUsuario.ok }}</p> }
         @if (eUsuario.erro) { <p class="cf-erro">{{ eUsuario.erro }}</p> }
       </form>
+
+      <div class="cf-campo">
+        <div class="cf-label-linha">
+          <label for="cf-escola">Escola, cursinho ou mentoria</label>
+          @if (escola && trocandoEscola) { <button class="cf-link" type="button" (click)="trocandoEscola = false">Cancelar</button> }
+        </div>
+        @if (escola && !trocandoEscola) {
+          <div class="cf-escolhida">
+            <span class="cf-escola-ico"><ed-icone nome="school" [tamanho]="18" /></span>
+            <span class="cf-escola-txt"><b>{{ escola.nome }}</b>@if (escola.local) { <small>{{ escola.local }}</small> }</span>
+            <button class="cf-link" type="button" (click)="trocarEscola()" [disabled]="eEscola.salvando">Trocar</button>
+            <button class="cf-x" type="button" (click)="removerEscola()" [disabled]="eEscola.salvando" aria-label="Remover escola"><ed-icone nome="x" [tamanho]="16" /></button>
+          </div>
+        } @else {
+          <div class="cf-busca">
+            <ed-icone nome="search" [tamanho]="17" />
+            <input id="cf-escola" name="escola" type="search" [(ngModel)]="buscaEscola" (ngModelChange)="aoBuscarEscola($event)" placeholder="Busque pelo nome" autocomplete="off" maxlength="100" [disabled]="eEscola.salvando" />
+          </div>
+          @if (buscaEscola.trim().length >= 2 && (opcoesEscola.length || podeAdicionarEscola)) {
+            <ul class="cf-opcoes" role="listbox" aria-label="Escolas encontradas">
+              @for (o of opcoesEscola; track (o.codigo ?? 'l' + o.idLivre)) {
+                <li><button type="button" role="option" (click)="escolherEscola(o)" [disabled]="eEscola.salvando">
+                  <span class="cf-escola-ico"><ed-icone nome="school" [tamanho]="16" /></span>
+                  <span class="cf-escola-txt"><b>{{ o.nome }}</b>@if (o.local) { <small>{{ o.local }}</small> }</span>
+                </button></li>
+              }
+              @if (podeAdicionarEscola) {
+                <li><button type="button" role="option" class="cf-adicionar" (click)="adicionarEscola()" [disabled]="eEscola.salvando">
+                  <span class="cf-escola-ico"><ed-icone nome="plus" [tamanho]="16" /></span>
+                  <span class="cf-escola-txt"><b>Adicionar “{{ buscaEscola.trim() }}”</b></span>
+                </button></li>
+              }
+            </ul>
+          }
+        }
+        @if (eEscola.ok) { <p class="cf-ok">{{ eEscola.ok }}</p> }
+        @if (eEscola.erro) { <p class="cf-erro">{{ eEscola.erro }}</p> }
+      </div>
     </section>
 
     <section class="cf-bloco" aria-labelledby="t-acesso">

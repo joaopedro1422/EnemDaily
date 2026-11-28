@@ -2,7 +2,7 @@ import { AvatarComponent } from '../shared/avatar/avatar.component';
 import { ChangeDetectorRef, Component, ElementRef, HostListener, NgZone, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { AtividadeRecente, Grupo, UsuarioGrupo } from '../models/grupo';
+import { AtividadeRecente, DestaqueOntem, Grupo, UsuarioGrupo } from '../models/grupo';
 import { Usuario } from '../models/usuario';
 import { RankingDeltaEvent } from '../models/dtos';
 import { APIURL } from '../models/Environment';
@@ -10,6 +10,7 @@ import { GrupoService } from '../services/grupo.service';
 import { AuthServiceService } from '../services/auth-service.service';
 import { AuthModalComponent } from '../modal/auth-modal/auth-modal.component';
 import { PodioMensalComponent } from '../modal/podio-mensal/podio-mensal.component';
+import { DestaqueOntemComponent } from '../modal/destaque-ontem/destaque-ontem.component';
 import { GrupoConfigComponent } from '../modal/grupo-config/grupo-config.component';
 import { Alert } from '../alerts';
 import { CarregandoComponent } from '../shared/carregando/carregando.component';
@@ -35,7 +36,7 @@ const TEMPO_DESTAQUE = 6500;
 
 @Component({
   selector: 'app-grupo',
-  imports: [AvatarComponent, AuthModalComponent, PodioMensalComponent, GrupoConfigComponent, IconeComponent, CarregandoComponent],
+  imports: [AvatarComponent, AuthModalComponent, PodioMensalComponent, DestaqueOntemComponent, GrupoConfigComponent, IconeComponent, CarregandoComponent],
   templateUrl: './grupo.component.html',
   styleUrl: './grupo.component.css'
 })
@@ -75,6 +76,11 @@ export class GrupoComponent implements OnInit, OnDestroy {
 
   copiado = false;
   exibirPodio = false;
+  /** Destaque de ontem: abre na primeira visita do dia (depois do pódio, se os dois caírem no mesmo dia). */
+  destaqueOntem: DestaqueOntem | null = null;
+  exibirDestaqueOntem = false;
+  private podioHoje = false;
+  private destaqueVerificado = false;
   exibirBannerPodio = false;
   bannerRecolhido = false;
   exibirConfig = false;
@@ -122,6 +128,31 @@ export class GrupoComponent implements OnInit, OnDestroy {
     clearInterval(this.relogioDestaque);
   }
 
+  fecharPodio() {
+    this.exibirPodio = false;
+    this.podioHoje = false;
+    if (this.destaqueOntem) this.depois(() => (this.exibirDestaqueOntem = true), 400);
+  }
+
+  /** Uma vez por dia por grupo (neste aparelho): busca e mostra o destaque de ontem, se houver. */
+  private verificarDestaqueOntem() {
+    if (this.destaqueVerificado) return;
+    this.destaqueVerificado = true;
+    const chave = `edDestaqueOntem:${this.idGrupo}`;
+    const d = new Date();
+    const hoje = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    try { if (localStorage.getItem(chave) === hoje) return; } catch { /* sem armazenamento: mostra mesmo assim */ }
+    this.grupoService.getDestaqueOntem(this.idGrupo).subscribe({
+      next: destaque => {
+        try { localStorage.setItem(chave, hoje); } catch { /* ignora */ }
+        if (!destaque) return;
+        this.destaqueOntem = destaque;
+        if (!this.podioHoje) this.depois(() => (this.exibirDestaqueOntem = true), 700);
+      },
+      error: () => {}
+    });
+  }
+
   private depois(fn: () => void, ms: number) {
     this.timers.push(setTimeout(fn, ms));
   }
@@ -146,6 +177,7 @@ export class GrupoComponent implements OnInit, OnDestroy {
       this.usuarioAdmin = res.idAdmin === u.id;
       this.usuarioPresente = res.usuariogrupo.some(x => x.usuario === u.usuario);
       if (!this.usuarioPresente) this.mostrarConvite = true;
+      if (this.usuarioPresente && !this.isConvite) this.verificarDestaqueOntem();
       if (!res.admVisivel) res.usuariogrupo = res.usuariogrupo.filter(x => !x.isAdm);
       this.ordenar();
     }));
@@ -153,7 +185,10 @@ export class GrupoComponent implements OnInit, OnDestroy {
 
     const dia = new Date().getDate();
     if (!this.isConvite && diasDeGrupo > 5) {
-      if (dia === 1) this.depois(() => (this.exibirPodio = true), 2500);
+      if (dia === 1) {
+        this.podioHoje = true;
+        this.depois(() => (this.exibirPodio = true), 2500);
+      }
       if (dia <= 3) {
         this.exibirBannerPodio = true;
         this.depois(() => (this.bannerRecolhido = true), 3500);
@@ -314,6 +349,18 @@ export class GrupoComponent implements OnInit, OnDestroy {
     if (membros.length && totalXp > 80 && dias > 1) {
       const hoje = melhor(u => u.xpHoje ?? 0);
       if (hoje?.xpHoje > 0) lista.push({ chave: 'hoje', rotulo: 'Destaque do dia', icone: 'zap', cor: '#5B6CFF', nome: hoje.usuario, avatar: hoje.avatar, valor: formatarNumero(hoje.xpHoje), unidade: 'XP hoje', frase: 'Ninguém pontuou mais nas últimas horas.' });
+
+      // Quem mais subiu no ranking geral hoje: a posição de antes sai do XP de agora menos o XP de hoje.
+      // Posição = 1 + quantos têm estritamente mais XP (empates dividem o lugar).
+      const posicao = (u: UsuarioGrupo, xp: (x: UsuarioGrupo) => number) => 1 + membros.filter(o => o !== u && xp(o) > xp(u)).length;
+      const xpAntes = (x: UsuarioGrupo) => Math.max(0, (x.xpGrupo ?? 0) - (x.xpHoje ?? 0));
+      const subida = membros
+        .filter(u => (u.xpHoje ?? 0) > 0)
+        .map(u => ({ u, antes: posicao(u, xpAntes), agora: posicao(u, x => x.xpGrupo ?? 0) }))
+        .map(s => ({ ...s, ganho: s.antes - s.agora }))
+        .filter(s => s.ganho >= 2)
+        .sort((a, b) => b.ganho - a.ganho || (b.u.xpHoje ?? 0) - (a.u.xpHoje ?? 0))[0];
+      if (subida) lista.push({ chave: 'subida', rotulo: 'Em ascensão', icone: 'trending-up', cor: '#14B8A6', nome: subida.u.usuario, avatar: subida.u.avatar, valor: `+${subida.ganho}`, unidade: 'posições hoje', frase: `Saiu do ${subida.antes}º para o ${subida.agora}º lugar só hoje.` });
 
       const acertos = melhor(u => u.sequenciaAcertos ?? 0);
       if (acertos?.sequenciaAcertos > 1) lista.push({ chave: 'acertos', rotulo: 'Sequência de acertos', icone: 'flame', cor: '#FF7A1A', nome: acertos.usuario, avatar: acertos.avatar, valor: String(acertos.sequenciaAcertos), unidade: 'acertos seguidos', frase: 'A maior sequência de acertos do grupo.' });

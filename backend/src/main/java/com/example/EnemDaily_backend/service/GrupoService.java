@@ -13,9 +13,14 @@ import jakarta.transaction.Transactional;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.YearMonth;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -64,6 +69,69 @@ public class GrupoService {
         }
         return new PodioGrupoResponseDTO(posicao, usuariosPodio);
     }
+    /** Até quantos pontos de XP de diferença o destaque de ontem é decidido no desempate. */
+    static final int FAIXA_EMPATE_XP = 5;
+
+    private record Ontem(GrupoUsuario gu, int xpOntem, int xpHoje, int tempoMedio) {
+        int xpFimOntem() { return Math.max(0, gu.getXp() - xpHoje); }
+        int xpInicioOntem() { return Math.max(0, xpFimOntem() - xpOntem); }
+    }
+
+    /**
+     * Destaque de ontem: mais XP; se outros ficaram a até 5 XP, vence quem mais subiu no ranking geral ao longo
+     * de ontem e, depois, o menor tempo médio. Vazio quando ninguém do grupo pontuou ontem.
+     */
+    @Transactional
+    public Optional<DestaqueOntemDTO> destaqueOntem(UUID idGrupo) {
+        Grupo grupo = grupoRepository.findById(idGrupo).orElseThrow(() -> new RuntimeException("grupo não encontrado"));
+        Map<UUID, Object[]> linhas = new HashMap<>();
+        for (Object[] l : eventRepository.resumoOntemNoGrupo(idGrupo)) linhas.put(UUID.fromString(String.valueOf(l[0])), l);
+
+        List<Ontem> membros = grupoUsuarioRepository.findAllByGrupo(grupo).stream()
+                .filter(gu -> grupo.isAdmVisivel() || !gu.isAdmin())
+                .map(gu -> {
+                    Object[] l = linhas.get(gu.getUsuario().getId());
+                    if (l == null) return new Ontem(gu, 0, 0, 0);
+                    int respostas = ((Number) l[4]).intValue();
+                    int tempo = ((Number) l[3]).intValue();
+                    return new Ontem(gu, ((Number) l[1]).intValue(), ((Number) l[2]).intValue(), respostas > 0 ? Math.round((float) tempo / respostas) : 0);
+                }).toList();
+
+        List<Ontem> pontuaram = membros.stream().filter(m -> m.xpOntem() > 0).toList();
+        if (pontuaram.isEmpty()) return Optional.empty();
+
+        Map<Ontem, Integer> ganho = new HashMap<>();
+        Map<Ontem, Integer> posicaoFim = new HashMap<>();
+        for (Ontem m : pontuaram) {
+            int antes = 1 + (int) membros.stream().filter(o -> o != m && o.xpInicioOntem() > m.xpInicioOntem()).count();
+            int depois = 1 + (int) membros.stream().filter(o -> o != m && o.xpFimOntem() > m.xpFimOntem()).count();
+            ganho.put(m, Math.max(0, antes - depois));
+            posicaoFim.put(m, depois);
+        }
+
+        int topo = pontuaram.stream().mapToInt(Ontem::xpOntem).max().orElse(0);
+        // Sem tempo registrado conta como o mais lento no desempate.
+        Comparator<Ontem> tempo = Comparator.comparingInt(m -> m.tempoMedio() > 0 ? m.tempoMedio() : Integer.MAX_VALUE);
+        List<Ontem> faixa = pontuaram.stream()
+                .filter(m -> m.xpOntem() >= topo - FAIXA_EMPATE_XP)
+                .sorted(Comparator.<Ontem>comparingInt(ganho::get).reversed()
+                        .thenComparing(tempo)
+                        .thenComparing(Comparator.comparingInt(Ontem::xpOntem).reversed()))
+                .toList();
+
+        Ontem v = faixa.get(0);
+        String desempate = null;
+        if (faixa.size() > 1) {
+            Ontem segundo = faixa.get(1);
+            if (!ganho.get(v).equals(ganho.get(segundo))) desempate = "posicoes";
+            else if (tempo.compare(v, segundo) != 0) desempate = "tempo";
+        }
+        Usuario u = v.gu().getUsuario();
+        return Optional.of(new DestaqueOntemDTO(u.getId(), u.getUsuario(), u.getAvatar(),
+                LocalDate.now(ZoneId.of("America/Sao_Paulo")).minusDays(1), v.xpOntem(), ganho.get(v), posicaoFim.get(v),
+                v.tempoMedio(), desempate, pontuaram.size()));
+    }
+
     public void processaMelhorDoMes(UUID idGrupo){
         LocalDateTime fimMes = LocalDateTime.now();
         LocalDateTime inicioMes = fimMes.minusMonths(1).withDayOfMonth(1).withHour(0).withMinute(0);

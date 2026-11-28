@@ -55,6 +55,8 @@ export interface PerfilPublico {
   dueloAtivo: Duelo | null;
   duelosVencidos: number;
   duelosDisputados: number;
+  /** Escola, cursinho ou mentoria que a pessoa informou (escondida em perfil privado para quem não é amigo). */
+  escola: string | null;
 }
 
 export interface SolicitacaoAmizade { id: string; usuario: UsuarioMini; criadaEm: string; }

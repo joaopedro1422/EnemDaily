@@ -1,0 +1,46 @@
+<div class="do" [class.saindo]="saindo" [class.eu]="souEu" role="dialog" aria-modal="true" aria-labelledby="do-nome" (click)="tocarFundo()">
+  <div class="do-arte" aria-hidden="true">
+    <span class="do-brilho"></span>
+    <span class="do-raios"></span>
+    <span class="do-onda"></span>
+    <span class="do-onda o2"></span>
+    @for (e of estrelas; track $index) {
+      <i class="do-estrela" [style.left.%]="e.x" [style.top.%]="e.y" [style.--d.ms]="e.d" [style.--s.px]="e.s"></i>
+    }
+  </div>
+
+  <button class="do-x" type="button" (click)="fechar(); $event.stopPropagation()" aria-label="Fechar"><ed-icone nome="x" [tamanho]="20" /></button>
+
+  <header class="do-cab">
+    <span class="do-rotulo"><ed-icone nome="star" [tamanho]="14" />Destaque de ontem</span>
+    <p class="do-data">{{ dataLonga }}@if (nomeGrupo) { <span>·</span> {{ nomeGrupo }} }</p>
+  </header>
+
+  <section class="do-centro">
+    <div class="do-foto">
+      <span class="do-anel"></span>
+      <span class="do-av"><ed-avatar [valor]="destaque.avatar" [nome]="destaque.usuario" [tamanho]="140" [encher]="true" /></span>
+      <span class="do-coroa"><ed-icone nome="crown" [tamanho]="20" /></span>
+    </div>
+
+    @if (souEu) { <span class="do-voce">Você foi o destaque de ontem!</span> }
+    <h1 class="do-nome" id="do-nome">{{ destaque.usuario }}</h1>
+
+    <div class="do-xp"><b>{{ formatarNumero(xp) }}</b><small>XP ontem</small></div>
+
+    @if (destaque.posicoes > 0 || destaque.tempoMedio > 0) {
+      <ul class="do-stats">
+        @if (destaque.posicoes > 0) {
+          <li><span class="do-stat-ico"><ed-icone nome="trending-up" [tamanho]="16" /></span><b>+{{ destaque.posicoes }}</b><small>{{ destaque.posicoes === 1 ? 'posição subida' : 'posições subidas' }}</small></li>
+        }
+        @if (destaque.tempoMedio > 0) {
+          <li><span class="do-stat-ico"><ed-icone nome="timer" [tamanho]="16" /></span><b>{{ tempo }}</b><small>por questão</small></li>
+        }
+      </ul>
+    }
+  </section>
+
+  <footer class="do-pe">
+    <button class="do-btn" type="button" (click)="fechar(); $event.stopPropagation()">Ver o grupo<ed-icone nome="arrow-right" [tamanho]="18" /></button>
+  </footer>
+</div>

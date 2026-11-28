@@ -28,9 +28,11 @@ public class ComunidadeService {
     private final BloqueioRepository bloqueioRepository;
     private final EventRepository eventRepository;
     private final DueloService dueloService;
+    private final EscolaService escolaService;
 
     public ComunidadeService(UsuarioRepository usuarioRepository, AmizadeRepository amizadeRepository, BloqueioRepository bloqueioRepository,
-                             EventRepository eventRepository, DueloService dueloService) {
+                             EventRepository eventRepository, DueloService dueloService, EscolaService escolaService) {
+        this.escolaService = escolaService;
         this.usuarioRepository = usuarioRepository;
         this.amizadeRepository = amizadeRepository;
         this.bloqueioRepository = bloqueioRepository;
@@ -105,7 +107,8 @@ public class ComunidadeService {
                 !eu0 && motivo == null, motivo, disp != null && disp.hoje(),
                 eu0 ? new ComunidadeDTOs.Placar(0, 0, 0) : dueloService.placarEntre(eu, u),
                 eu0 ? null : dueloService.ativoEntre(eu, u),
-                est[0], est[1]);
+                est[0], est[1],
+                veCampus ? escolaService.minha(u).map(EscolaService.Opcao::nome).orElse(null) : null);
     }
 
 

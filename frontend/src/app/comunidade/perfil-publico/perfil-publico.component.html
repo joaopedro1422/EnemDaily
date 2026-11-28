@@ -37,8 +37,9 @@
       </dl>
 
       @if (perfil.relacao === 'EU') {
-        <div class="pp-acoes">
+        <div class="pp-acoes eu">
           <button class="pp-pri" type="button" (click)="editando = true"><ed-icone nome="pen-line" [tamanho]="17" />Editar avatar e capa</button>
+          @if (perfil.escola) { <span class="pp-escola" [title]="perfil.escola"><ed-icone nome="school" [tamanho]="15" /><span>{{ perfil.escola }}</span></span> }
         </div>
         <p class="pp-proprio"><ed-icone nome="circle-user" [tamanho]="16" />É assim que os outros veem o seu perfil.</p>
       } @else if (perfil.relacao === 'BLOQUEADO') {
@@ -64,6 +65,7 @@
               </div>
             }
           </div>
+          @if (perfil.escola) { <span class="pp-escola" [title]="perfil.escola"><ed-icone nome="school" [tamanho]="15" /><span>{{ perfil.escola }}</span></span> }
         </div>
         @if (!perfil.podeDesafiar && perfil.motivoSemDuelo) { <p class="pp-motivo"><ed-icone nome="lock" [tamanho]="14" />{{ perfil.motivoSemDuelo }}</p> }
         @if (confirmarBloqueio) {

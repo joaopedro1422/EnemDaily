@@ -52,6 +52,9 @@ public class Usuario {
     private Boolean perfilPrivado = false;
     @Column(columnDefinition = "boolean default false")
     private Boolean duelosSoAmigos = false;
+    /** Escola informada pelo aluno: código INEP (lista oficial) ou uma opção digitada (tb_escola_livre). */
+    private Long escolaInep;
+    private Long escolaLivreId;
     private boolean d1;
     private boolean d7;
     private boolean d30;

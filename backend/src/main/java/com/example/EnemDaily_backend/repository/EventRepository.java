@@ -282,4 +282,30 @@ public interface EventRepository extends JpaRepository<Event, Long> {
           AND e.data >= :inicio AND e.data < :fim
     """, nativeQuery = true)
     long respostasNoPeriodo(@Param("usuarioId") UUID usuarioId, @Param("inicio") LocalDateTime inicio, @Param("fim") LocalDateTime fim);
+
+    /**
+     * Por membro do grupo: XP de ontem, XP de hoje, tempo somado de ontem e quantas respostas de ontem têm tempo.
+     * Só conta respostas nas áreas do grupo, como o "XP hoje" da tela do grupo.
+     */
+    @Query(value = """
+        SELECT gu.usuario_id,
+          COALESCE(SUM(CASE WHEN e.data < CURRENT_DATE THEN (e.json_context->>'xp')::int END), 0),
+          COALESCE(SUM(CASE WHEN e.data >= CURRENT_DATE THEN (e.json_context->>'xp')::int END), 0),
+          COALESCE(SUM(CASE WHEN e.data < CURRENT_DATE THEN (e.json_context->>'tempoGasto')::int END), 0),
+          COUNT(CASE WHEN e.data < CURRENT_DATE AND e.json_context->>'tempoGasto' IS NOT NULL THEN 1 END)
+        FROM grupo_usuario gu
+        JOIN grupos g ON g.id = gu.grupo_id
+        LEFT JOIN event e ON e.id_usuario = gu.usuario_id
+          AND e.tipo IN ('RESPOSTA_QUESTAO', 'RESPOSTA_BONUS')
+          AND e.data >= CURRENT_DATE - INTERVAL '1 day'
+          AND (
+            (e.json_context->>'area' = 'HUMANAS'    AND g.humanas    = TRUE) OR
+            (e.json_context->>'area' = 'EXATAS'     AND g.exatas     = TRUE) OR
+            (e.json_context->>'area' = 'LINGUAGENS' AND g.linguagens = TRUE) OR
+            (e.json_context->>'area' = 'NATUREZAS'  AND g.naturezas  = TRUE)
+          )
+        WHERE gu.grupo_id = :grupoId
+        GROUP BY gu.usuario_id
+        """, nativeQuery = true)
+    List<Object[]> resumoOntemNoGrupo(UUID grupoId);
 }

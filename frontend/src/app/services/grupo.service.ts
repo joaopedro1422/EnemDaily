@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { GrupoRequest, NovoGrupoResponse } from '../models/dtos';
 import { Observable, tap } from 'rxjs';
 import { GrupoResumido, Usuario } from '../models/usuario';
-import { Grupo, GrupoAtualizado, PodioResponse, UsuarioGrupo } from '../models/grupo';
+import { DestaqueOntem, Grupo, GrupoAtualizado, PodioResponse, UsuarioGrupo } from '../models/grupo';
 import { AuthServiceService } from './auth-service.service';
 import { APIURL } from '../models/Environment';
 
@@ -34,6 +34,10 @@ export class GrupoService {
     Authorization: `Bearer ${token}`
     });
     return this.http.get<GrupoResumido[]>(`${this.apiUrl}/publicos`,{headers}).pipe(tap( res => console.log(res)));
+  }
+  /** Destaque de ontem no grupo; null quando ninguém pontuou ontem (204). */
+  getDestaqueOntem(idGrupo: string): Observable<DestaqueOntem | null> {
+    return this.http.get<DestaqueOntem | null>(`${this.apiUrl}/${idGrupo}/destaque-ontem`);
   }
   getPodioMensal(idGrupo: string): Observable<PodioResponse>{
      const token = localStorage.getItem('tokenUser');

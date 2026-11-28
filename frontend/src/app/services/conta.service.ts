@@ -6,6 +6,8 @@ import { Usuario } from '../models/usuario';
 import { AuthServiceService } from './auth-service.service';
 
 export interface Disponibilidade { disponivel: boolean; motivo?: string; atual?: boolean; }
+/** Uma escola da busca: da lista do INEP (codigo, local, rede) ou digitada por algum aluno (idLivre). */
+export interface OpcaoEscola { tipo: 'inep' | 'livre'; codigo: number | null; idLivre: number | null; nome: string; local: string | null; rede: 'publica' | 'privada' | null; }
 
 @Injectable({ providedIn: 'root' })
 export class ContaService {
@@ -31,6 +33,19 @@ export class ContaService {
 
   alterarEmail(email: string, senhaAtual: string): Observable<Usuario> {
     return this.http.put<Usuario>(`${this.base}/email`, { email, senhaAtual }, { headers: this.headers }).pipe(tap(u => this.auth.atualizarUsuario(u)));
+  }
+
+  escola(): Observable<{ escola: OpcaoEscola | null }> {
+    return this.http.get<{ escola: OpcaoEscola | null }>(`${this.base}/escola`, { headers: this.headers });
+  }
+
+  buscarEscolas(q: string): Observable<OpcaoEscola[]> {
+    return this.http.get<OpcaoEscola[]>(`${this.base}/escolas`, { headers: this.headers, params: { q } });
+  }
+
+  /** Escolhe uma opção (codigo ou idLivre), cria uma nova pelo nome digitado, ou limpa (tudo nulo). */
+  definirEscola(escolha: { codigo?: number | null; idLivre?: number | null; nome?: string | null }): Observable<{ escola: OpcaoEscola | null }> {
+    return this.http.put<{ escola: OpcaoEscola | null }>(`${this.base}/escola`, escolha, { headers: this.headers });
   }
 
   alterarSenha(senhaAtual: string, novaSenha: string): Observable<unknown> {

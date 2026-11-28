@@ -1,5 +1,8 @@
 @if (exibirPodio && grupo) {
-  <app-podio-mensal [idGrupo]="idGrupo" [nomeGrupo]="grupo.nome" (close)="exibirPodio = false" />
+  <app-podio-mensal [idGrupo]="idGrupo" [nomeGrupo]="grupo.nome" (close)="fecharPodio()" />
+}
+@if (exibirDestaqueOntem && destaqueOntem) {
+  <app-destaque-ontem [destaque]="destaqueOntem" [nomeGrupo]="grupo?.nome ?? ''" [souEu]="destaqueOntem.idUsuario === usuario?.id" (close)="exibirDestaqueOntem = false" />
 }
 @if (exibirConfig && grupo) {
   <app-grupo-config [grupo]="grupo" [usuarioDemo]="!!usuario?.demo" (close)="exibirConfig = false" />

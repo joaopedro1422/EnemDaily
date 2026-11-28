@@ -22,7 +22,7 @@ public final class ComunidadeDTOs {
                                 int acertosLinguagens, int acertosHumanas, int acertosNaturezas, int acertosExatas,
                                 String relacao, UUID amizadeId, boolean perfilPrivado,
                                 boolean podeDesafiar, String motivoSemDuelo, boolean podeDuelarHoje,
-                                Placar placar, Duelo dueloAtivo, int duelosVencidos, int duelosDisputados) {}
+                                Placar placar, Duelo dueloAtivo, int duelosVencidos, int duelosDisputados, String escola) {}
 
     public record SolicitacaoAmizade(UUID id, UsuarioMini usuario, String criadaEm) {}
 

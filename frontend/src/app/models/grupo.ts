@@ -54,3 +54,16 @@ export interface Grupo {
   atividadesRecentes: AtividadeRecente[];
   dtCriacao: string;
 }
+/** Destaque do grupo no dia anterior (data em "aaaa-mm-dd"; tempoMedio em segundos; desempate: o que decidiu). */
+export interface DestaqueOntem {
+  idUsuario: string;
+  usuario: string;
+  avatar: string;
+  data: string;
+  xp: number;
+  posicoes: number;
+  posicao: number;
+  tempoMedio: number;
+  desempate: 'posicoes' | 'tempo' | null;
+  participantes: number;
+}
