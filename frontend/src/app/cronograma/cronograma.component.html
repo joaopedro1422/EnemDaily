@@ -1,0 +1,289 @@
+@if (carregando) {
+  <div class="cr-carregando"><ed-carregando [tamanho]="56" texto="Carregando seu cronograma" /></div>
+} @else if (falhou) {
+  <div class="cr-carregando">
+    <p>Não foi possível carregar o cronograma.</p>
+    <button class="cr-btn" type="button" (click)="carregar()">Tentar de novo</button>
+  </div>
+} @else if (painel && !painel.configurado && !ajuda && !montagem && !gerando) {
+  <section class="cr-inicio">
+    <span class="cr-inicio-ico"><ed-icone nome="calendar-check" [tamanho]="28" /></span>
+    <h1>Meu cronograma</h1>
+    <p>Um plano de estudos até o ENEM, organizado para o seu tempo.</p>
+    <button class="cr-btn" type="button" (click)="montagem = 'criar'"><ed-icone nome="sparkles" [tamanho]="18" />Montar meu cronograma</button>
+  </section>
+} @else if (painel?.configurado && painel!.resumo && painel!.fases) {
+  <main class="cr" [class.revelar]="revelar">
+    <header class="cr-topo">
+      <div class="cr-titulo">
+        <span class="cr-ico"><ed-icone nome="calendar-check" [tamanho]="22" /></span>
+        <div>
+          <h1>Meu cronograma</h1>
+          <p><b>{{ painel!.resumo!.diasParaProva }}</b> dias para o ENEM<span class="cr-fase" [attr.data-fase]="painel!.fases!.atual">{{ fases[painel!.fases!.atual] }}</span></p>
+        </div>
+      </div>
+      <div class="cr-botoes">
+        <button class="cr-redondo" type="button" (click)="ajuda = 'normal'" aria-label="Como o cronograma funciona" title="Como funciona"><ed-icone nome="circle-help" [tamanho]="20" /></button>
+        <button class="cr-redondo" type="button" (click)="ajustes = true" aria-label="Ajustes do cronograma" title="Ajustes"><ed-icone nome="engrenagem" [tamanho]="20" /></button>
+      </div>
+    </header>
+
+    @if (painel!.resumo!.bemVindo && !bemVindoFechado) {
+      <div class="cr-bemvindo">
+        <span class="cr-bemvindo-ico"><ed-icone nome="sparkles" [tamanho]="17" /></span>
+        <p><b>Que bom te ver de volta!</b> Reorganizei o plano a partir de hoje.</p>
+        <button type="button" (click)="bemVindoFechado = true" aria-label="Fechar aviso"><ed-icone nome="x" [tamanho]="16" /></button>
+      </div>
+    }
+
+    <!-- Hoje -->
+    <section class="hoje" [class.concluido]="totalHoje > 0 && !pendentes.length" aria-labelledby="hoje-titulo">
+      <header class="hoje-cab">
+        <div>
+          <span class="rotulo">Hoje</span>
+          <h2 id="hoje-titulo">{{ dataLonga(painel!.hoje) }}</h2>
+        </div>
+        @if (totalHoje) {
+          <div class="anel" [attr.aria-label]="feitas.length + ' de ' + totalHoje + ' feitos'">
+            <svg viewBox="0 0 40 40" aria-hidden="true">
+              <circle class="anel-trilho" cx="20" cy="20" r="16" />
+              <circle class="anel-arco" cx="20" cy="20" r="16" [attr.stroke-dasharray]="arco(feitas.length, totalHoje)" />
+            </svg>
+            <b>{{ feitas.length }}<small>/{{ totalHoje }}</small></b>
+          </div>
+        }
+      </header>
+
+      @if (antesDoInicio) {
+        <div class="hoje-vazio">
+          <ed-icone nome="calendar" [tamanho]="22" />
+          <p>Seu cronograma começa <b>{{ dataCurta(painel!.config!.inicio) }}</b>.</p>
+        </div>
+      } @else if (!totalHoje) {
+        <div class="hoje-vazio">
+          <ed-icone nome="leaf" [tamanho]="22" />
+          <p>Dia livre no seu plano.@if (amanha) { <span>Próximo: <b>{{ amanha.nome }}</b>, {{ dataCurta(amanha.data) }}.</span> }</p>
+        </div>
+      } @else {
+        <ul class="tarefas">
+          @for (t of pendentes; track chaveTarefa(t, $index); let i = $index) {
+            <li class="tarefa" [style.--c]="t.assunto ? info(t.assunto.area).cor : 'var(--ed-caneta)'" [style.--i]="i">
+              <button class="t-corpo" type="button" (click)="abrir(t, null, 'hoje')">
+                <span class="t-ico"><ed-icone [nome]="t.assunto ? info(t.assunto.area).icone : 'pen-line'" [tamanho]="17" /></span>
+                <span class="t-txt">
+                  <b>{{ t.assunto?.nome ?? 'Redação da semana' }}</b>
+                  <span class="t-meta">
+                    <span class="t-tipo" [attr.data-tipo]="t.tipo">{{ rotulo(t) }}</span>
+                    @if (t.assunto && t.tipo === 'estudo') { <span>{{ pesos[t.assunto.peso] }}</span> }
+                    @if (t.deOntem) { <span class="t-chip"><ed-icone nome="history" [tamanho]="12" />De ontem</span> }
+                    @if (t.atrasoDias > 0) { <span class="t-chip"><ed-icone nome="clock" [tamanho]="12" />{{ t.atrasoDias === 1 ? 'Desde ontem' : 'Há ' + t.atrasoDias + ' dias' }}</span> }
+                  </span>
+                </span>
+              </button>
+              <button class="t-check" type="button" (click)="check(t, $event)" [disabled]="ocupado"
+                      [class.aberto]="perguntaRevisao === t.assunto?.id && !!t.assunto"
+                      [attr.aria-label]="'Marcar ' + (t.assunto?.nome ?? 'redação') + ' como feito'">
+                <ed-icone nome="check" [tamanho]="18" [traco]="3" />
+              </button>
+              @if (perguntaRevisao === t.assunto?.id && !!t.assunto) {
+                <div class="t-revisao">
+                  <span>Como foi?</span>
+                  <button type="button" (click)="revisar(t, false)" [disabled]="ocupado">Tranquila</button>
+                  <button type="button" class="sec" (click)="revisar(t, true)" [disabled]="ocupado">Com dificuldade</button>
+                </div>
+              }
+            </li>
+          }
+          @for (t of feitas; track chaveTarefa(t, $index)) {
+            <li class="tarefa feita" [style.--c]="t.assunto ? info(t.assunto.area).cor : 'var(--ed-caneta)'">
+              <button class="t-corpo" type="button" (click)="abrir(t, null, 'feito')">
+                <span class="t-ico"><ed-icone [nome]="t.assunto ? info(t.assunto.area).icone : 'pen-line'" [tamanho]="17" /></span>
+                <span class="t-txt">
+                  <b>{{ t.assunto?.nome ?? 'Redação da semana' }}</b>
+                  <span class="t-meta"><span class="t-tipo">{{ rotulo(t) }}</span></span>
+                </span>
+              </button>
+              <span class="t-check feito" aria-label="Feito"><ed-icone nome="check" [tamanho]="18" [traco]="3" /></span>
+            </li>
+          }
+        </ul>
+
+        @if (pendentes.length) {
+          @if (!confirmandoNaoDeu) {
+            <footer class="hoje-pe">
+              <button class="cr-btn" type="button" (click)="concluirDia()" [disabled]="ocupado">
+                <ed-icone nome="check" [tamanho]="18" [traco]="2.8" />{{ pendentes.length > 1 ? 'Concluir o dia' : 'Concluir' }}
+              </button>
+              <button class="cr-texto" type="button" (click)="confirmandoNaoDeu = true" [disabled]="ocupado">Hoje não deu</button>
+            </footer>
+          } @else {
+            <div class="hoje-confirma">
+              <p>Sem problema. O que falta vai para os próximos dias, sem bagunçar o resto do plano.</p>
+              <div>
+                <button class="cr-btn" type="button" (click)="naoDeuHoje()" [disabled]="ocupado">Reorganizar</button>
+                <button class="cr-btn sec" type="button" (click)="confirmandoNaoDeu = false">Voltar</button>
+              </div>
+            </div>
+          }
+        } @else {
+          <div class="hoje-fim">
+            <span class="hoje-selo"><ed-icone nome="check" [tamanho]="20" [traco]="3" /></span>
+            <div>
+              <b>Dia concluído</b>
+              @if (amanha) { <span>Próximo: {{ amanha.nome }}, {{ dataCurta(amanha.data) }}</span> }
+            </div>
+          </div>
+        }
+      }
+    </section>
+
+    <!-- Semana -->
+    <section class="card semana" aria-label="Sua semana">
+      <div class="sem-dias">
+        @for (d of painel!.semana; track d.data; let i = $index) {
+          <button type="button" class="sd" [class.hoje]="d.data === painel!.hoje" [class.sel]="diaSelecionado === d.data"
+                  [class.passado]="d.data < painel!.hoje" [class.cheio]="d.data <= painel!.hoje && d.feitas > 0 && d.feitas >= (d.planejadas ?? 0)"
+                  [class.livre]="!(d.planejadas ?? 0) && !d.feitas"
+                  (click)="diaSelecionado = diaSelecionado === d.data ? null : d.data" [attr.aria-pressed]="diaSelecionado === d.data"
+                  [attr.aria-label]="dataLonga(d.data)">
+            <small>{{ iniciais[i] }}</small>
+            <span class="sd-anel">
+              <svg viewBox="0 0 40 40" aria-hidden="true">
+                <circle class="anel-trilho" cx="20" cy="20" r="16" />
+                @if (d.data <= painel!.hoje) { <circle class="anel-arco" cx="20" cy="20" r="16" [attr.stroke-dasharray]="arco(d.feitas, d.planejadas ?? d.feitas)" /> }
+              </svg>
+              <b>{{ diaDoMes(d.data) }}</b>
+            </span>
+            <i class="sd-pontos" aria-hidden="true">@for (p of pontos(d); track $index) { <i></i> }</i>
+          </button>
+        }
+      </div>
+      @if (diaAberto) {
+        <div class="sem-detalhe">
+          <h3>{{ dataCurta(diaAberto.data) }} · {{ diaAberto.data < painel!.hoje ? 'feito' : 'previsto' }}</h3>
+          @if (!diaAberto.tarefas.length) {
+            <p class="sem-vazio">{{ diaAberto.data < painel!.hoje ? 'Nada marcado neste dia.' : 'Dia livre.' }}</p>
+          } @else {
+            <ul>
+              @for (t of diaAberto.tarefas; track $index) {
+                <li [style.--c]="t.assunto ? info(t.assunto.area).cor : 'var(--ed-caneta)'">
+                  <button type="button" (click)="abrir(t, null, diaAberto.data < painel!.hoje ? 'feito' : 'previsto')">
+                    <i class="ponto"></i><b>{{ t.assunto?.nome ?? 'Redação da semana' }}</b><small>{{ rotulo(t) }}</small>
+                  </button>
+                </li>
+              }
+            </ul>
+          }
+        </div>
+      }
+    </section>
+
+    <!-- Caminho até o ENEM -->
+    <section class="card mapa" aria-labelledby="mapa-titulo">
+      <header class="card-cab">
+        <h2 id="mapa-titulo">Seu caminho até o ENEM</h2>
+        @if (painel!.resumo!.sequenciaDias > 1) { <span class="sequencia"><ed-icone nome="flame" [tamanho]="15" />{{ painel!.resumo!.sequenciaDias }} dias seguidos</span> }
+      </header>
+      <app-mapa-ano [mapa]="painel!.mapa" [hoje]="painel!.hoje" />
+      <div class="cob">
+        <div class="cob-num"><b>{{ pct(painel!.resumo!.cobertura) }}%</b><span>do que cai na prova já estudado</span></div>
+        <div class="cob-barra" aria-hidden="true">
+          <i class="plano" [style.width.%]="pct(painel!.resumo!.coberturaPlano)"></i>
+          <i class="estudado" [style.width.%]="pct(painel!.resumo!.cobertura)"></i>
+        </div>
+        <div class="cob-leg">
+          <span><i class="estudado"></i>Estudado · {{ painel!.resumo!.estudados }} assuntos</span>
+          <span><i class="plano"></i>No seu plano · {{ pct(painel!.resumo!.coberturaPlano) }}%</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="grade-2">
+      <!-- Áreas -->
+      <section class="card areas" aria-labelledby="areas-titulo">
+        <header class="card-cab"><h2 id="areas-titulo">Por área</h2></header>
+        <ul>
+          @for (a of painel!.areas; track a.area) {
+            <li [style.--c]="info(a.area).cor" [style.--ct]="info(a.area).corTexto">
+              <span class="ar-ico"><ed-icone [nome]="info(a.area).icone" [tamanho]="16" /></span>
+              <div class="ar-txt">
+                <b>{{ info(a.area).curto }}</b>
+                <span class="ar-barra"><i [style.width.%]="a.noPlano ? (a.estudados / a.noPlano) * 100 : 0"></i></span>
+              </div>
+              <small>{{ a.estudados }}/{{ a.noPlano }}</small>
+            </li>
+          }
+        </ul>
+      </section>
+
+      <!-- Próximos -->
+      @if (painel!.proximos.length) {
+        <section class="card proximos" aria-labelledby="prox-titulo">
+          <header class="card-cab"><h2 id="prox-titulo">Próximos assuntos</h2></header>
+          <ul>
+            @for (p of painel!.proximos; track p.assunto.id) {
+              <li [style.--c]="info(p.assunto.area).cor">
+                <button type="button" (click)="abrir(null, p.assunto, 'previsto')">
+                  <span class="px-data">{{ dataCurta(p.data) }}</span>
+                  <i class="ponto"></i>
+                  <b>{{ p.assunto.nome }}</b>
+                  <ed-icone nome="chevron-right" [tamanho]="16" />
+                </button>
+              </li>
+            }
+          </ul>
+        </section>
+      }
+    </div>
+
+    @if (painel!.fora.length || painel!.removidos.length) {
+      <details class="fora">
+        <summary>
+          <span>Fora do plano · {{ painel!.fora.length + painel!.removidos.length }}</span>
+          <ed-icone nome="chevron-down" [tamanho]="18" />
+        </summary>
+        @if (painel!.fora.length) {
+          <p>Os de menor incidência que não couberam no seu tempo. Se o tempo mudar, eles podem entrar.</p>
+          <div class="fora-lista">
+            @for (a of painel!.fora; track a.id) {
+              <button type="button" [style.--c]="info(a.area).cor" (click)="abrir(null, a, 'fora')"><i class="ponto"></i>{{ a.nome }}</button>
+            }
+          </div>
+        }
+        @if (painel!.removidos.length) {
+          <p>Você tirou do plano:</p>
+          <div class="fora-lista">
+            @for (a of painel!.removidos; track a.id) {
+              <button type="button" [style.--c]="info(a.area).cor" (click)="abrir(null, a, 'removido')"><i class="ponto"></i>{{ a.nome }}</button>
+            }
+          </div>
+        }
+      </details>
+    }
+  </main>
+}
+
+@if (ajuda && painel) {
+  <app-como-funciona [orientacao]="painel.orientacao" [primeiraVez]="ajuda === 'primeira'" (fechou)="fecharAjuda($event)" />
+}
+@if (montagem && painel) {
+  <app-montagem [config]="montagem === 'editar' ? painel.config : null" [hoje]="painel.hoje" [estudadosAntes]="painel.estudadosAntes"
+                (concluir)="montar($event)" (cancelar)="cancelarMontagem()" />
+}
+@if (gerando) {
+  <app-geracao [modo]="gerando.modo" [pronto]="gerando.pronto" (fim)="fimGeracao()" />
+}
+@if (ajustes && painel?.config) {
+  <app-ajustes-cronograma [config]="painel!.config!" (escolha)="escolhaAjustes($event)" (notificacoes)="notificacoes($event)" />
+}
+@if (folha) {
+  <app-folha-assunto [assunto]="folha.assunto" [tarefa]="folha.tarefa" [contexto]="folha.contexto" [ocupado]="ocupado"
+                     (acao)="acaoFolha($event)" (fechou)="folha = null" />
+}
+
+@if (aviso) {
+  <div class="aviso" [class.erro]="aviso.erro" role="status" aria-live="polite">
+    <span>{{ aviso.texto }}</span>
+    @if (aviso.desfazer) { <button type="button" (click)="usarDesfazer()"><ed-icone nome="rotate-ccw" [tamanho]="15" />Desfazer</button> }
+  </div>
+}

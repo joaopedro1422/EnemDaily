@@ -1,0 +1,114 @@
+<div class="mt" role="dialog" aria-modal="true" aria-labelledby="mt-titulo">
+  <header class="mt-topo">
+    <button class="mt-voltar" type="button" (click)="voltar()" [attr.aria-label]="passo === 0 ? 'Fechar' : 'Voltar'">
+      <ed-icone [nome]="passo === 0 ? 'x' : 'chevron-right'" [tamanho]="20" [class.girar]="passo > 0" />
+    </button>
+    <div class="mt-trilha" aria-hidden="true">
+      @for (p of [0, 1, 2, 3]; track p) { <i [class.feito]="p < passo" [class.atual]="p === passo"></i> }
+    </div>
+    <span class="mt-conta">{{ passo + 1 }}/{{ totalPassos }}</span>
+  </header>
+
+  <div class="mt-corpo">
+    @switch (passo) {
+      @case (0) {
+        <section class="mt-passo" [class.tras]="direcao === 'tras'">
+          <h2 id="mt-titulo">Quanto tempo você tem para estudar?</h2>
+          <p class="mt-sub">Por dia da semana. Dá para mudar quando quiser.</p>
+
+          <div class="mt-atalhos" role="group" aria-label="Mesmo tempo nos dias úteis">
+            <span>Dias úteis</span>
+            @for (a of ATALHOS; track a) {
+              <button type="button" [class.on]="atalhoAtivo(a)" (click)="diasUteis(a)">{{ formatar(a) }}</button>
+            }
+          </div>
+
+          <ul class="mt-dias">
+            @for (d of DIAS; track d; let i = $index) {
+              <li [class.folga]="minutos[i] === 0">
+                <span class="mt-dia">{{ d }}</span>
+                <div class="mt-passador">
+                  <button type="button" (click)="mudar(i, -1)" [disabled]="minutos[i] === 0" [attr.aria-label]="'Menos tempo na ' + d"><span aria-hidden="true">−</span></button>
+                  <b aria-live="polite">{{ formatar(minutos[i]) }}</b>
+                  <button type="button" (click)="mudar(i, 1)" [disabled]="minutos[i] >= 300" [attr.aria-label]="'Mais tempo na ' + d"><span aria-hidden="true">+</span></button>
+                </div>
+              </li>
+            }
+          </ul>
+          <p class="mt-total" [class.baixo]="totalSemana < 60">
+            @if (totalSemana < 60) { Escolha pelo menos 1 hora na semana } @else { <b>{{ formatar(totalSemana) }}</b> por semana }
+          </p>
+        </section>
+      }
+
+      @case (1) {
+        <section class="mt-passo" [class.tras]="direcao === 'tras'">
+          <h2 id="mt-titulo">Alguma área precisa de mais atenção?</h2>
+          <p class="mt-sub">Ela ganha mais espaço no plano. Até duas, ou nenhuma.</p>
+          <div class="mt-areas">
+            @for (a of AREAS; track a) {
+              <button type="button" class="mt-area" [class.on]="foco.includes(a)" [style.--c]="info(a).cor" [style.--ct]="info(a).corTexto"
+                      [attr.aria-pressed]="foco.includes(a)" (click)="alternarFoco(a)">
+                <span class="mt-area-ico"><ed-icone [nome]="info(a).icone" [tamanho]="22" /></span>
+                <b>{{ info(a).curto }}</b>
+                <span class="mt-marca" aria-hidden="true"><ed-icone nome="check" [tamanho]="13" [traco]="3" /></span>
+              </button>
+            }
+          </div>
+        </section>
+      }
+
+      @case (2) {
+        <section class="mt-passo" [class.tras]="direcao === 'tras'">
+          <h2 id="mt-titulo">Qual língua estrangeira você vai fazer?</h2>
+          <p class="mt-sub">Só ela entra no seu plano.</p>
+          <div class="mt-opcoes">
+            <button type="button" class="mt-opcao" [class.on]="lingua === 'ingles'" (click)="lingua = 'ingles'" [attr.aria-pressed]="lingua === 'ingles'">
+              <span class="mt-sigla">EN</span><b>Inglês</b><span class="mt-radio" aria-hidden="true"></span>
+            </button>
+            <button type="button" class="mt-opcao" [class.on]="lingua === 'espanhol'" (click)="lingua = 'espanhol'" [attr.aria-pressed]="lingua === 'espanhol'">
+              <span class="mt-sigla">ES</span><b>Espanhol</b><span class="mt-radio" aria-hidden="true"></span>
+            </button>
+          </div>
+        </section>
+      }
+
+      @case (3) {
+        <section class="mt-passo" [class.tras]="direcao === 'tras'">
+          <h2 id="mt-titulo">Quando você quer começar?</h2>
+          <p class="mt-sub">O plano vai até a véspera do ENEM.</p>
+          <div class="mt-opcoes">
+            @if (editando) {
+              <button type="button" class="mt-opcao" [class.on]="inicio === 'manter'" (click)="inicio = 'manter'" [attr.aria-pressed]="inicio === 'manter'">
+                <ed-icone nome="history" [tamanho]="20" /><b>Manter como está</b><small>{{ dataCurta(config!.inicio) }}</small><span class="mt-radio" aria-hidden="true"></span>
+              </button>
+            }
+            <button type="button" class="mt-opcao" [class.on]="inicio === 'hoje'" (click)="inicio = 'hoje'" [attr.aria-pressed]="inicio === 'hoje'">
+              <ed-icone nome="zap" [tamanho]="20" /><b>Hoje</b><small>{{ dataCurta(hoje) }}</small><span class="mt-radio" aria-hidden="true"></span>
+            </button>
+            <button type="button" class="mt-opcao" [class.on]="inicio === 'segunda'" (click)="inicio = 'segunda'" [attr.aria-pressed]="inicio === 'segunda'">
+              <ed-icone nome="calendar" [tamanho]="20" /><b>Na segunda-feira</b><small>{{ dataCurta(proximaSegunda) }}</small><span class="mt-radio" aria-hidden="true"></span>
+            </button>
+            <button type="button" class="mt-opcao" [class.on]="inicio === 'outra'" (click)="inicio = 'outra'" [attr.aria-pressed]="inicio === 'outra'">
+              <ed-icone nome="calendar-check" [tamanho]="20" /><b>Outra data</b><span class="mt-radio" aria-hidden="true"></span>
+            </button>
+            @if (inicio === 'outra') {
+              <input class="mt-data" type="date" [min]="hoje" [max]="maxData" [value]="outraData" (input)="outraData = $any($event.target).value" aria-label="Data de início" />
+            }
+          </div>
+          @if (estudadosAntes > 0 && !editando) {
+            <p class="mt-antes"><ed-icone nome="check" [tamanho]="15" [traco]="3" />{{ estudadosAntes === 1 ? '1 assunto que você já estudou entra' : estudadosAntes + ' assuntos que você já estudou entram' }} como feito{{ estudadosAntes === 1 ? '' : 's' }}.</p>
+          }
+        </section>
+      }
+    }
+  </div>
+
+  <footer class="mt-pe">
+    <button class="mt-btn" type="button" (click)="avancar()" [disabled]="!podeAvancar">
+      @if (passo < totalPassos - 1) { Continuar<ed-icone nome="arrow-right" [tamanho]="18" /> }
+      @else if (editando) { Salvar e reorganizar }
+      @else { <ed-icone nome="sparkles" [tamanho]="18" />Montar meu cronograma }
+    </button>
+  </footer>
+</div>

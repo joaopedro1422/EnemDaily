@@ -4,6 +4,9 @@
 .ci-topo { display: grid; gap: 12px; max-width: 760px; }
 .ci-topo h1 { margin: 0; font-size: clamp(30px, 6.5vw, 44px); font-weight: 800; letter-spacing: -.035em; line-height: 1.08; text-wrap: balance; }
 .ci-topo p { margin: 0; font-family: var(--ed-fonte-leitura); font-size: 17.5px; line-height: 1.6; color: var(--ed-tinta-2); }
+.ci-cronograma { justify-self: start; display: inline-flex; align-items: center; gap: 8px; height: 42px; padding: 0 12px 0 14px; border-radius: 12px; background: var(--ed-caneta-suave); color: var(--ed-caneta-texto); font-size: 14.5px; font-weight: 800; text-decoration: none; transition: background var(--ed-t-rapido); }
+.ci-cronograma:hover { background: color-mix(in srgb, var(--ed-caneta) 18%, var(--ed-folha)); }
+.ci-cronograma ed-icone:last-child { opacity: .7; }
 .ci-busca { display: flex; align-items: center; gap: 10px; height: 52px; margin-top: 8px; padding: 0 16px; border-radius: 14px; border: 1.5px solid var(--ed-pauta-forte); background: var(--ed-folha); color: var(--ed-tinta-3); }
 .ci-busca:focus-within { border-color: var(--ed-caneta); box-shadow: 0 0 0 4px var(--ed-caneta-suave); }
 .ci-busca input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; color: var(--ed-tinta); font: 500 16px var(--ed-fonte); }

@@ -38,6 +38,8 @@ public class SecurityConfig {
                         .requestMatchers("/push/**").permitAll()
                         .requestMatchers("/admin/**").permitAll()
                         .requestMatchers("/conteudos/**").permitAll()
+                        .requestMatchers("/mentor/**").permitAll()
+                        .requestMatchers("/recursos").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

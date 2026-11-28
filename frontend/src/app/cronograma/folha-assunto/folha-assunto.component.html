@@ -1,0 +1,127 @@
+<div class="fa" [class.fechando]="fechando" role="dialog" aria-modal="true" aria-labelledby="fa-titulo">
+  <div class="fa-fundo" (click)="fechar()"></div>
+
+  <section class="fa-folha" [style.--c]="assunto ? info(assunto.area).cor : 'var(--ed-caneta)'" [style.--ct]="assunto ? info(assunto.area).corTexto : 'var(--ed-caneta-texto)'">
+    <span class="fa-alca" aria-hidden="true"></span>
+
+    <header class="fa-cab">
+      @if (redacao) {
+        <span class="fa-area"><ed-icone nome="pen-line" [tamanho]="14" />Redação</span>
+      } @else if (assunto) {
+        <span class="fa-area"><ed-icone [nome]="info(assunto.area).icone" [tamanho]="14" />{{ assunto.disciplina }}</span>
+      }
+      <div class="fa-cab-acoes">
+        @if (!redacao && contexto !== 'removido' && detalhe?.situacao !== 'estudado') {
+          <button class="fa-icone" type="button" (click)="menu = !menu" [attr.aria-expanded]="menu" aria-label="Mais opções"><ed-icone nome="ellipsis" [tamanho]="20" /></button>
+        }
+        <button class="fa-icone" type="button" (click)="fechar()" aria-label="Fechar"><ed-icone nome="x" [tamanho]="20" /></button>
+      </div>
+      @if (menu) {
+        <div class="fa-menu" role="menu">
+          <button type="button" role="menuitem" (click)="emitir('ja-domino')"><ed-icone nome="zap" [tamanho]="17" /><span><b>Já domino esse assunto</b><small>Conta como estudado e vai direto para revisão</small></span></button>
+          <button type="button" role="menuitem" (click)="emitir('remover')"><ed-icone nome="eye-off" [tamanho]="17" /><span><b>Tirar do meu plano</b><small>Dá para voltar quando quiser</small></span></button>
+        </div>
+      }
+    </header>
+
+    <h2 id="fa-titulo">{{ redacao ? 'Redação da semana' : assunto?.nome }}</h2>
+
+    <div class="fa-chips">
+      @if (rotuloTarefa) { <span class="fa-chip forte">{{ rotuloTarefa }}</span> }
+      @if (assunto && !redacao) { <span class="fa-chip">{{ pesos[assunto.peso] }}</span> }
+      @if (tarefa?.deOntem) { <span class="fa-chip suave"><ed-icone nome="history" [tamanho]="13" />De ontem</span> }
+      @if ((tarefa?.atrasoDias ?? 0) > 0) { <span class="fa-chip suave"><ed-icone nome="clock" [tamanho]="13" />Desde {{ tarefa!.atrasoDias === 1 ? 'ontem' : 'há ' + tarefa!.atrasoDias + ' dias' }}</span> }
+      @if (situacao) { <span class="fa-chip ok"><ed-icone nome="check" [tamanho]="13" [traco]="3" />{{ situacao }}</span> }
+    </div>
+
+    @if (redacao) {
+      <p class="fa-texto">Uma redação completa, no tempo da prova. Depois de corrigida, registre a nota em Redações para acompanhar cada competência.</p>
+      <a class="fa-link" routerLink="/redacoes" (click)="fechar()"><ed-icone nome="pen-line" [tamanho]="17" />Ir para Redações<ed-icone nome="chevron-right" [tamanho]="17" /></a>
+    } @else if (erro) {
+      <p class="fa-texto">Não foi possível carregar os detalhes agora.</p>
+    } @else if (!detalhe) {
+      <div class="fa-carregando"><ed-carregando [tamanho]="40" /></div>
+    } @else {
+      <section class="fa-sec">
+        <h3><ed-icone nome="target" [tamanho]="15" />Como cai no ENEM</h3>
+        <p class="fa-texto">{{ detalhe.comoCai }}</p>
+      </section>
+
+      <section class="fa-sec">
+        <h3><ed-icone nome="check" [tamanho]="15" [traco]="2.6" />O que dominar
+          @if (marcados.size) { <small>{{ marcados.size }}/{{ detalhe.dominar.length }}</small> }
+        </h3>
+        <ul class="fa-dominar">
+          @for (d of detalhe.dominar; track $index) {
+            <li><button type="button" [class.on]="marcados.has($index)" (click)="alternar($index)" [attr.aria-pressed]="marcados.has($index)">
+              <span class="fa-caixa" aria-hidden="true"><ed-icone nome="check" [tamanho]="12" [traco]="3.2" /></span>{{ d }}
+            </button></li>
+          }
+        </ul>
+      </section>
+
+      @if (detalhe.flashcards.length) {
+        <section class="fa-sec">
+          <button class="fa-sec-btn" type="button" (click)="verCards = !verCards" [attr.aria-expanded]="verCards">
+            <h3><ed-icone nome="sparkles" [tamanho]="15" />Revisão rápida <small>{{ detalhe.flashcards.length }} cards</small></h3>
+            <ed-icone nome="chevron-down" [tamanho]="18" [class.virado]="verCards" />
+          </button>
+          @if (verCards) {
+            <div class="fa-cards">
+              <button class="fa-card" type="button" [class.virado]="virado" (click)="virado = !virado" [attr.aria-label]="virado ? 'Ver pergunta' : 'Ver resposta'">
+                <span class="fa-card-face frente"><small>Pergunta</small>{{ detalhe.flashcards[card].pergunta }}<em>Toque para ver a resposta</em></span>
+                <span class="fa-card-face verso"><small>Resposta</small>{{ detalhe.flashcards[card].resposta }}</span>
+              </button>
+              <div class="fa-cards-nav">
+                <button type="button" (click)="proximoCard(-1)" aria-label="Card anterior"><ed-icone nome="chevron-right" [tamanho]="18" class="girar" /></button>
+                <span>{{ card + 1 }} de {{ detalhe.flashcards.length }}</span>
+                <button type="button" (click)="proximoCard(1)" aria-label="Próximo card"><ed-icone nome="chevron-right" [tamanho]="18" /></button>
+              </div>
+            </div>
+          }
+        </section>
+      }
+
+      @if (detalhe.prerequisitos.length) {
+        <p class="fa-pre"><ed-icone nome="history" [tamanho]="14" />Vem depois de {{ nomesPre }}</p>
+      }
+
+      @if (linkConteudo) {
+        <a class="fa-link" [routerLink]="linkConteudo" (click)="fechar()"><ed-icone nome="book-open" [tamanho]="17" />Resumo de apoio<ed-icone nome="chevron-right" [tamanho]="17" /></a>
+      }
+    }
+
+    <footer class="fa-pe">
+      @switch (contexto) {
+        @case ('hoje') {
+          @if (redacao) {
+            <button class="fa-btn" type="button" [disabled]="ocupado" (click)="emitir('redacao-feita')"><ed-icone nome="check" [tamanho]="18" [traco]="2.8" />Fiz a redação</button>
+          } @else if (revisao) {
+            <span class="fa-pergunta">Como foi a revisão?</span>
+            <div class="fa-duplo">
+              <button class="fa-btn" type="button" [disabled]="ocupado" (click)="emitir('tranquila')">Tranquila</button>
+              <button class="fa-btn sec" type="button" [disabled]="ocupado" (click)="emitir('dificil')">Com dificuldade</button>
+            </div>
+          } @else if (emPartes) {
+            <button class="fa-btn" type="button" [disabled]="ocupado" (click)="emitir('parte')"><ed-icone nome="check" [tamanho]="18" [traco]="2.8" />Fiz a parte de hoje</button>
+            <button class="fa-btn sec" type="button" [disabled]="ocupado" (click)="emitir('terminar')">Terminei o assunto todo</button>
+          } @else {
+            <button class="fa-btn" type="button" [disabled]="ocupado" (click)="emitir('concluir')"><ed-icone nome="check" [tamanho]="18" [traco]="2.8" />Concluí</button>
+          }
+          <button class="fa-texto-btn" type="button" [disabled]="ocupado" (click)="emitir('nao-consegui')">Não consegui hoje</button>
+        }
+        @case ('removido') {
+          <button class="fa-btn" type="button" [disabled]="ocupado" (click)="emitir('restaurar')"><ed-icone nome="rotate-ccw" [tamanho]="18" />Voltar ao meu plano</button>
+        }
+        @case ('feito') { }
+        @default {
+          @if (detalhe?.situacao === 'estudado') {
+            <button class="fa-texto-btn" type="button" [disabled]="ocupado" (click)="emitir('nao-estudado')">Marcar como não estudado</button>
+          } @else {
+            <button class="fa-btn" type="button" [disabled]="ocupado || !detalhe" (click)="emitir('estudei')"><ed-icone nome="check" [tamanho]="18" [traco]="2.8" />Já estudei</button>
+          }
+        }
+      }
+    </footer>
+  </section>
+</div>

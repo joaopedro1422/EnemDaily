@@ -1,0 +1,36 @@
+:host { display: grid; gap: 10px; min-width: 0; }
+.ma-rolagem { overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: thin; margin: 0 -16px; padding: 0 16px 6px; -webkit-mask-image: linear-gradient(to right, transparent 0, #000 16px, #000 calc(100% - 22px), transparent 100%); mask-image: linear-gradient(to right, transparent 0, #000 16px, #000 calc(100% - 22px), transparent 100%); }
+.ma-grade { display: grid; grid-auto-flow: column; grid-auto-columns: 15px; gap: 4px; width: max-content; padding-right: 10px; }
+.ma-coluna { display: grid; grid-template-rows: 16px 14px repeat(7, 15px); gap: 4px; position: relative; }
+.ma-rotulos { grid-auto-columns: 14px; }
+.ma-dia-rot { font-size: 9.5px; font-weight: 700; line-height: 15px; color: var(--ed-tinta-3); text-align: center; }
+.ma-mes { font-size: 10.5px; font-weight: 800; line-height: 16px; color: var(--ed-tinta-3); white-space: nowrap; text-transform: capitalize; overflow: visible; }
+
+.ma-faixa { position: relative; align-self: center; height: 5px; border-radius: 3px; margin: 0 -2px; }
+.ma-faixa.base { background: color-mix(in srgb, var(--ed-caneta) 35%, var(--ed-folha)); }
+.ma-faixa.aprofundamento { background: color-mix(in srgb, var(--ed-caneta) 70%, var(--ed-folha)); }
+.ma-faixa.reta-final { background: var(--ed-mt); }
+.ma-faixa em { position: absolute; left: 2px; bottom: 7px; font-style: normal; font-size: 10px; font-weight: 800; letter-spacing: .02em; color: var(--ed-tinta-2); white-space: nowrap; z-index: 1; }
+.ma-coluna .ma-mes:not(:empty) + .ma-faixa em { bottom: 7px; }
+
+.ma-cel, .ma-fora { display: block; width: 15px; height: 15px; border-radius: 4px; }
+.ma-fora { background: transparent; }
+.ma-cel.livre { background: var(--ed-fundo-2); }
+.ma-cel.feito { background: var(--ed-ok); }
+.ma-cel.parcial { background: color-mix(in srgb, var(--ed-ok) 45%, var(--ed-folha)); }
+.ma-cel.pendente { background: var(--ed-folha); box-shadow: inset 0 0 0 1.5px var(--ed-pauta-forte); }
+.ma-cel.previsto-1 { background: color-mix(in srgb, var(--ed-caneta) 16%, var(--ed-folha)); }
+.ma-cel.previsto-2 { background: color-mix(in srgb, var(--ed-caneta) 32%, var(--ed-folha)); }
+.ma-cel.previsto-3 { background: color-mix(in srgb, var(--ed-caneta) 52%, var(--ed-folha)); }
+.ma-cel.hoje { background: var(--ed-caneta); box-shadow: 0 0 0 2px var(--ed-folha), 0 0 0 4px var(--ed-caneta); animation: ma-pulso 1.8s ease-in-out infinite; }
+@keyframes ma-pulso { 50% { box-shadow: 0 0 0 2px var(--ed-folha), 0 0 0 6px color-mix(in srgb, var(--ed-caneta) 35%, transparent); } }
+
+.ma-final { grid-template-rows: 16px 14px 1fr; }
+.ma-final .ma-mes { color: var(--ed-mt-texto); }
+.ma-bandeira { align-self: start; width: 26px; height: 26px; margin-top: 2px; border-radius: 8px; display: grid; place-items: center; background: color-mix(in srgb, var(--ed-mt) 18%, var(--ed-folha)); color: var(--ed-mt-texto); }
+
+.ma-legenda { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12px; font-weight: 600; color: var(--ed-tinta-3); }
+.ma-legenda span { display: inline-flex; align-items: center; gap: 6px; }
+.ma-legenda .ma-cel { width: 11px; height: 11px; border-radius: 3px; }
+
+@media (prefers-reduced-motion: reduce) { .ma-cel.hoje { animation: none; } }

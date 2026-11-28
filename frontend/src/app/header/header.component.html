@@ -18,6 +18,7 @@
         <a routerLink="/Home" routerLinkActive="ativo" [routerLinkActiveOptions]="{ exact: true }">Início</a>
         <a routerLink="/homeGrupos" routerLinkActive="ativo">Grupos</a>
         <a routerLink="/amigos" routerLinkActive="ativo">Amigos@if (pendentesComunidade) { <i class="nav-bolha">{{ pendentesComunidade }}</i> }</a>
+        @if (cronograma) { <a routerLink="/cronograma" routerLinkActive="ativo">Cronograma</a> }
         <a routerLink="/simulados" routerLinkActive="ativo">Simulados</a>
         <a routerLink="/redacoes" routerLinkActive="ativo">Redações</a>
         <a routerLink="/conteudos" routerLinkActive="ativo">Conteúdos</a>
@@ -68,6 +69,7 @@
     <a routerLink="/amigos" routerLinkActive="ativo" (click)="fecharMenu()"><ed-icone nome="users" />Amigos@if (pendentesComunidade) { <i class="nav-bolha">{{ pendentesComunidade }}</i> }</a>
     <a routerLink="/estatisticas" routerLinkActive="ativo" (click)="fecharMenu()"><ed-icone nome="chart-column" />Estatísticas</a>
     <span class="gaveta-rotulo">Estudos</span>
+    @if (cronograma) { <a routerLink="/cronograma" routerLinkActive="ativo" (click)="fecharMenu()"><ed-icone nome="calendar-check" />Meu cronograma</a> }
     <a routerLink="/simulados" routerLinkActive="ativo" (click)="fecharMenu()"><ed-icone nome="clipboard-list" />Simulados</a>
     <a routerLink="/redacoes" routerLinkActive="ativo" (click)="fecharMenu()"><ed-icone nome="pen-line" />Redações</a>
     <a routerLink="/conteudos" routerLinkActive="ativo" (click)="fecharMenu()"><ed-icone nome="book-open" />Conteúdos</a>

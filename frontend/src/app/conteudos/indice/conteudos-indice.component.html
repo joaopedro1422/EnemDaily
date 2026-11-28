@@ -2,6 +2,9 @@
   <header class="ci-topo">
     <h1>Os principais assuntos do ENEM</h1>
     <p>Organizados exatamente como caem na prova</p>
+    @if (cronograma$ | async) {
+      <a class="ci-cronograma" routerLink="/cronograma"><ed-icone nome="calendar-check" [tamanho]="18" />Cronograma de estudos<ed-icone nome="chevron-right" [tamanho]="16" /></a>
+    }
     <label class="ci-busca">
       <ed-icone nome="search" [tamanho]="18" />
       <input type="search" [(ngModel)]="busca" name="busca" placeholder="Buscar assunto, por exemplo: Primeira Guerra" autocomplete="off" />

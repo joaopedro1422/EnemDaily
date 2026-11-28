@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { HomeComponentComponent } from './home-component/home-component.component';
+import { cronogramaGuard } from './cronograma/cronograma.guard';
 
 export const routes: Routes = [
   { path: '', component: HomeComponentComponent },
@@ -21,6 +22,7 @@ export const routes: Routes = [
   { path: 'configuracoes', loadComponent: () => import('./configuracoes/configuracoes.component').then(m => m.ConfiguracoesComponent) },
   { path: 'admin', loadComponent: () => import('./admin/admin.component').then(m => m.AdminComponent) },
   { path: 'admin/conteudos', loadComponent: () => import('./admin/conteudos/admin-conteudos.component').then(m => m.AdminConteudosComponent) },
+  { path: 'cronograma', canActivate: [cronogramaGuard], loadComponent: () => import('./cronograma/cronograma.component').then(m => m.CronogramaComponent) },
   { path: 'conteudos', loadComponent: () => import('./conteudos/indice/conteudos-indice.component').then(m => m.ConteudosIndiceComponent) },
   { path: 'conteudos/:area/:slug', loadComponent: () => import('./conteudos/pagina/conteudo-pagina.component').then(m => m.ConteudoPaginaComponent) }
 ];

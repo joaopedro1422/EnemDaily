@@ -1,10 +1,12 @@
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { AsyncPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { AREAS_CONTEUDO, ChaveAreaConteudo, ResumoConteudo, infoAreaConteudo } from '../../models/conteudo';
 import { ConteudoService } from '../../services/conteudo.service';
 import { AuthServiceService } from '../../services/auth-service.service';
+import { RecursosService } from '../../services/recursos.service';
 import { IconeComponent } from '../../shared/icone/icone.component';
 import { CarregandoComponent } from '../../shared/carregando/carregando.component';
 import { SeoService } from '../seo';
@@ -14,7 +16,7 @@ type Situacao = 'todos' | 'faltam' | 'estudados';
 @Component({
   selector: 'app-conteudos-indice',
   standalone: true,
-  imports: [FormsModule, RouterLink, IconeComponent, CarregandoComponent],
+  imports: [AsyncPipe, FormsModule, RouterLink, IconeComponent, CarregandoComponent],
   templateUrl: './conteudos-indice.component.html',
   styleUrl: './conteudos-indice.component.css'
 })
@@ -22,6 +24,7 @@ export class ConteudosIndiceComponent implements OnInit, OnDestroy {
   private conteudos = inject(ConteudoService);
   private seo = inject(SeoService);
   private auth = inject(AuthServiceService);
+  readonly cronograma$ = inject(RecursosService).cronograma$;
   private subs = new Subscription();
 
   readonly areas = AREAS_CONTEUDO;

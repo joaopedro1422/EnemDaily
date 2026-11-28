@@ -1,5 +1,6 @@
 import { EstadoInstalacao, PwaService } from '../services/pwa.service';
 import { ComunidadeService } from '../services/comunidade.service';
+import { RecursosService } from '../services/recursos.service';
 import { SomService } from '../shared/som/som.service';
 import { AvatarComponent } from '../shared/avatar/avatar.component';
 import { Component, HostListener, OnDestroy, OnInit, inject } from '@angular/core';
@@ -39,11 +40,15 @@ export class HeaderComponent implements OnInit, OnDestroy {
   private pwa = inject(PwaService);
   private comunidade = inject(ComunidadeService);
   private som = inject(SomService);
+  private recursos = inject(RecursosService);
+  /** "Meu cronograma" liberado para o aluno (módulo em teste). */
+  cronograma = false;
   sons = this.som.ligado;
 
   constructor(private authService: AuthServiceService, private router: Router, private rankingStore: RankingStoreServiceService) {
     this.comunidade.notificacoes$.subscribe(n => (this.pendentesComunidade = n ? n.amizades + n.duelos : 0));
     this.pwa.instalacao$.subscribe(e => (this.instalacao = e));
+    this.recursos.cronograma$.subscribe(v => (this.cronograma = v));
   }
 
   ngOnInit() {
